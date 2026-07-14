@@ -135,8 +135,6 @@ CREATE TABLE `trnProductSpecification` (
     CONSTRAINT `FK_trnProductSpecification_mstProduct_mstProductId` FOREIGN KEY (`mstProductId`) REFERENCES `mstProduct` (`mstProductId`) ON DELETE CASCADE
 ) CHARACTER SET=utf8mb4;
 
-) CHARACTER SET=utf8mb4;
-
 
 CREATE TABLE `trnProductTags` (
     `trnProductTagsId` int NOT NULL AUTO_INCREMENT,
@@ -225,6 +223,21 @@ CREATE TABLE `trnOrderItems` (
     CONSTRAINT `PK_trnOrderItems` PRIMARY KEY (`trnOrderItemsId`),
     CONSTRAINT `FK_trnOrderItems_mstProduct_mstProductId` FOREIGN KEY (`mstProductId`) REFERENCES `mstProduct` (`mstProductId`) ON DELETE CASCADE,
     CONSTRAINT `FK_trnOrderItems_trnOrder_trnOrderId` FOREIGN KEY (`trnOrderId`) REFERENCES `trnOrder` (`trnOrderId`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+
+
+CREATE TABLE `mstFAQ` (
+    `mstFAQId` int NOT NULL AUTO_INCREMENT,
+    `question` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `answer` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `isActive` tinyint(1) NOT NULL,
+    `createdBy` int NOT NULL,
+    `createdDate` datetime(6) NOT NULL,
+    `updatedBy` int NULL,
+    `updatedDate` datetime(6) NULL,
+    `deletedBy` int NULL,
+    `deletedDate` datetime(6) NULL,
+    CONSTRAINT `PK_mstFAQ` PRIMARY KEY (`mstFAQId`)
 ) CHARACTER SET=utf8mb4;
 
 

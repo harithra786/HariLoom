@@ -30,24 +30,22 @@
         }
 
         /* BACKGROUND */
-      
         body {
             height: 100vh;
-            background-color: #F7F4ED;
+            background-image: url('@Url.Content("~/images/Login.png")');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
         }
-        /* OVERLAY */
+        /* OVERLAY - GLASS FROSTED EFFECT */
         .overlay {
-           @* position: fixed;
+            position: fixed;
             inset: 0;
-<<<<<<< HEAD
-            /* keep a slight dark overlay for contrast but do not blur the background image */
-            background: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.36));
-            z-index: 1;*@
-            display:none;
-=======
-            background: transparent;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             z-index: 1;
->>>>>>> 6fda05b1dc9f98deb52b523fe753b21980965c89
         }
 
         /* POSITION LEFT */
@@ -244,7 +242,7 @@
         <div class="login-card">
             <!-- Logo -->
             <div class="logo">
-                <img src="~/img/avatars/hariloom_logo_blue.png" alt="Hariloom Logo" />
+                <img src="~/images/Logo.jpeg" alt="Hariloom Logo" />
             </div>
 
             <!-- Views Container -->
