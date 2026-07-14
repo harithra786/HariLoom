@@ -1,0 +1,1107 @@
+@{
+    ViewData["Title"] = "Product Details";
+}
+@section Styles {
+    <style>
+        /* Multi-select styling for available sizes */
+        .available-sizes-select {
+            min-height: 140px;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            font-size: 14px;
+            background-color: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+            .available-sizes-select option {
+                padding: 8px 12px;
+                margin: 4px 0;
+                background-color: #fff;
+                color: #333;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                cursor: pointer;
+                line-height: 1.5;
+            }
+
+                .available-sizes-select option:checked {
+                    background: linear-gradient(#0d47a1, #0d47a1) !important;
+                    background-color: #0d47a1 !important;
+                    color: #fff !important;
+                    font-weight: 600;
+                }
+
+                .available-sizes-select option:hover {
+                    background-color: #f8f9fa;
+                }
+
+        /* Make multi-select more visually appealing */
+        .form-select[multiple] {
+            background-image: none;
+            background-position: unset;
+            padding-right: 0.75rem;
+        }
+
+        /* Grouping dropdown styling */
+        #prodGrouping {
+            appearance: auto;
+        }
+
+            #prodGrouping option {
+                padding: 8px 12px;
+            }
+
+                #prodGrouping option:checked {
+                    background: linear-gradient(#1e4d8b, #1e4d8b);
+                    background-color: #1e4d8b !important;
+                }
+
+        /* Image preview remove button */
+        .img-preview-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .img-preview-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .img-preview-remove {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: #fff;
+            border: 2px solid #fff;
+            font-size: 12px;
+            line-height: 14px;
+            text-align: center;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .img-preview-remove:hover {
+            background: #a71d2a;
+            transform: scale(1.15);
+        }
+        .img-preview-index {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: #333;
+            color: #fff;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 10px;
+        }
+    </style>
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products Management /</span> Product Details</h4>
+    </div>
+    <div class="d-flex align-content-center flex-wrap">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productAddModal"> Add </button>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="productAddModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <form class="modal-content" id="productForm" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="fnClrModal()"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="row">
+                    <!-- First column-->
+                    <div class="col-12 col-lg-8">
+                        <!-- Product Information -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Product information</h5>
+                                <input type="text" class="form-control d-none" id="productTableId" placeholder="Product Table ID" name="productTableId" />
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-md-6 mb-6">
+                                        <label class="form-label" for="productName">Name</label>
+                                        <input type="text" class="form-control only-letters-spaces" id="productName" placeholder="Product title" name="productName" required />
+                                    </div>
+                                    <div class="col-md-6 mb-6">
+                                        <label class="form-label" for="productDisplayId">Product ID</label>
+                                        <input type="text" class="form-control letters-numbers" id="productDisplayId" placeholder="Product ID" name="productDisplayId" required />
+                                    </div>
+                                </div>
+                                <div class="row sizeVariants">
+                                    <div class="col-md-6 mb-6">
+                                        <label class="form-label">Available Sizes</label>
+                                        <div id="productAvailableSizes" class="d-flex flex-wrap gap-2">
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeXS" value="XS">
+                                                <label class="form-check-label" for="sizeXS">XS</label>
+                                            </div>
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeS" value="S">
+                                                <label class="form-check-label" for="sizeS">S</label>
+                                            </div>
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeM" value="M">
+                                                <label class="form-check-label" for="sizeM">M</label>
+                                            </div>
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeL" value="L">
+                                                <label class="form-check-label" for="sizeL">L</label>
+                                            </div>
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeXL" value="XL">
+                                                <label class="form-check-label" for="sizeXL">XL</label>
+                                            </div>
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" name="productAvailableSizes" id="sizeXXL" value="XXL">
+                                                <label class="form-check-label" for="sizeXXL">XXL</label>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">Select one or more sizes.</small>
+                                    </div>
+                                </div>
+                                <!-- Description -->
+                                <div class="row mb-2">
+                                    <div class="col-md-12 mb-6">
+                                        <label class="mb-1">Description</label>
+                                        <textarea id="productDescriptionEditor"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Specifications Input -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Product Specifications</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="specificationContainer">
+                                    <!-- First row (non-removable) -->
+                                    <div class="row mb-3 spec-row">
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control only-letters-spaces spec-title text-dark" placeholder="Title (e.g., Fabric)" name="specTitle" required />
+                                        </div>
+                                        <div class="col-md-5">
+                                            <textarea class="form-control spec-value text-dark"
+                                                      placeholder="Enter one bullet per line"
+                                                      name="specValue"
+                                                      rows="4"
+                                                      required>
+</textarea>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-center">
+                                            <!-- No remove button here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="addSpecRow()">Add Specification</button>
+                            </div>
+                        </div>
+                        <!-- Wash Care Input -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Wash Care Instructions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="washCareContainer">
+                                    <div class="row mb-3 washcare-row">
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control washcare-instruction text-dark" placeholder="Wash Care Instruction" name="washCareInstruction" required />
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-center">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="addWashCareRow()">Add Wash Care</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second column -->
+                    <div class="col-12 col-lg-4">
+                        <!-- Cover Image Upload -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Cover Image</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="coverImage" name="coverImage" accept=".webp, image/webp" required />
+                                    <small class="text-muted">Upload a single cover image for the product.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product Images Upload -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Product Images</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="productImages" name="productImages" accept=".webp, image/webp" multiple required />
+                                    <small class="text-muted d-block mt-2">Upload up to 6 images for the product. Hold Ctrl (Cmd on Mac) to select multiple images.</small>
+                                    <small class="text-muted d-block" id="imageCountInfo"></small>
+                                </div>
+                                <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
+                            </div>
+                        </div>
+                        <!-- Pricing Card -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Pricing</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-6">
+                                    <label class="form-label" for="productPrice">Base Price</label>
+                                    <input type="text" class="form-control only-decimal" id="productPrice" placeholder="Price" name="productPrice" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fnClrModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Product Details</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Available</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var isSaving = false;
+        var lastSaveStart = 0; // timestamp (ms) when last save started
+        var selectedProductImages = []; // managed array of Files for product images
+        $(function () {
+            loadProducts();
+
+            // Load categories when modal is opened to ensure selects are populated
+            $('#productAddModal').on('show.bs.modal', async function (event) {
+                try {
+                    // If modal is opening for Add (modal title is 'Add Product'), clear fields before load
+                    const modalTitle = $('#productAddModal').find('.modal-title');
+                    if (modalTitle.text().trim() === 'Add Product') {
+                        // Reset visible fields but keep modal open
+                        $('#productForm')[0].reset();
+                        //tags.clear();
+                        //$('#tagContainer').empty();
+                        $('#specificationContainer').empty();
+                        $('#washCareContainer').empty();
+                        $('#colorVariantContainer').empty();
+                        $('#imagePreviewContainer').empty();
+                        $('#imageCountInfo').empty();
+                        selectedProductImages = [];
+                        if ($('#productDescriptionEditor').length) $('#productDescriptionEditor').summernote('code', '');
+                        $('#coverImage').siblings('div:has(img)').remove();
+                        // ensure productTableId is cleared so Save creates new record
+                        $('#productTableId').val(0);
+                    }
+
+                    // await loadMainCategory();
+
+                    // // If there is a selected main category (from session), load subcategories
+                    // const mainVal = $('#mainCategory').val();
+                    // if (mainVal) {
+                    //     await loadSubCategory($('#mainCategory'));
+                    // }
+                } catch (err) {
+                    console.error('Error loading categories on modal show', err);
+                }
+            });
+
+            // Ensure isSaving resets when modal is hidden to avoid stuck state if AJAX never completes
+            $('#productAddModal').on('hidden.bs.modal', function () {
+                console.log('productAddModal hidden -> resetting save state');
+                isSaving = false;
+                $('#saveBtn').prop('disabled', false);
+            });
+
+            $('#productDescriptionEditor').summernote({
+                placeholder: 'Write product description here...',
+                tabsize: 2,
+                height: 200,
+                toolbar: [
+                    ['style', ['bold', 'underline', 'clear']],
+                    ['color', ['backcolor']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']]
+                ]
+            });
+
+            // Handle cover image selection with preview
+            $('#coverImage').on('change', function () {
+                // Remove any existing preview
+                $(this).siblings('div:has(img)').remove();
+                
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const coverPreviewHtml = `
+                            <div style="margin-bottom: 10px; margin-top: 10px;">
+                                <img src="${e.target.result}" alt="Cover Image Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6;">
+                                <small class="d-block text-success mt-2">✓ Cover image selected</small>
+                            </div>
+                        `;
+                        $('#coverImage').after(coverPreviewHtml);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle product images file selection with validation and preview
+            $('#productImages').on('change', function () {
+                const files = Array.from(this.files);
+
+                // Add new files to the managed array (up to 6 total)
+                const remaining = 6 - selectedProductImages.length;
+                if (remaining <= 0) {
+                    $('#imageCountInfo').text('⚠ Maximum 6 images already added.').css('color', '#ff6b6b');
+                    return;
+                }
+                const toAdd = files.slice(0, remaining);
+                selectedProductImages = selectedProductImages.concat(toAdd);
+
+                if (files.length > remaining) {
+                    $('#imageCountInfo').text(`⚠ Only ${remaining} more image(s) could be added (max 6). ${selectedProductImages.length} image(s) total.`).css('color', '#ff6b6b');
+                } else {
+                    $('#imageCountInfo').text(`${selectedProductImages.length} image(s) selected`).css('color', '#6c757d');
+                }
+
+                renderImagePreviews();
+            });
+            // Save button click handler - ensure only one handler is attached
+            $('#saveBtn').off('click').on('click', function (e) {
+                e.preventDefault();
+                // let the fn handle isSaving state and button disabling
+                fnSaveOrUpdateProductDetails();
+            });
+        });
+
+        function loadProducts() {
+            $.ajax({
+                url: '@Url.Action("GetAllProductDetails", "ProductsManagement")',
+                type: 'GET',
+                cache: false,
+                success: function (response) {
+                    console.log('loadProducts response:', response);
+                    var products = [];
+                    if (response) {
+                        // Support both ApiResponseDTO and raw array
+                        if (response.success && Array.isArray(response.data)) products = response.data;
+                        else if (Array.isArray(response)) products = response;
+                        else if (response.data && Array.isArray(response.data)) products = response.data;
+                    }
+
+                    let tbody = '';
+                    products.forEach((p, idx) => {
+
+                        tbody += `<tr>
+                            <td>${idx + 1}</td>
+                            <td>${p.productDisplayId || ''}</td>
+                            <td>${p.coverImagePath
+                                ? `<img src="/${p.coverImagePath}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />`
+                                : `<div style="width:60px;height:60px;background:#e9ecef;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#adb5bd;font-size:20px;">📷</div>`
+                            }</td>
+                            <td>${p.productName || ''}</td>
+                            <td>₹${p.basePrice || 0}</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" ${p.isAvailable ? 'checked' : ''}  onchange="toggleAvailable(${p.productId}, this.checked)">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" ${p.isActive ? 'checked' : ''}  onchange="toggleActive(${p.productId}, this.checked)">
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="fnGoToProductDetails(${p.productId})">View</button>
+                                <button class="btn btn-sm btn-warning" onclick="fnEditProduct(${p.productId})">Edit</button>
+                            </td>
+                        </tr>`;
+                    });
+                    $('#productTableBody').html(tbody);
+                },
+                error: function (xhr) { console.error('Failed to load products', xhr); }
+            });
+        }
+
+        function toggleActive(id, isActive) {
+            $.post('@Url.Action("DeactivateProduct", "ProductsManagement")', { id, isActive, updatedBy: 1 }, function (response) {
+                if (response && response.success) {
+                    toastr.success(response.message || 'Status updated successfully');
+                } else {
+                    toastr.error(response ? response.message : 'Error updating status');
+                }
+                loadProducts();
+            }).fail(function () {
+                toastr.error('Error updating status');
+                loadProducts();
+            });
+        }
+
+        function toggleAvailable(id, isAvailable) {
+            $.post('@Url.Action("SetProductAvailability", "ProductsManagement")', { id, isAvailable, updatedBy: 1 }, function (response) {
+                if (response && response.success) {
+                    toastr.success(response.message || 'Availability updated successfully');
+                } else {
+                    toastr.error(response ? response.message : 'Error updating availability');
+                }
+                loadProducts();
+            }).fail(function () {
+                toastr.error('Error updating availability');
+                loadProducts();
+            });
+        }
+
+        function addSpecRow() {
+            const container = document.getElementById("specificationContainer");
+
+            const row = document.createElement("div");
+            row.className = "row mb-3 spec-row";
+            row.innerHTML = `<div class="col-md-5">
+                    <input type="text" class="form-control only-letters-spaces spec-title text-dark" placeholder="Title (e.g., Fit)" name="specTitle" required/>
+                </div>
+                        <div class="col-md-5">
+            <textarea
+                class="form-control spec-value text-dark"
+                placeholder="Enter one bullet per line"
+                name="specValue"
+                rows="4"
+                required></textarea>
+        </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSpecRow(this)">Remove</button>
+            </div>`;
+            container.appendChild(row);
+        }
+
+        function removeSpecRow(button) {
+            const allRows = document.querySelectorAll("#specificationContainer .spec-row");
+            if (allRows.length <= 1) {
+                alert("At least one specification is required.");
+                return;
+            }
+            const row = button.closest(".spec-row");
+            row.remove();
+        }
+
+        function addWashCareRow() {
+            const container = document.getElementById("washCareContainer");
+
+            const row = document.createElement("div");
+            row.className = "row mb-3 washcare-row";
+            row.innerHTML = `<div class="col-md-10">
+                    <input type="text" class="form-control washcare-instruction text-dark" placeholder="Wash Care Instruction" name="washCareInstruction" required/>
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeWashCareRow(this)">Remove</button>
+            </div>`;
+            container.appendChild(row);
+        }
+
+        function removeWashCareRow(button) {
+            const allRows = document.querySelectorAll("#washCareContainer .washcare-row");
+            if (allRows.length <= 1) {
+                alert("At least one wash care instruction is required.");
+                return;
+            }
+            const row = button.closest(".washcare-row");
+            row.remove();
+        }
+
+        // const tags = new Set();
+
+        // function handleTagInput(e) {
+        //     if (e.key === "Enter") {
+        //         e.preventDefault();
+        //         addTag();
+        //     }
+        // }
+
+        // function addTag() {
+        //     const input = document.getElementById('tagInput');
+        //     const tagText = input.value.trim();
+
+        //     if (tagText === '' || tags.has(tagText.toLowerCase())) {
+        //         input.value = '';
+        //         return;
+        //     }
+
+        //     tags.add(tagText.toLowerCase());
+
+        //     const tagContainer = document.getElementById('tagContainer');
+        //     const tagEl = document.createElement('span');
+        //     tagEl.className = 'badge bg-secondary d-flex align-items-center gap-1 p-2';
+        //     tagEl.innerHTML = `${tagText}<button type="button" class="btn-close btn-close-white btn-sm" aria-label="Remove" onclick="removeTag(this, '${tagText.toLowerCase()}')"></button>`;
+
+        //     tagContainer.appendChild(tagEl);
+        //     input.value = '';
+        // }
+
+        // function removeTag(btn, value) {
+        //     tags.delete(value);
+        //     btn.parentElement.remove();
+        // }
+
+        // function prodGrouping() {
+        //     return new Promise(function (resolve, reject) {
+        //         $.get('@Url.Action("GetAllActiveProductGrouping", "ProductsManagement")')
+        //             .done(function (response) {
+        //                 $('#prodGrouping').html("");
+
+        //                 let options = `<option value="" selected disabled>Select grouping</option>`;
+        //                 response.data.forEach((cat, idx) => {
+        //                     options += `<option value="${cat.mstProductGroupingId}">${cat.groupingName}</option>`;
+        //                 });
+        //                 $('#prodGrouping').html(options);
+
+        //                 const $grouping = $('#prodGrouping');
+        //                 const selectedGroupingId = sessionStorage.getItem('selectedGroupingId');
+        //                 if (selectedGroupingId) {
+        //                     $grouping.val(selectedGroupingId).trigger('change');
+        //                 } else {
+        //                     $grouping.prop("selectedIndex", 0); // select default
+        //                 }
+
+        //                 resolve();
+        //             })
+        //             .fail(function (err) { console.error('Failed to load grouping', err); reject(err); });
+        //     });
+        // }
+
+        // function loadMainCategory() {
+        //     return new Promise(function (resolve, reject) {
+        //         $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")')
+        //             .done(function (response) {
+        //                 $('#mainCategory').html("");
+
+        //                 let options = `<option value="" selected disabled>Select main category</option>`;
+        //                 response.data.forEach((cat, idx) => {
+        //                     options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
+        //                 });
+        //                 $('#mainCategory').html(options);
+
+        //                 // Session value selection
+        //                 const $mainCategory = $('#mainCategory');
+        //                 const selectedCategoryId = sessionStorage.getItem('selectedCategoryId');
+        //                 if (selectedCategoryId) {
+        //                     $mainCategory.val(selectedCategoryId).trigger('change');
+        //                 } else {
+        //                     $mainCategory.prop("selectedIndex", 0); // select default
+        //                 }
+        //                 resolve();
+        //             })
+        //             .fail(function (err) { console.error('Failed to load main categories', err); reject(err); });
+        //     });
+        // }
+
+        // function loadSubCategory(ele) {
+        //     return new Promise(function (resolve, reject) {
+        //         var id = $(ele).val();
+        //         $.get('@Url.Action("GetAllActiveProductSubCategoriesByMainCategoryId", "ProductsManagement")', { id: id })
+        //             .done(function (response) {
+        //                 $('#subCategory').html("");
+
+        //                 let options = `<option value="" selected disabled>Select sub category</option>`;
+        //                 response.data.forEach((cat) => {
+        //                     options += `<option value="${cat.mstProductSubCategoryId}">${cat.subCategoryName}</option>`;
+        //                 });
+        //                 $('#subCategory').html(options);
+
+        //                 const $subCategory = $('#subCategory');
+        //                 const selectedSubCategoryId = sessionStorage.getItem('selectedSubCategoryId');
+        //                 if (selectedSubCategoryId) {
+        //                     $subCategory.val(selectedSubCategoryId);
+        //                 } else {
+        //                     $subCategory.prop("selectedIndex", 0);
+        //                 }
+        //                 resolve();
+        //             })
+        //             .fail(function (err) { console.error('Failed to load sub categories', err); reject(err); });
+        //     });
+        // }
+
+
+        function fnSaveOrUpdateProductDetails() {
+            console.log('fnSaveOrUpdateProductDetails called');
+            var now = Date.now();
+            if (isSaving) {
+                var elapsed = now - lastSaveStart;
+                console.log('Save already in progress, elapsed(ms):', elapsed);
+                // if previous save started long ago (>15s), consider it stale and allow a retry
+                if (elapsed < 15000) {
+                    console.log('Aborting new save because previous is recent.');
+                    return;
+                }
+                console.log('Previous save appears stale, resetting state and continuing.');
+                isSaving = false;
+                $('#saveBtn').prop('disabled', false);
+            }
+
+            var ajaxStarted = false;
+            isSaving = true;
+            lastSaveStart = Date.now();
+            $('#saveBtn').prop('disabled', true);
+
+            const isEditMode = $('#productTableId').val() && $('#productTableId').val() > 0;
+
+            // For edit mode: make file inputs not required
+            if (isEditMode) {
+                $('#coverImage').prop('required', false);
+                $('#productImages').prop('required', false);
+            } else {
+                // For add mode: keep them required
+                $('#coverImage').prop('required', true);
+                $('#productImages').prop('required', true);
+            }
+
+            // Grouping is optional/removed; do not require it here.
+            // if ($('#mainCategory').length) {
+            //     if ($('#mainCategory option').length <= 1) {
+            //         loadMainCategory();
+            //         alert('Loading main categories. Please wait a moment and try Save again.');
+            //         return;
+            //     }
+            // }
+
+            // // If subcategory options are not yet loaded, try to load based on current mainCategory
+            // if ($('#subCategory').length) {
+            //     if ($('#subCategory option').length <= 1) {
+            //         var mainVal = $('#mainCategory').val();
+            //         if (mainVal) {
+            //             loadSubCategory($('#mainCategory'));
+            //             alert('Loading sub categories for the selected main category. Please wait and try Save again.');
+            //             return;
+            //         }
+            //     }
+            // }
+
+            // Minimal client-side validation (avoid Parsley binding issues)
+            // var requiredFields = [
+            //     { selector: '#productName', name: 'Product Name' },
+            //     { selector: '#productDisplayId', name: 'Product ID' },
+            //     { selector: '#productSimplePrice', name: 'Price' }
+            // ];
+
+            // // Only require main/sub category if those elements actually exist on the page and are visible
+            // if ($('#mainCategory').length && $('#mainCategory').is(':visible')) requiredFields.push({ selector: '#mainCategory', name: 'Main Category' });
+            // if ($('#subCategory').length && $('#subCategory').is(':visible')) requiredFields.push({ selector: '#subCategory', name: 'Sub Category' });
+
+            // for (var rf of requiredFields) {
+            //     var $el = $(rf.selector);
+            //     if ($el.length && $el.is(':visible') && (!$el.val() || $el.val().toString().trim() === '' || $el.val() === '0')) {
+            //         alert('Please enter/select: ' + rf.name);
+            //         $el.focus();
+            //         return;
+            //     }
+            // }
+
+            // try {
+            //     console.log('Building FormData');
+            // } catch (e) {
+            //     console.error('Error before building FormData', e);
+            // }
+
+            // Validate product images (max 6)
+            if (selectedProductImages.length > 6) {
+                alert("Maximum 6 images are allowed. Please remove some images.");
+                isSaving = false;
+                $('#saveBtn').prop('disabled', false);
+                return false;
+            }
+
+            const formData = new FormData();
+            formData.append("productId", $('#productTableId').val() || 0);
+            formData.append("productName", $('#productName').val());
+            formData.append("productDisplayId", $('#productDisplayId').val());
+            formData.append('sizeVariants', $('input[name="productAvailableSizes"]:checked').map(function(){ return this.value; }).get().join(',') || '');
+            formData.append("productDescription", $('#productDescriptionEditor').summernote('code'));
+            formData.append("basePrice", parseInt($('#productPrice').val()) || 0);
+            formData.append("createdBy", sessionStorage.getItem('userId') || 1);
+
+            // Only append cover image if a new one is selected
+            const coverImage = $('#coverImage')[0].files[0];
+            if (coverImage) {
+                formData.append("coverImage", coverImage);
+            }
+
+            // Append product images from managed array
+            for (let j = 0; j < selectedProductImages.length; j++) {
+                formData.append('productImages', selectedProductImages[j]);
+            }
+
+            $('.spec-row').each(function (i) {
+                const title = $(this).find('.spec-title').val() || $(this).find('input[name="specTitle"]').val();
+                const value = $(this).find('.spec-value').val() || $(this).find('input[name="specValue"]').val();
+
+                if (title && value) {
+                    formData.append(`specifications[${i}].title`, title);
+                    formData.append(`specifications[${i}].value`, value);
+                }
+            });
+
+            $('.washcare-row').each(function (i) {
+                const instruction = $(this).find('.washcare-instruction').val() || $(this).find('input[name="washCareInstruction"]').val();
+
+                if (instruction) {
+                    formData.append(`washCares[${i}].instruction`, instruction);
+                }
+            });
+
+            // Debug: log FormData keys (files not fully serializable)
+            try {
+                for (var pair of formData.entries()) {
+                    console.log('FormData entry:', pair[0], pair[1]);
+                }
+            } catch (e) { console.log('Could not enumerate FormData entries', e); }
+
+            // Submit the form
+            $.ajax({
+                url: '@Url.Action("SaveOrUpdateProduct", "ProductsManagement")',
+                type: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log('SaveOrUpdateProduct response:', res);
+                    if (res && res.success) {
+                        alert(res.message || "Product saved successfully!");
+                        fnClrModal();
+                        // ensure the list refreshes after a short delay to account for any DB latency
+                        setTimeout(loadProducts, 300);
+                    } else {
+                        alert(res && res.message ? res.message : "Error on Product Save!");
+                    }
+                    // reset saving state and re-enable button
+                    isSaving = false;
+                    $('#saveBtn').prop('disabled', false);
+                },
+                error: function (xhr) {
+                    console.error('SaveOrUpdateProduct error', xhr);
+                    var msg = 'Error on Product Save!';
+                    try {
+                        var json = xhr && xhr.responseJSON ? xhr.responseJSON : JSON.parse(xhr.responseText || '{}');
+                        if (json && json.message) msg = json.message;
+                    } catch (e) { }
+                    alert(msg);
+                    isSaving = false;
+                    $('#saveBtn').prop('disabled', false);
+                }
+            });
+        }
+
+        function fnEditProduct(id) {
+            $.ajax({
+                url: '@Url.Action("GetProductById", "ProductsManagement")',
+                type: 'GET',
+                data: { id: id },
+                dataType: "json",
+                success: function (res) {
+                    if (res.success) {
+                        const data = res.data;
+                        $('#productTableId').val(data.productId);
+                        $('#productName').val(data.productName);
+                        $('#productDisplayId').val(data.productDisplayId);
+                        $('#productDescriptionEditor').summernote('code', data.productDescription || '');
+                        $('#productPrice').val(data.basePrice);
+                        $('#discountPrice').val(data.discountedPrice);
+                        
+                        // For single grouping selection
+                        // const groupingId = data.mstProductGroupingIds ? data.mstProductGroupingIds.split(',')[0] : '';
+                        // $('#prodGrouping').val(groupingId).trigger('change');
+                        // $('#mainCategory').val(data.mstProductMainCategoryId).trigger('change');
+
+                        // Tags
+                        // tags.clear(); // assuming `tags` is a global Set
+                        // $('#tagContainer').html('');
+                        // if (Array.isArray(data.tags)) {
+                        //     data.tags.forEach(tag => {
+                        //         $('#tagInput').val(tag);
+                        //         addTag();
+                        //     });
+                        // }
+
+                        // Specifications
+                        $('#specificationContainer').html('');
+                        if (Array.isArray(data.specifications)) {
+                            data.specifications.forEach((spec, index) => {
+                                const row = document.createElement("div");
+                                row.className = "row mb-3 spec-row";
+                                row.innerHTML = `
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control only-letters-spaces spec-title text-dark" value="${spec.title}" placeholder="Title (e.g., Fit)" name="specTitle" required />
+                                    </div>
+                                            <div class="col-md-5">
+            <textarea
+                class="form-control spec-value text-dark"
+                placeholder="Enter one bullet per line"
+                name="specValue"
+                rows="4"
+                required>${spec.value}</textarea>
+        </div>
+                                    <div class="col-md-2 d-flex align-items-center">
+                                        ${index !== 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeSpecRow(this)">Remove</button>` : ''}
+                                    </div>`;
+                                $('#specificationContainer').append(row);
+                            });
+                        }
+
+                        // Wash Cares
+                        $('#washCareContainer').html('');
+                        if (Array.isArray(data.washCares)) {
+                            data.washCares.forEach((wc, index) => {
+                                const row = document.createElement("div");
+                                row.className = "row mb-3 washcare-row";
+                                row.innerHTML = `
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control washcare-instruction text-dark" value="${wc.instruction}" placeholder="Wash Care Instruction" name="washCareInstruction" required />
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-center">
+                                        ${index !== 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeWashCareRow(this)">Remove</button>` : ''}
+                                    </div>`;
+                                $('#washCareContainer').append(row);
+                            });
+                        }
+
+                        // Product Images - Load existing images into managed array with remove buttons
+                        selectedProductImages = [];
+                        $('#imagePreviewContainer').html('');
+
+                        if (Array.isArray(data.productImages) && data.productImages.length > 0) {
+                            $('#imageCountInfo').text(`${data.productImages.length} image(s) currently uploaded`).css('color', '#6c757d');
+                            data.productImages.forEach((imagePath, idx) => {
+                                fetch('/' + imagePath)
+                                    .then(res => res.blob())
+                                    .then(blob => {
+                                        const file = new File([blob], `existing_image_${idx + 1}.jpg`, { type: blob.type || 'image/jpeg' });
+                                        selectedProductImages.push(file);
+                                        renderImagePreviews();
+                                    })
+                                    .catch(err => console.error('Failed to load image', err));
+                            });
+                        } else {
+                            $('#imageCountInfo').text('').css('color', '#6c757d');
+                        }
+
+                        // Populate main Available Sizes field from color variants
+                        let allSizes = [];
+                        data.sizes.forEach(sizeObj => {
+                            if (!allSizes.includes(sizeObj.size)) {
+                                allSizes.push(sizeObj.size);
+                            }
+                        });
+
+                        // if (Array.isArray(data.colorVariants) && data.colorVariants.length > 0) {
+                        //     data.colorVariants.forEach(variant => {
+                        //         if (variant.availableSizes) {
+                        //             if (typeof variant.availableSizes === 'string') {
+                        //                 variant.availableSizes.split(',').forEach(size => {
+                        //                     const trimmedSize = size.trim();
+                        //                     if (!allSizes.includes(trimmedSize)) {
+                        //                         allSizes.push(trimmedSize);
+                        //                     }
+                        //                 });
+                        //             } else if (Array.isArray(variant.availableSizes)) {
+                        //                 variant.availableSizes.forEach(size => {
+                        //                     if (!allSizes.includes(size)) {
+                        //                         allSizes.push(size);
+                        //                     }
+                        //                 });
+                        //             }
+                        //         }
+                        //     });
+                        // }
+
+                        // Set selected sizes in the main Available Sizes field
+                        if (allSizes.length > 0) {
+                            document.querySelectorAll('input[name="productAvailableSizes"]').forEach(cb => {
+                                cb.checked = allSizes.includes(cb.value);
+                            });
+                        }
+
+
+                        // Display existing cover image
+                        if (data.coverImagePath) {
+                            const coverPreviewHtml = `
+                                <div style="margin-bottom: 10px;">
+                                    <img src="/${data.coverImagePath}" alt="Cover Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6;">
+                                    <small class="d-block text-success mt-2">✓ Existing cover image</small>
+                                </div>
+                            `;
+                            $('#coverImage').after(coverPreviewHtml);
+                        }
+
+                        // Color Variants
+                        // $('#colorVariantContainer').html('');
+                        // colorVariantIndex = 0;
+                        // if (Array.isArray(data.colorVariants)) {
+                        //     data.colorVariants.forEach(variant => {
+                        //         const index = colorVariantIndex++;
+
+                        //         // Parse available sizes - handle both string and array formats
+                        //         let selectedSizes = [];
+                        //         if (variant.availableSizes) {
+                        //             if (typeof variant.availableSizes === 'string') {
+                        //                 selectedSizes = variant.availableSizes.split(',').map(s => s.trim());
+                        //             } else if (Array.isArray(variant.availableSizes)) {
+                        //                 selectedSizes = variant.availableSizes;
+                        //             }
+                        //         }
+
+                        //         const html = `<div class="color-variant-block border rounded p-3 mb-4 position-relative" data-index="${index}">
+                        //             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" onclick="$(this).closest('.color-variant-block').remove()" aria-label="Close"></button>
+                        //             <div class="row mb-3">
+                        //                 <div class="col-md-4">
+                        //                     <label class="form-label">Pick Color</label>
+                        //                     <input type="color" name="colorVariants[${index}].hex" class="form-control form-control-color" value="${variant.colorCode || '#000000'}" required/>
+                        //                 </div>
+                        //                 <div class="col-md-8">
+                        //                     <label class="form-label">Color Name</label>
+                        //                     <input type="text" name="colorVariants[${index}].name" class="form-control only-letters-spaces" value="${variant.colorName || ''}" required/>
+                        //                 </div>
+                        //             </div>
+                        //             <div class="mb-3">
+                        //                 <label class="form-label">Upload Images</label>
+                        //                 <input type="file" name="colorVariants[${index}].images" class="form-control" multiple accept=".webp, image/webp" />
+                        //                 <small class="text-muted">You can select multiple images for this color. Leave empty to keep existing images.</small>
+                        //                 ${variant.colorImageBase64 && variant.colorImageBase64.length > 0 ? `<div class="mt-2"><small class="text-success">✓ Existing image available</small></div>` : ''}
+                        //             </div>
+                        //             <div class="mb-2">
+                        //                 <label class="form-label">Available Sizes</label>
+                        //                 <select name="colorVariants[${index}].sizes" class="form-select available-sizes-select" multiple required>
+                        //                     ${["XS", "S", "M", "L", "XL", "XXL"].map(size => `<option value="${size}" ${selectedSizes.includes(size) ? 'selected' : ''}>${size}</option>`).join('')}
+                        //                 </select>
+                        //                 <small class="text-muted d-block mt-2">Hold Ctrl (or Cmd on Mac) to select multiple sizes.</small>
+                        //             </div>
+                        //         </div>`;
+                        //         $('#colorVariantContainer').append(html);
+                        //     });
+                        // }
+
+                        // Update modal title to indicate editing
+                        const modalTitle = $('#productAddModal').find('.modal-title');
+                        modalTitle.text('Edit Product');
+
+                        setTimeout(() => {
+                            $('#productAddModal').modal('show');
+                        }, 500);
+
+                    } else {
+                        //$('#errorMsg').text(res.message || "Error occurred").show();
+                    }
+                },
+                error: function (xhr) {
+                    //const errMsg = xhr.responseJSON?.message || "Something went wrong!";
+                    //$('#errorMsg').text(errMsg).show();
+                }
+            });
+        }
+
+        function fnClrModal(){
+            $('#productForm')[0].reset();
+            $('#productForm').parsley().reset();
+            $('#productAddModal').modal('hide');
+            //tags.clear();
+            //$('#tagContainer').empty();
+            $('.clrTxtValues').val("");
+            $('#specificationContainer').empty();
+            $('#washCareContainer').empty();
+            $('#colorVariantContainer').empty();
+            $('#imagePreviewContainer').empty();
+            $('#imageCountInfo').empty();
+            selectedProductImages = [];
+            $('#productDescriptionEditor').summernote('code', '');
+            // Remove cover image preview if exists
+            $('#coverImage').siblings('div:has(img)').remove();
+            // Reset modal title and file input requirements
+            const modalTitle = $('#productAddModal').find('.modal-title');
+            modalTitle.text('Add Product');
+            $('#coverImage').prop('required', true);
+            $('#productImages').prop('required', true);
+        }
+
+        // Renders image previews with remove (×) buttons
+        function renderImagePreviews() {
+            const previewContainer = $('#imagePreviewContainer');
+            previewContainer.html('');
+
+            selectedProductImages.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const wrapper = $(`
+                        <div class="img-preview-wrapper">
+                            <button type="button" class="img-preview-remove" data-idx="${idx}" title="Remove image">&times;</button>
+                            <img src="${e.target.result}" alt="Preview">
+                            <span class="img-preview-index">${idx + 1}/${selectedProductImages.length}</span>
+                        </div>
+                    `);
+                    // Need to insert at the correct position
+                    const children = previewContainer.children();
+                    if (idx >= children.length) {
+                        previewContainer.append(wrapper);
+                    } else {
+                        $(children[idx]).before(wrapper);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Remove image by index (delegated click)
+        $(document).on('click', '.img-preview-remove', function () {
+            const idx = parseInt($(this).data('idx'));
+            selectedProductImages.splice(idx, 1);
+            $('#imageCountInfo').text(selectedProductImages.length > 0 ? `${selectedProductImages.length} image(s) selected` : '').css('color', '#6c757d');
+            renderImagePreviews();
+        });
+    </script>
+}

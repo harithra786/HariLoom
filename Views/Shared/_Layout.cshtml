@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="~/" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>@ViewData["Title"] - Hariloom</title>
+    <meta name="description" content="" />
+    <link rel="icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/vendor/fonts/boxicons.css" />
+    <link rel="stylesheet" href="~/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="~/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="~/css/demo.css" />
+    <link rel="stylesheet" href="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/src/parsley.min.css">
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+            <!-- Menu -->
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <div class="app-brand demo">
+                    <div class="app-brand justify-content-center">
+                        <img src="~/images/Hariloom Logo Transparent.png" alt="Hariloom Logo" class="app-brand-logo demo" style="width:70%" />
+                    </div>
+
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+                        <i class="bx bx-chevron-left bx-sm align-middle"></i>
+                    </a>
+                </div>
+
+                <div class="menu-inner-shadow"></div>
+
+                <ul class="menu-inner py-1">
+                    <li class="menu-item">
+                        <a href="@Url.Action("AdminDashboard", "Dashboard")" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Dashboard">Dashboard</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-box"></i>
+                            <div data-i18n="Management">Products Management</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="@Url.Action("ProductGrouping", "ProductsManagement")" class="menu-link">
+                                    <div data-i18n="ProductGrouping">Product Grouping</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ProductMainCategory", "ProductsManagement")" class="menu-link">
+                                    <div data-i18n="ProductMainCategory">Product Main Category</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ProductSubCategory", "ProductsManagement")" class="menu-link">
+                                    <div data-i18n="ProductSubCategory">Product Sub Category</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ProductDetails", "ProductsManagement")" class="menu-link">
+                                    <div data-i18n="ProductDetails">Products Details</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ProductInventory", "ProductsManagement")" class="menu-link">
+                                    <div data-i18n="ProductInventory">Product Inventory</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="@Url.Action("OrderManagement", "OrderManagement")" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-cart"></i>
+                            <div data-i18n="Management">Order Management</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="@Url.Action("UserDatabase", "Dashboard")" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-user-pin"></i>
+                            <div data-i18n="UserDatabase">User Database</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="@Url.Action("FaqAdd", "Dashboard")" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-message-rounded-dots"></i>
+                            <div data-i18n="FAQ">FAQ</div>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <!-- / Menu -->
+            <!-- Layout container -->
+            <div class="layout-page">
+                <!-- Navbar -->
+
+                <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+                     id="layout-navbar" style="background-color: #ffffff !important;">
+                    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                            <i class="bx bx-menu bx-sm"></i>
+                        </a>
+                    </div>
+
+                    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                        <!-- Search -->
+                        @* <div class="navbar-nav align-items-center">
+                            <div class="nav-item d-flex align-items-center">
+                                <i class="bx bx-search fs-4 lh-0"></i>
+                                <input type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search..." />
+                            </div>
+                        </div> *@
+                        <!-- /Search -->
+                        
+                        <div class="navbar-nav align-items-center flex-grow-1">
+                            <h5 class="mb-0 text-primary ms-3">Welcome back Nivedha Kamatchi! 🎉</h5>
+                        </div>
+
+                        <ul class="navbar-nav flex-row align-items-center ms-auto">
+                            <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                                    <div class="avatar avatar-online">
+                                        <img src="~/images/Hariloom Logo Transparent.png" class="w-px-40 h-auto rounded-circle" />
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="avatar avatar-online">
+                                                        <img src="~/images/Hariloom Logo Transparent.png" class="w-px-40 h-auto rounded-circle" />
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <span class="fw-semibold d-block userNameSpan"></span>
+                                                    <small class="text-muted" id="userAccessLevel"></small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" onclick="fnUserLogout()">
+                                            <i class="bx bx-power-off me-2"></i>
+                                            <span class="align-middle">Log Out</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <div class="container-xxl flex-grow-1 container-p-y">
+                        @RenderBody()
+                    </div>
+                </div>
+                <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
+        </div>
+
+    </div>
+    <!-- / Layout wrapper -->
+    <script src="~/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/vendor/js/helpers.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src="~/vendor/libs/popper/popper.js"></script>
+    <script src="~/vendor/js/bootstrap.js"></script>
+    <script src="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/vendor/js/menu.js"></script>
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="~/js/main.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/parsley.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const userName = sessionStorage.getItem('name');
+        $('.userNameSpan').text(userName);
+
+        const userAccessLevelId = sessionStorage.getItem('accessLevel');
+        $('#userAccessLevel').text(userAccessLevelId == 1 ? "User" : "Admin");
+
+        $(document).ready(function () {
+            const currentPath = window.location.pathname.toLowerCase();
+
+            $('.menu-inner .menu-link').each(function () {
+                const linkPath = $(this).attr('href')?.toLowerCase();
+
+                if (linkPath && currentPath === linkPath) {
+                    const $menuItem = $(this).closest('.menu-item');
+                    $menuItem.addClass('active');
+
+                    const $parentMenu = $menuItem.closest('.menu-sub');
+                    if ($parentMenu.length) {
+                        $parentMenu.show();
+                        $parentMenu.closest('.menu-item').addClass('active open');
+                    }
+                } else {
+                    $(this).closest('.menu-item').removeClass('active');
+                }
+            });
+        });
+
+        // Allow only numbers
+        document.querySelectorAll('.only-numbers').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^0-9]/g, '');
+            });
+        });
+
+        // Allow only letters
+        document.querySelectorAll('.only-letters').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^a-zA-Z ]/g, '');
+            });
+        });
+
+        // Allow letters, numbers, and specific special characters
+        document.querySelectorAll('.letters-numbers-special').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^a-zA-Z0-9\/\-, ]/g, '');
+            });
+        });
+
+        // Allow only decimal numbers
+        document.querySelectorAll('.only-decimal').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^0-9.]/g, '');
+            });
+        });
+
+        // Allow only letters and numbers
+        document.querySelectorAll('.letters-numbers').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^a-zA-Z0-9]/g, '');
+            });
+        });
+
+        // Allow only letters and spaces
+        document.querySelectorAll('.only-letters-spaces').forEach(element => {
+            element.addEventListener('keyup', () => {
+                element.value = element.value.replace(/[^a-zA-Z ]/g, '');
+            });
+        });
+
+
+        // Allow decimals with two places
+        document.querySelectorAll('.decimal-two-places').forEach(element => {
+            element.addEventListener('keyup', () => {
+                let value = element.value.replace(/[^0-9.]/g, '');
+
+                // Allow only one decimal point
+                if ((value.match(/\./g) || []).length > 1) {
+                    value = value.substring(0, value.lastIndexOf('.'));
+                }
+
+                // Restrict to two decimal places
+                let parts = value.split('.');
+                if (parts.length > 1 && parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].substring(0, 2);
+                }
+
+                element.value = value;
+            });
+        });
+
+        function fnGoToProductDetails(productId) {
+            sessionStorage.removeItem('selectedProductId');
+            sessionStorage.setItem('selectedProductId', productId);
+            window.location.href = '@Url.Action("ProductDetail", "Website")';
+        }
+
+        function fnUserLogout(){
+            // Clear session storage
+            sessionStorage.clear();
+
+            // Clear all cookies
+            document.cookie.split(";").forEach(function (c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+
+            //Redirect to page
+             window.location.href = '@Url.Action("UserLogout", "Auth")';
+        }
+
+        function initializeTableSearch(searchInputId, tableBodyId, searchableColumns) {
+            $(document).off('keyup', searchInputId).on('keyup', searchInputId, function () {
+                var value = $(this).val().toLowerCase();
+                $(tableBodyId + ' tr').each(function () {
+                    var row = $(this);
+                    var match = false;
+                    searchableColumns.forEach(function (columnIndex) {
+
+                        var cellText = row.find('td:eq(' + columnIndex + ')').text().toLowerCase();
+                        if (cellText.includes(value)) {
+                            match = true;
+                        }
+                    });
+                    row.toggle(match);
+                });
+            });
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,471 @@
+@using hariloom.Models.DTOs
+@model BuyNowDTO
+@{
+    Layout = "_ShopLayout";
+    var actualPrice = Model.mrp;
+    var idProduct = Model.mstProductId;
+}
+
+@section Styles {
+    <style>
+
+        .bn-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        .bn-card {
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .bn-product {
+            display: flex;
+            gap: 16px;
+        }
+
+        .thumb {
+            width: 180px;
+            height: 180px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f7f7f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .meta {
+            flex: 1;
+        }
+
+            .meta h4 {
+                margin-bottom: 10px;
+                font-size: 20px;
+            }
+
+        .bn-price {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .bn-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+            .bn-controls label {
+                display: block;
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .bn-controls select,
+            .bn-controls input {
+                padding: 8px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+            }
+
+        .price-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .place-order {
+            width: 100%;
+            border: none;
+            background: #0d47a1;
+            color: #fff;
+            padding: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        @@media(max-width:900px) {
+
+            .bn-container {
+                grid-template-columns: 1fr;
+            }
+
+            .bn-product {
+                flex-direction: column;
+            }
+
+            .thumb {
+                width: 100%;
+                height: 300px;
+            }
+            .address-grid { grid-template-columns: 1fr !important; }
+        }
+
+        .address-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .address-input:focus { border-color: #0d47a1; }
+
+    </style>
+}
+
+<div class="bn-container">
+    <div>
+        <div class="bn-card">
+        <div class="bn-product">
+            <div class="thumb">
+                @if (!string.IsNullOrEmpty(Model.coverImagePath))
+                {
+                    <img src="~/@Model.coverImagePath" alt="Product" />
+                }
+            </div>
+
+            <div class="meta">
+                <h4>@Model.productName</h4>
+                <div class="bn-price">
+                    ₹ <span id="unitPrice">@actualPrice.ToString("F2")</span>
+                </div>
+                <div class="bn-controls">
+                    <div>
+                        <label>Size</label>
+                        <select id="sizeSelect">
+                            @if (Model.sizes != null && Model.sizes.Any())
+                            {
+                                foreach (var size in Model.sizes)
+                                {
+                                    <option value="@size.size"
+                                            selected="@(size.size == Model.size)"
+                                            data-qty="@size.quantityAvailable">
+                                        @size.size
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label>Quantity</label>
+                        <input type="number" id="quantityInput" min="1" max="@Model.quantityAvailable" value="@Model.quantity" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delivery Address -->
+        <div class="bn-card" style="margin-top:20px;">
+            <div style="font-weight:600; font-size:16px; margin-bottom:15px;">Delivery Address</div>
+            <div class="address-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <input type="text" id="addrLine1" class="address-input" placeholder="Address Line 1 *" />
+                <input type="text" id="addrLine2" class="address-input" placeholder="Address Line 2 (Optional)" />
+                <input type="text" id="addrCity" class="address-input" placeholder="City *" />
+                <input type="text" id="addrState" class="address-input" placeholder="State *" />
+                <input type="text" id="addrZip" class="address-input" placeholder="Zip Code *" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Details -->
+    <div class="bn-card price-panel">
+        <div class="row">
+            <span class="muted">MRP</span>
+            <span>₹ @Model.mrp.ToString("F2")</span>
+        </div>
+        
+        <div style="margin-top: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e6e6e6;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:6px;">
+                <div id="productSummaryText">&bull; @Model.productName - @actualPrice.ToString("F0") x @Model.quantity</div>
+                <div id="productSummaryCalc" style="white-space:nowrap;">= ₹ @((actualPrice * Model.quantity).ToString("F2"))</div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <span class="muted">Total Amount</span>
+            <span class="total">
+                ₹ <span id="totalAmount"></span>
+            </span>
+        </div>
+
+        <div style="margin-top: 15px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #555; display: flex; align-items: flex-start; gap: 8px;">
+            <i class="bx bx-package" style="font-size: 18px; color: #0d47a1;"></i>
+            <div>
+                <div style="font-weight: 600; color: #111; margin-bottom: 4px;">Shipping Details</div>
+                Standard delivery takes 3-5 business days. Free shipping on all orders!
+            </div>
+        </div>
+
+        <button id="payNowBtn" class="place-order" style="margin-top:15px;" disabled style="opacity:0.5; cursor:not-allowed;">
+            PLACE ORDER
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const payNowBtn = document.getElementById('payNowBtn');
+        const quantityInput = document.getElementById('quantityInput');
+        const totalAmount = document.getElementById('totalAmount');
+        const unitPriceForPage = parseFloat('@actualPrice');
+        const sizeSelect = document.getElementById('sizeSelect');
+        quantityInput.addEventListener('input', updateTotal);
+        sizeSelect.addEventListener('change', () => {
+            let maxQty = parseInt(sizeSelect.options[sizeSelect.selectedIndex].getAttribute('data-qty')) || 0;
+            if (parseInt(quantityInput.value) > maxQty && maxQty > 0) {
+                quantityInput.value = maxQty;
+            } else if (maxQty === 0) {
+                quantityInput.value = 0;
+            }
+            updateTotal();
+            validateAddress();
+        });
+
+        (() => {
+            const url = new URL(window.location.href);
+            if (!url.search || url.search === "") {
+                window.location.href = "@Url.Action("Home", "Website")";
+                return;
+            }
+
+            window.history.replaceState({}, document.title, "@Url.Action("BuyNow", "Website")");
+            updateTotal();
+        })();
+
+        function updateTotal() {
+            const sizeSelectEl = document.getElementById('sizeSelect');
+            const selectedOption = sizeSelectEl && sizeSelectEl.selectedIndex >= 0 ? sizeSelectEl.options[sizeSelectEl.selectedIndex] : null;
+            const maxQty = selectedOption ? (parseInt(selectedOption.getAttribute('data-qty')) || 0) : (parseInt('@Model.quantityAvailable') || 0);
+            
+            quantityInput.max = maxQty;
+            let qty = parseInt(quantityInput.value);
+            
+            if (maxQty <= 0) {
+                payNowBtn.disabled = true;
+                payNowBtn.style.opacity = '0.5';
+                payNowBtn.style.cursor = 'not-allowed';
+                payNowBtn.innerText = 'OUT OF STOCK';
+                quantityInput.value = 0;
+                quantityInput.disabled = true;
+                totalAmount.innerText = '0.00';
+                return;
+            } else {
+                payNowBtn.innerText = 'PLACE ORDER';
+                quantityInput.disabled = false;
+            }
+
+            if (isNaN(qty) || qty < 1) {
+                qty = 1;
+            } else if (qty > maxQty) {
+                qty = maxQty;
+                quantityInput.value = maxQty;
+                alert(`Only ${maxQty} items available in stock for this size.`);
+            }
+
+            const total = (qty * unitPriceForPage).toFixed(2);
+            totalAmount.innerText = total;
+            document.getElementById('productSummaryText').innerHTML = `&bull; @Model.productName - ${unitPriceForPage.toFixed(0)} x ${qty}`;
+            document.getElementById('productSummaryCalc').innerText = `= ₹ ${total}`;
+        }
+
+        // Load user address
+        const userId = sessionStorage.getItem('userId');
+        if (userId) {
+            fetch('/Website/GetUserAddresses?mstUserId=' + userId)
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.success && res.data && res.data.length > 0) {
+                        const addr = res.data[0];
+                        $('#addrLine1').val(addr.addressLine1 || '');
+                        $('#addrLine2').val(addr.addressLine2 || '');
+                        $('#addrCity').val(addr.city || '');
+                        $('#addrState').val(addr.state || '');
+                        $('#addrZip').val(addr.zipCode || '');
+                        validateAddress();
+                    }
+                });
+        }
+
+        function validateAddress() {
+            const l1 = $('#addrLine1').val()?.trim() || '';
+            const city = $('#addrCity').val()?.trim() || '';
+            const state = $('#addrState').val()?.trim() || '';
+            const zip = $('#addrZip').val()?.trim() || '';
+            const btn = $('#payNowBtn');
+            if (l1 && city && state && zip) {
+                btn.prop('disabled', false).css({ opacity: 1, cursor: 'pointer' });
+            } else {
+                btn.prop('disabled', true).css({ opacity: 0.5, cursor: 'not-allowed' });
+            }
+        }
+
+        $(document).on('input', '.address-input', validateAddress);
+
+        payNowBtn.addEventListener('click', async () => {
+            try {
+                if (!userId) {
+                    alert('Please log in first.');
+                    return;
+                }
+
+                const l1 = $('#addrLine1').val()?.trim() || '';
+                const city = $('#addrCity').val()?.trim() || '';
+                const state = $('#addrState').val()?.trim() || '';
+                const zip = $('#addrZip').val()?.trim() || '';
+                if (!l1 || !city || !state || !zip) {
+                    alert('Please fill in all required address fields.');
+                    return;
+                }
+
+                // Optionally save address
+                await fetch('@Url.Action("AddUserAddress", "Website")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mstUserId: parseInt(userId),
+                        label: 'Delivery',
+                        addressLine1: l1,
+                        addressLine2: $('#addrLine2').val()?.trim() || '',
+                        city: city,
+                        state: state,
+                        zipCode: zip
+                    })
+                });
+
+                // Create Order & Razorpay Order
+                const response = await $.ajax({
+                    url: '@Url.Action("CreateOrderMarkStatus", "Website")',
+                    type: 'GET',
+                    data: {
+                        userId: sessionStorage.getItem('userId'),
+                        productId: parseInt('@idProduct'),
+                        quantity: parseInt(quantityInput.value || 1),
+                        size: sizeSelect.value || ''
+                    }
+                });
+
+                if (!response.success) {
+                    alert(response.message);
+                    return;
+                }
+
+                const orderData = response.data;
+                const options = {
+                    key: orderData.key,
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "Hariloom",
+                    description: "Product Purchase",
+                    order_id: orderData.razorpayOrderId,
+                    handler: async function (razorpayResponse) {
+                        debugger;
+
+                        try {
+                            const verifyResponse = await $.ajax({
+                                url: '@Url.Action("VerifyPayment", "Website")',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    orderId: orderData.orderId,
+                                    razorpayOrderId: razorpayResponse.razorpay_order_id,
+                                    razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+                                    razorpaySignature: razorpayResponse.razorpay_signature
+                                })
+                            });
+
+                            if (verifyResponse.success) {
+                                window.location.href = '@Url.Action("Orders", "Website")';
+                            } else {
+                                alert(verifyResponse.message || "Payment verification failed.");
+                            }
+                        } catch (err) {
+                            alert("Payment successful but verification timed out or failed. Please check your orders page.");
+                            window.location.href = '@Url.Action("Orders", "Website")';
+                        }
+                    },
+                    prefill: {
+                        name: sessionStorage.getItem('name'),
+                        email: sessionStorage.getItem('email'),
+                        contact: sessionStorage.getItem('contact')
+                    },
+                    modal: {
+                        ondismiss: async function() {
+                            await $.post('@Url.Action("MarkPaymentFailed", "Website")', { orderId: orderData.orderId });
+                            window.location.href = '@Url.Action("Orders", "Website")';
+                        }
+                    },
+                    theme: {
+                        color: "#000000"
+                    },
+                    config: {
+                        display: {
+                            blocks: {
+                                upi: {
+                                    name: "Pay via UPI / GPay",
+                                    instruments: [
+                                        { method: "upi" }
+                                    ]
+                                },
+                                other: {
+                                    name: "Other Payment Modes",
+                                    instruments: [
+                                        { method: "card" },
+                                        { method: "netbanking" },
+                                        { method: "wallet" }
+                                    ]
+                                }
+                            },
+                            sequence: ["block.upi", "block.other"],
+                            preferences: {
+                                show_default_blocks: false
+                            }
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.on('payment.failed', async function (response) {
+                    await $.post('@Url.Action("MarkPaymentFailed", "Website")', { orderId: orderData.orderId });
+                    // Let Razorpay's own UI handle the retry, no need for confirm box
+                });
+
+                razorpay.open();
+
+            } catch (error) {
+                alert(error);
+            }
+        });
+    </script>
+}

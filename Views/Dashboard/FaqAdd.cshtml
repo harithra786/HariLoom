@@ -1,0 +1,252 @@
+@{
+    ViewBag.Title = "FAQ Management";
+}
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">FAQ Management</h5>
+                <button type="button" class="btn btn-primary" onclick="openAddModal()">Add FAQ</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="faqTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Question</th>
+                                <th>Answer</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faqTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add FAQ Modal -->
+<div class="modal fade" id="addFaqModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add FAQ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addFaqForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="addQuestion">Question</label>
+                        <textarea class="form-control" id="addQuestion" required rows="3" placeholder="Enter the question"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addAnswer">Answer</label>
+                        <textarea class="form-control" id="addAnswer" required rows="5" placeholder="Enter the answer"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit FAQ Modal -->
+<div class="modal fade" id="editFaqModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit FAQ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editFaqForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editFaqId" />
+                    <div class="mb-3">
+                        <label class="form-label" for="editQuestion">Question</label>
+                        <textarea class="form-control" id="editQuestion" required rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editAnswer">Answer</label>
+                        <textarea class="form-control" id="editAnswer" required rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadFaqs();
+
+            $('#addFaqForm').on('submit', function (e) {
+                e.preventDefault();
+                addFaq();
+            });
+
+            $('#editFaqForm').on('submit', function (e) {
+                e.preventDefault();
+                updateFaq();
+            });
+        });
+
+        function loadFaqs() {
+            $.get('@Url.Action("GetAdminFaqs", "Dashboard")', function (res) {
+                if (res.success) {
+                    var html = '';
+                    if (res.data.length === 0) {
+                        html = '<tr><td colspan="5" class="text-center">No FAQs found.</td></tr>';
+                    } else {
+                        res.data.forEach(function (faq, index) {
+                            var checked = faq.isActive ? "checked" : "";
+                            html += `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${faq.question}</td>
+                                        <td>${faq.answer.substring(0, 50)}${faq.answer.length > 50 ? '...' : ''}</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch" onchange="toggleFaqStatus(${faq.mstFAQId}, this)" ${checked}>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-icon btn-outline-primary" onclick="openEditModal(${faq.mstFAQId}, \`${faq.question.replace(/"/g, '&quot;')}\`, \`${faq.answer.replace(/"/g, '&quot;')}\`)">
+                                                    <i class="bx bx-edit-alt"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-icon btn-outline-danger" onclick="deleteFaq(${faq.mstFAQId})">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                     </tr>`;
+                        });
+                    }
+                    $('#faqTableBody').html(html);
+                } else {
+                    toastr.error('Failed to load FAQs.');
+                }
+            });
+        }
+
+        function openAddModal() {
+            $('#addFaqForm')[0].reset();
+            $('#addFaqModal').modal('show');
+        }
+
+        function addFaq() {
+            var payload = {
+                question: $('#addQuestion').val(),
+                answer: $('#addAnswer').val(),
+                userId: parseInt(sessionStorage.getItem('userId')) || 1
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddFaq", "Dashboard")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success(res.message);
+                        $('#addFaqModal').modal('hide');
+                        loadFaqs();
+                    } else {
+                        toastr.error(res.message);
+                    }
+                },
+                error: function () {
+                    toastr.error('An error occurred.');
+                }
+            });
+        }
+
+        function openEditModal(id, question, answer) {
+            $('#editFaqId').val(id);
+            $('#editQuestion').val(question);
+            $('#editAnswer').val(answer);
+            $('#editFaqModal').modal('show');
+        }
+
+        function updateFaq() {
+            var payload = {
+                mstFAQId: parseInt($('#editFaqId').val()),
+                question: $('#editQuestion').val(),
+                answer: $('#editAnswer').val(),
+                userId: parseInt(sessionStorage.getItem('userId')) || 1
+            };
+
+            $.ajax({
+                url: '@Url.Action("UpdateFaq", "Dashboard")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success(res.message);
+                        $('#editFaqModal').modal('hide');
+                        loadFaqs();
+                    } else {
+                        toastr.error(res.message);
+                    }
+                },
+                error: function () {
+                    toastr.error('An error occurred.');
+                }
+            });
+        }
+
+        function toggleFaqStatus(id, element) {
+            var isActive = $(element).is(':checked');
+            $.ajax({
+                url: '@Url.Action("UpdateFaqStatus", "Dashboard")' + '?faqId=' + id + '&isActive=' + isActive,
+                type: 'POST',
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success(res.message);
+                    } else {
+                        toastr.error(res.message);
+                        $(element).prop('checked', !isActive); // Revert UI
+                    }
+                },
+                error: function () {
+                    toastr.error('An error occurred.');
+                    $(element).prop('checked', !isActive); // Revert UI
+                }
+            });
+        }
+
+        function deleteFaq(id) {
+            if (confirm("Are you sure you want to delete this FAQ?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteFaq", "Dashboard")' + '?faqId=' + id,
+                    type: 'POST',
+                    success: function (res) {
+                        if (res.success) {
+                            toastr.success(res.message);
+                            loadFaqs();
+                        } else {
+                            toastr.error(res.message);
+                        }
+                    },
+                    error: function () {
+                        toastr.error('An error occurred while deleting.');
+                    }
+                });
+            }
+        }
+    </script>
+}

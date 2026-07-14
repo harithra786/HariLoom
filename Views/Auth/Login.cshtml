@@ -1,0 +1,639 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" class="light-style customizer-hide" dir="ltr" data-theme="theme-default" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>Hariloom - Login</title>
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Helpers -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+
+        /* BACKGROUND */
+      
+        body {
+            height: 100vh;
+            background-color: #F7F4ED;
+        }
+        /* OVERLAY */
+        .overlay {
+           @* position: fixed;
+            inset: 0;
+<<<<<<< HEAD
+            /* keep a slight dark overlay for contrast but do not blur the background image */
+            background: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.36));
+            z-index: 1;*@
+            display:none;
+=======
+            background: transparent;
+            z-index: 1;
+>>>>>>> 6fda05b1dc9f98deb52b523fe753b21980965c89
+        }
+
+        /* POSITION LEFT */
+       
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* CARD */
+        
+       
+        .login-card {
+            width: 420px;
+            padding: 30px 35px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        /* LOGO */
+        .logo {
+            width: 65px;
+            height: 65px;
+            border-radius: 16px;
+            background: #5a8cc9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .logo img {
+            width: 70%;
+        }
+
+        /* TEXT */
+        .login-card h2 {
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        /* INPUT */
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            font-size: 13px;
+                color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            outline: 2px solid #5a8cc9;
+            background: #F8F8F8;
+            color: #333;
+            border: 1px solid #ddd;
+            
+               
+        }
+
+        .field input::placeholder {
+            color: #bbb;
+        }
+
+       @* .field input:focus {
+            outline: 2px solid #5a8cc9;
+        }*@
+        .field input:focus {
+            border-color: #5a8cc9;
+            box-shadow: 0 0 0 2px rgba(90,140,201,0.2);
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: linear-gradient(135deg, #5a8cc9, #4a7fcc);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(90,140,201,0.4);
+        }
+
+        /* FOOTER */
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 18px;
+        }
+
+        .footer-text a {
+            color: #5a8cc9;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sign up link */
+        .signup-link {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+
+        .signup-link span {
+                color: #555;
+        }
+
+        .signup-link a {
+            color: #5a8cc9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .toast-success {
+            background-color: #28a745 !important;
+            color: #ffffff !important;
+        }
+
+        .toast-error {
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+        }
+
+        #toast-container > div {
+            opacity: 1 !important;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+            .password-container input {
+                width: 100%;
+                padding: 14px 45px 14px 14px; /* space for eye icon */
+            }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #777;
+            font-size: 16px;
+        }
+
+            .toggle-password:hover {
+                color: #5a8cc9;
+            }
+        
+    </style>
+
+</head>
+
+<body>
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="~/img/avatars/hariloom_logo_blue.png" alt="Hariloom Logo" />
+            </div>
+
+            <!-- Views Container -->
+            <div id="loginView">
+                <!-- Welcome Text -->
+                <h2>Welcome Back</h2>
+                <p class="subtitle">Please login to your account</p>
+
+                <!-- Email Field -->
+                <div class="field">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="text" id="phoneNumber" name="phone-number" placeholder="Enter your phone number" autocomplete="username" autofocus class="only-numbers" />
+                </div>
+
+                <!-- Password Field -->
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               autocomplete="current-password"
+                               placeholder="Enter your password" />
+                        <span id="togglePassword" class="toggle-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Link -->
+                <div style="text-align: right; margin-bottom: 15px; margin-top: -5px;">
+                    <a href="javascript:void(0);" id="forgotPasswordLink" style="color: #5a8cc9; text-decoration: none; font-size: 13px; font-weight: 500;">Forgot Password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button id="btnLogin">Log In</button>
+
+                <!-- Sign Up Link -->
+                <div class="signup-link">
+                    <span>Don't have an account?</span>
+                    <a href="@Url.Action("Register", "Auth")">Sign Up</a>
+                </div>
+            </div>
+
+            <div id="forgotPasswordView" style="display: none;">
+                <h2>Forgot Password?</h2>
+                <p class="subtitle">Enter your details to reset</p>
+                
+                <div class="field">
+                    <label for="fpPhoneNumber">Phone Number</label>
+                    <input type="text" id="fpPhoneNumber" name="fpPhoneNumber" placeholder="Enter your phone number" autocomplete="off" class="only-numbers" />
+                </div>
+
+                <div class="field">
+                    <label for="fpEmail">Email Address</label>
+                    <input type="email" id="fpEmail" name="fpEmail" placeholder="Enter your email address" autocomplete="off" />
+                </div>
+
+                <button type="button" class="btn-secondary" id="fpSendOtpBtn" style="margin-bottom: 14px; background: linear-gradient(135deg, #888, #666); color: #fff;">Send OTP</button>
+
+                <div id="fpOtpSection">
+                    <div class="field">
+                        <label for="fpOtp">OTP</label>
+                        <input type="text" id="fpOtp" name="fpOtp" placeholder="Enter OTP" disabled maxlength="4" />
+                    </div>
+                    <button type="button" class="btn-secondary" id="fpProceedBtn" style="margin-bottom: 14px; display: none;">Proceed</button>
+                </div>
+
+                <div id="fpPasswordSection" style="display: none;">
+                    <div class="field">
+                        <label for="fpNewPassword">New Password</label>
+                        <div class="password-container">
+                            <input type="password" id="fpNewPassword" name="fpNewPassword" autocomplete="new-password" placeholder="Enter new password" />
+                            <span id="toggleFpPassword" class="toggle-password">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="fpConfirmPassword">Confirm Password</label>
+                        <div class="password-container">
+                            <input type="password" id="fpConfirmPassword" name="fpConfirmPassword" autocomplete="new-password" placeholder="Confirm new password" />
+                            <span id="toggleFpConfirmPassword" class="toggle-password">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button id="btnResetPassword">Reset Password</button>
+                </div>
+
+                <div class="signup-link">
+                    <a href="javascript:void(0);" id="backToLoginLink">Back to Login</a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-text">
+                © 2026 Hariloom
+            </div>
+        </div>
+    </div>
+    <script src="~/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/vendor/js/bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        sessionStorage.clear();
+
+        $('.only-numbers').on('keyup', function () {
+            // Remove non-digit characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // Limit to 10 digits
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+
+        // Login AJAX
+        $('#btnLogin').click(function (e) {
+            e.preventDefault();
+            const phoneNumber = $('#phoneNumber').val();
+            const password = $('#password').val();
+            $.ajax({
+                url: '@Url.Action("userLogin", "Auth")',
+                type: 'POST',
+                dataType: 'json',
+                data: { phoneNumber: phoneNumber, password: password },
+                success: function (response) {
+                    debugger;
+                    if (response.success) {
+                        debugger;
+
+                        toastr.success(response.message || 'Login successful!');
+                        // Add details to session
+                        sessionStorage.setItem('userId', response.data.userId);
+                        sessionStorage.setItem('name', response.data.name);
+                        sessionStorage.setItem('contact', response.data.phoneNumber);
+                        sessionStorage.setItem('email', response.data.email);
+                        sessionStorage.setItem('accessLevel', response.data.accessLevel);
+
+                        window.location.href = response.data.url;
+                    } else {
+                        toastr.error(response.message || 'Incorrect password. Please try again.');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('Login failed! Please try again later.');
+                }
+            });
+        });
+                $('#togglePassword').click(function () {
+
+            const passwordField = $('#password');
+            const icon = $(this).find('i');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+
+        });
+
+        // Forgot Password Logic
+        $('#forgotPasswordLink').click(function () {
+            $('#loginView').hide();
+            $('#forgotPasswordView').show();
+        });
+
+        $('#backToLoginLink').click(function () {
+            $('#forgotPasswordView').hide();
+            $('#loginView').show();
+            // Reset sections
+            $('#fpPhoneEmailSection').show();
+            $('#fpOtpSection').show();
+            $('#fpPasswordSection').hide();
+            $('#fpProceedBtn').hide();
+        });
+
+        $('#toggleFpPassword').click(function () {
+            const passwordField = $('#fpNewPassword');
+            const icon = $(this).find('i');
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        $('#toggleFpConfirmPassword').click(function () {
+            const passwordField = $('#fpConfirmPassword');
+            const icon = $(this).find('i');
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        let fpGeneratedOTP = '';
+        let fpUserEmail = '';
+        let fpOtpExpiryTime = 0;
+        let fpOtpTimerInterval = null;
+
+        function generateFpOTP() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        $('#fpSendOtpBtn').click(function () {
+            const phoneNumber = $('#fpPhoneNumber').val();
+            const email = $('#fpEmail').val();
+            
+            if (!phoneNumber || phoneNumber.length !== 10) {
+                toastr.error('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            if (!email) {
+                toastr.error('Please enter a valid email address');
+                return;
+            }
+
+            $('#fpSendOtpBtn').prop('disabled', true).text('Verifying...');
+
+            $.ajax({
+                url: '@Url.Action("VerifyUserForReset", "Auth")',
+                type: 'GET',
+                data: { phoneNumber: phoneNumber, email: email },
+                success: function(response) {
+                    if(response.success) {
+                        fpUserEmail = email;
+                        const userName = response.data.name;
+
+                        fpGeneratedOTP = generateFpOTP();
+                        fpOtpExpiryTime = new Date().getTime() + (5 * 60 * 1000); // 5 mins
+
+                        $('#fpSendOtpBtn').text('Sending OTP...');
+
+                        // Send OTP via backend
+                        $.ajax({
+                            url: '@Url.Action("SendOtpEmail", "Auth")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                email: fpUserEmail,
+                                userName: userName,
+                                otp: fpGeneratedOTP,
+                                phoneNumber: phoneNumber
+                            }),
+                            success: function (res) {
+                                if (res.success) {
+                                    toastr.success('OTP sent successfully to your registered email');
+                                    $('#fpOtp').prop('disabled', false).focus();
+                                    $('#fpProceedBtn').show();
+                                    startFpOTPTimer();
+                                } else {
+                                    toastr.error('Failed to send OTP email.');
+                                    $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.error('Failed to send OTP email.');
+                                $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                            }
+                        });
+
+                    } else {
+                        toastr.error(response.message || 'User verification failed');
+                        $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                    }
+                },
+                error: function() {
+                    toastr.error('Verification failed! Please try again later.');
+                    $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                }
+            });
+        });
+
+        function startFpOTPTimer() {
+            if (fpOtpTimerInterval) clearInterval(fpOtpTimerInterval);
+            fpOtpTimerInterval = setInterval(function () {
+                const currentTime = new Date().getTime();
+                const timeRemaining = fpOtpExpiryTime - currentTime;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(fpOtpTimerInterval);
+                    fpOtpTimerInterval = null;
+                    $('#fpOtp').prop('disabled', true).val('');
+                    $('#fpProceedBtn').hide();
+                    toastr.warning('OTP has expired. Please request a new one.');
+                    $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                } else {
+                    const minutes = Math.floor(timeRemaining / 60000);
+                    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+                    $('#fpSendOtpBtn').text(`Resend OTP (${minutes}:${seconds.toString().padStart(2, '0')})`);
+                }
+            }, 1000);
+        }
+
+        $('#fpProceedBtn').click(function () {
+            const otp = $('#fpOtp').val();
+
+            if (!otp) {
+                toastr.error('Please enter the OTP');
+                return;
+            }
+
+            if (otp !== fpGeneratedOTP) {
+                toastr.error('Invalid OTP. Please enter the correct OTP.');
+                return;
+            }
+
+            const currentTime = new Date().getTime();
+            if (currentTime > fpOtpExpiryTime) {
+                toastr.error('OTP has expired. Please request a new one.');
+                return;
+            }
+
+            // OTP valid, show next section
+            $('#fpOtpSection').hide();
+            $('#fpPhoneEmailSection').hide();
+            $('#fpPasswordSection').show();
+
+            // Stop timer since OTP is already verified
+            if (fpOtpTimerInterval) {
+                clearInterval(fpOtpTimerInterval);
+                fpOtpTimerInterval = null;
+            }
+        });
+
+        $('#btnResetPassword').click(function (e) {
+            e.preventDefault();
+            const phoneNumber = $('#fpPhoneNumber').val();
+            const newPassword = $('#fpNewPassword').val();
+            const confirmPassword = $('#fpConfirmPassword').val();
+
+            if (!phoneNumber || !newPassword || !confirmPassword) {
+                toastr.error('Please fill in all fields');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                toastr.error('Passwords do not match');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("userForgotPassword", "Auth")',
+                type: 'POST',
+                dataType: 'json',
+                data: { phoneNumber: phoneNumber, newPassword: newPassword },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#fpPhoneNumber').val('');
+                        $('#fpEmail').val('');
+                        $('#fpNewPassword').val('');
+                        $('#fpConfirmPassword').val('');
+                        $('#fpOtp').val('');
+                        if (fpOtpTimerInterval) clearInterval(fpOtpTimerInterval);
+                        $('#fpSendOtpBtn').prop('disabled', false).text('Send OTP');
+                        $('#fpOtp').prop('disabled', true);
+                        $('#fpProceedBtn').hide();
+                        
+                        // Reset sections for next time
+                        $('#fpPhoneEmailSection').show();
+                        $('#fpOtpSection').show();
+                        $('#fpPasswordSection').hide();
+                        
+                        $('#forgotPasswordView').hide();
+                        $('#loginView').show();
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('Password reset failed');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

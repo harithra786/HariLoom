@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-menu-fixed layout-navbar-fixed" dir="ltr" data-theme="theme-default" data-assets-path="~/assets/" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>@ViewData["Title"] - Hariloom</title>
+    <meta name="description" content="" />
+    <link rel="icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.3/parsley.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/vendor/fonts/boxicons.css" />
+    <link rel="stylesheet" href="~/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="~/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="~/css/demo.css" />
+    <link rel="stylesheet" href="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+    <script src="~/vendor/js/helpers.js"></script>
+    <script src="~/js/config.js"></script>
+    <link rel="stylesheet" href="~/css/website.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-primary: 'Josefin Sans', sans-serif;
+            --font-secondary: 'Public Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body, html, .layout-page {
+            font-family: var(--font-primary);
+            overflow-x: hidden;
+            background-color: #F7F4ED !important;
+        }
+
+        .bg-navbar-theme {
+            background-color: #F7F4ED !important;
+        }
+
+        .font-primary { font-family: var(--font-primary); }
+        .font-secondary { font-family: var(--font-secondary); }
+
+        body::-webkit-scrollbar { display: none; }
+
+        .navbar {
+            padding: 15px 0 !important;
+        }
+
+        .logo-text {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 700;
+            color: #1f4fa3;
+            letter-spacing: 1px;
+        }
+
+        /* Navbar layout */
+        .navbar-inner {
+            position: relative;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 120px;
+            width: 100%;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        .center-logo {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 50;
+            white-space: nowrap;
+        }
+
+        .center-logo img {
+            pointer-events: auto;
+            height: 120px;
+            width: auto;
+            display: block;
+        }
+
+        /* Left nav links */
+        .nav-left-menu {
+            flex: 1;
+            display: flex;
+            gap: clamp(8px, 2vw, 16px);
+            justify-content: flex-start;
+            min-width: 0;
+            z-index: 10;
+        }
+
+        /* Right nav links */
+        .nav-right-menu {
+            flex: 1;
+            display: flex;
+            gap: clamp(8px, 2vw, 16px);
+            justify-content: flex-end;
+            align-items: center;
+            min-width: 0;
+            z-index: 10;
+        }
+
+        .nav-link {
+            font-size: clamp(11px, 1.4vw, 14px);
+            font-weight: 500;
+            color: #333 !important;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .nav-link:hover { color: #000 !important; }
+
+       
+        /* Hamburger button */
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            padding: 4px 8px;
+            z-index: 60;
+        }
+
+        /* Mobile slide-out menu */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+        }
+        .mobile-menu-overlay.active { display: block; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0; right: -280px;
+            width: 280px;
+            height: 100%;
+            background: #fff;
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 20px;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            overflow-y: auto;
+        }
+        .mobile-menu.active { right: 0; }
+
+        .mobile-menu-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #333;
+            display: block;
+            margin-left: auto;
+            margin-bottom: 20px;
+        }
+
+        .mobile-menu .mobile-nav-link {
+            display: block;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+        .mobile-menu .mobile-nav-link:hover { color: #1f4fa3; }
+
+        /* Desktop (1024px+) */
+        @@media (min-width: 1024px) {
+            .hamburger-btn { display: none !important; }
+            .nav-left-menu { display: flex !important; }
+        }
+
+        /* Tablet (769px - 1023px) */
+        @@media (max-width: 1023px) {
+            .nav-left-menu { display: none !important; }
+            .hamburger-btn { display: block; }
+
+            .center-logo {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Mobile (max-width: 768px) */
+        @@media (max-width: 768px) {
+            .navbar { padding: 10px 0 !important; }
+            .navbar-inner { min-height: 90px; }
+            .center-logo img { height: 90px; }
+
+            .nav-right-menu .nav-link { font-size: 12px; }
+
+            .nav-right-menu .navbar-nav { flex-direction: row; gap: 6px; }
+        }
+
+        /* Small phones (max-width: 480px) */
+        @@media (max-width: 480px) {
+            .navbar { padding: 8px 0 !important; }
+            .navbar-inner { min-height: 75px; }
+            .center-logo img { height: 75px; }
+        }
+
+        /* Footer */
+        .hariloom-footer {
+            background: #F7F4ED;
+            padding: clamp(20px, 5vw, 30px) clamp(15px, 3vw, 20px) 0;
+            overflow: hidden;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(12px, 3vw, 40px);
+            font-size: clamp(10px, 1.5vw, 14px);
+            letter-spacing: 1px;
+            color: #1f4fa3;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        .footer-top a {
+            text-decoration: none;
+            color: #1f4fa3;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+        .footer-top a:hover { opacity: 0.7; }
+
+        .footer-top .copyright {
+            margin-left: clamp(5px, 1.5vw, 20px);
+            font-size: clamp(9px, 1.2vw, 12px);
+        }
+
+        .footer-brand {
+            font-family: 'Elika Gorica', serif;
+            font-size: clamp(48px, 15vw, 616px);
+            font-weight: 800;
+            color: #1f4fa3;
+            line-height: 0.8;
+            text-align: center;
+            overflow: hidden;
+            word-break: break-word;
+            transform: translateY(clamp(30px, 6vw, 140px));
+            padding: 20px 10px;
+        }
+
+        .wishlist-heart {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            border: none;
+            background: transparent;
+            font-size: 32px;
+            color: white;
+            -webkit-text-stroke: 2px black;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .wishlist-img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .wishlist-menu-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            vertical-align: middle;
+        }
+
+        .wishlist-heart:hover { transform: scale(1.2); }
+
+        .wishlist-heart.active {
+            color: black;
+            -webkit-text-stroke: 2px black;
+        }
+
+        .site-content-bg {
+            background-color: #F7F4ED;
+        }
+
+        /* Override Bootstrap toast styling for Toastr */
+        #toast-container > div {
+            opacity: 1 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+        #toast-container > .toast-success {
+            background-color: #1f4fa3 !important;
+            color: #fff !important;
+        }
+        #toast-container > .toast-info {
+            background-color: #1f4fa3 !important;
+            color: #fff !important;
+        }
+        #toast-container.toast-top-right {
+            top: 80px !important; /* Push below header */
+            right: 20px !important;
+        }
+
+        @@media(max-width: 768px) {
+            .footer-top { gap: 12px; font-size: 11px; }
+            .footer-brand { font-size: clamp(48px, 15vw, 120px); }
+        }
+
+        @@media(max-width: 480px) {
+            .footer-top { gap: 8px; font-size: 10px; padding: 0 8px; }
+            .footer-brand { font-size: clamp(40px, 18vw, 80px); transform: translateY(20px); padding: 10px 5px; }
+        }
+
+        .login-btn {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            font-size: clamp(11px, 1.4vw, 14px);
+            padding: clamp(4px, 1vw, 8px) clamp(10px, 2vw, 16px) !important;
+            white-space: nowrap;
+        }
+        .login-btn:hover {
+            background-color: #5a6268 !important;
+            border-color: #5a6268 !important;
+        }
+
+        /* Prevent content overflow globally */
+        .content-wrapper {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Login Prompt Modal Buttons */
+        #loginPromptModal .btn-primary {
+            background-color: #1f4fa3;
+            border-color: #1f4fa3;
+            color: #fff;
+        }
+        #loginPromptModal .btn-primary:hover {
+            background-color: #163d80;
+            border-color: #163d80;
+        }
+        #loginPromptModal .btn-outline-primary {
+            color: #1f4fa3;
+            border-color: #1f4fa3;
+            background-color: transparent;
+        }
+        #loginPromptModal .btn-outline-primary:hover {
+            background-color: #1f4fa3;
+            color: #fff;
+        }
+
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+            .page-transition.loaded {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .page-transition.leaving {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar layout-without-menu">
+        <div class="layout-container">
+            <!-- Layout container -->
+            <div class="layout-page">
+                @if (ViewBag.HideNavigation != true)
+                {
+                    <nav class="layout-navbar container-fluid navbar navbar-expand-xl bg-navbar-theme">
+                <div class="w-100 d-flex align-items-center justify-content-between navbar-inner">
+                            <!-- HAMBURGER (mobile only) -->
+                            <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+                                <i class='bx bx-menu'></i>
+                            </button>
+                            <!-- LEFT MENU (desktop) -->
+                            <div class="nav-left-menu">
+                                <a class="nav-link" href="@Url.Action("Journey", "Website")">JOURNEY</a>
+                                <a class="nav-link" href="javascript:void(0);" onclick="scrollToSummerCollection()">SUMMER COLLECTION</a>
+                            </div>
+                            <!-- CENTER LOGO -->
+                            <div class="text-center d-flex align-items-center gap-2 center-logo">
+                                <img src="~/images/Hariloom Logo Transparent.png" alt="Hariloom Logo" />
+                            </div>
+                            <!-- RIGHT MENU -->
+                            <div class="nav-right-menu">
+                                <ul class="navbar-nav" id="navbarUserSection" style="flex-direction:row;align-items:center;gap:8px;">
+                                    <!-- User dropdown or login/signup buttons will be injected here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <!-- Mobile slide-out menu -->
+                    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+                    <div class="mobile-menu" id="mobileMenu">
+                        <button class="mobile-menu-close" onclick="toggleMobileMenu()">&times;</button>
+                        <a class="mobile-nav-link" href="@Url.Action("Journey", "Website")">JOURNEY</a>
+                        <a class="mobile-nav-link" href="javascript:void(0);" onclick="scrollToSummerCollection(); toggleMobileMenu();">SUMMER COLLECTIONS</a>
+                        <a class="mobile-nav-link" href="@Url.Action("Home", "Website")">HOME</a>
+                        <div id="mobileUserLinks"></div>
+                    </div>
+                    <div class="container-xxl product-grouping-names">
+                        <!-- Names will be appended here -->
+                    </div>
+                }
+
+                <!-- / Navbar -->
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <!-- Content -->
+                    <div class="@(ViewBag.IsHome == true ? "flex-grow-1 site-content-bg" : "container-xxl flex-grow-1 container-p-y site-content-bg")">
+                        @RenderBody()
+                    </div>
+                    <!-- / Content -->
+                    @if (ViewBag.HideNavigation != true)
+                    {
+                        <!-- Footer -->
+                        <footer class="hariloom-footer">
+
+                            <!-- TOP LINKS -->
+                            <div class="footer-top">
+                                <a href="@Url.Action("About", "Website")">ABOUT</a>
+                                <a href="@Url.Action("Shipping", "Website")">SHIPPING</a>
+                                <a href="@Url.Action("Contact", "Website")">CONTACT</a>
+                                <a href="https://www.instagram.com/hariloom.in?igsh=MXE5cHVwdDdwdzgzMA%3D%3D&utm_source=qr" target="_blank">INSTAGRAM</a>
+                                <a href="~/documents/About.pdf">PRIVACY</a>
+                                <a href="~/documents/Terms.pdf">TERMS</a>
+                                <a href="@Url.Action("Faq", "Website")" target="_self">FAQ</a>
+                                <span class="copyright">HARILOOM © 2026</span>
+                            </div>
+
+                            <!-- BIG BACKGROUND TEXT -->
+                            <div class="footer-brand">
+                                Hariloom
+                            </div>
+
+                        </footer>
+
+                        <!-- / Footer -->
+                    }
+                    <div class="content-backdrop fade"></div>
+                </div>
+                <!-- Content wrapper -->
+                <!-- Login/Signup Prompt Modal -->
+                <div class="modal fade" id="loginPromptModal" tabindex="-1" aria-labelledby="loginPromptModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content text-center">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title w-100" id="loginPromptModalLabel">Join Hariloom</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="~/images/Hariloom Logo Transparent.png" alt="Nova Attire" class="mb-3" style="width:80px; transform: translateX(-12px);">
+                                @*
+                               <blockquote class="blockquote mb-3">
+                                    <div class="row">
+                                        <p class="mb-0">"Style is a way to say who you are without having to speak."</p>
+                                        <footer class="blockquote-footer mt-1 text-end">Rachel Zoe</footer>
+                                    </div>
+                                </blockquote>*@
+                                <p class="mb-4">Sign in or create an account to unlock exclusive features and offers!</p>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/Auth/Login" class="btn btn-outline-primary">Sign In</a>
+                                    <a href="/Auth/Register" class="btn btn-primary">Sign Up</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / Layout page -->
+        </div>
+    </div>
+    <!-- / Layout wrapper -->
+    <script src="~/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/vendor/libs/popper/popper.js"></script>
+    <script src="~/vendor/js/bootstrap.js"></script>
+    <script src="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/vendor/js/menu.js"></script>
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="~/js/main.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.3/parsley.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
+
+            //loadNames();
+            const userName = sessionStorage.getItem('name');
+            const hariloomAuthToken = getCookie('hariloomAuthToken');
+            const $navbarUserSection = $('#navbarUserSection');
+            $navbarUserSection.empty();
+
+            if (hariloomAuthToken && userName) {
+                // User is logged in, show Bag link and the user dropdown
+                $navbarUserSection.append(`
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Website/Bag">BAG</a>
+                    </li>
+                `);
+
+                $navbarUserSection.append(`
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                        <div class="avatar avatar-online" style="transform: translateY(-3px);">
+                            <img src="/images/Hariloom Logo Transparent.png" class="w-px-40 h-auto rounded-circle" />
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar avatar-online">
+                                            <img src="/images/Hariloom Logo Transparent.png" class="w-px-40 h-auto rounded-circle" />
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <span class="fw-semibold d-block userNameSpan"></span>
+                                        <small class="text-muted" id="userAccessLevel"></small>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li><div class="dropdown-divider"></div></li>
+
+
+                                      <li>
+            <a class="dropdown-item" href="/Website/Profile">
+                <i class="bx bx-user me-2"></i>
+                <span class="align-middle">My Profile</span>
+            </a>
+        </li>
+                                      <li>
+            <a class="dropdown-item" href="/Website/Wishlist">
+                <i class="bx bx-heart me-2"></i>
+                <span class="align-middle">Wishlist</span>
+            </a>
+        </li>
+                        <li>
+                            <a class="dropdown-item" href="/Website/Bag">
+                                <i class="bx bx-cart me-2"></i>
+                                <span class="align-middle">Bag</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/Website/Orders">
+                                <i class="bx bx-receipt me-2"></i>
+                                <span class="align-middle">Order History</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="fnUserLogout()">
+                                <i class="bx bx-power-off me-2"></i>
+                                <span class="align-middle">Log Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>`);
+
+                // Set user info
+                $('.userNameSpan').text(userName);
+                const userAccessLevelId = sessionStorage.getItem('accessLevel');
+                $('#userAccessLevel').text(userAccessLevelId == 1 ? "User" : "Admin");
+            } else {
+                // User is not logged in, show Login and Bag buttons
+                $navbarUserSection.append(`
+                    <li class="nav-item">
+                        <a class="btn btn-primary login-btn" href="/Auth/Login">Login</a>
+                    </li>
+                `);
+            }
+
+            const fiveMinutes = 1 * 30 * 1000;
+            setTimeout(function() {
+                if (!hariloomAuthToken) {
+                    $("#loginPromptModal").modal("show");
+                }else{
+                    $("#loginPromptModal").modal("hide");
+                }
+            }, fiveMinutes);
+
+            // Populate mobile menu user links
+            var $mobileLinks = $('#mobileUserLinks');
+            if (hariloomAuthToken && userName) {
+                $mobileLinks.html(`
+                    <a class="mobile-nav-link" href="/Website/Bag">BAG</a>
+                    <a class="mobile-nav-link" href="/Website/Account">MY PROFILE</a>
+                    <a class="mobile-nav-link" href="/Website/Wishlist">FAVORITES</a>
+                    <a class="mobile-nav-link" href="/Website/Orders">ORDER HISTORY</a>
+                    <a class="mobile-nav-link" href="javascript:void(0);" onclick="fnUserLogout()">LOG OUT</a>
+                `);
+            } else {
+                $mobileLinks.html(`
+                    <a class="mobile-nav-link" href="/Auth/Login">LOGIN</a>
+                `);
+            }
+        });
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('active');
+            document.getElementById('mobileMenuOverlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('active') ? 'hidden' : '';
+        }
+
+        function loadNames() {
+            $.get('@Url.Action("GetAllActiveProductGrouping", "ProductsManagement")', function (groupingRes) {
+
+                if (!groupingRes.data || !Array.isArray(groupingRes.data))
+                return;
+
+                const groupingBox = $('.product-grouping-names');
+                groupingBox.empty();
+
+                groupingRes.data.forEach(group => {
+                    const badge = $('<div class="grouping-name cursor-pointer" onclick="fnLoadProductListWithGrouping(' + group.mstProductGroupingId + ')"></div>').text(group.groupingName);
+                    groupingBox.append(badge);
+                });
+
+            });
+        }
+
+        function fnGoToProductDetails(productId) {
+            sessionStorage.removeItem('selectedProductId');
+            sessionStorage.setItem('selectedProductId', productId);
+            window.location.href = '@Url.Action("ProductDetail", "Website")';
+        }
+
+        function fnLoadProductListWithGrouping(groupingId) {
+            sessionStorage.removeItem('selectedGroupingId');
+            sessionStorage.setItem('selectedGroupingId', groupingId);
+            window.location.href = '@Url.Action("ProductList", "Website")';
+        }
+
+        function fnLoadProductListWithMainCategory(categoryId) {
+            sessionStorage.removeItem('selectedCategoryId');
+            sessionStorage.setItem('selectedCategoryId', categoryId);
+            window.location.href = '@Url.Action("ProductList", "Website")';
+        }
+
+        function fnLoadProductListWithSubCategory(subCategoryId) {
+            sessionStorage.removeItem('selectedSubCategoryId');
+            sessionStorage.setItem('selectedSubCategoryId', subCategoryId);
+            window.location.href = '@Url.Action("ProductList", "Website")';
+        }
+
+
+        function fnOnClickBanner(groupingId,categoryId,subCategoryId) {
+            sessionStorage.removeItem('selectedGroupingId');
+            sessionStorage.setItem('selectedGroupingId', groupingId);
+
+            sessionStorage.removeItem('selectedCategoryId');
+            sessionStorage.setItem('selectedCategoryId', categoryId);
+
+            sessionStorage.removeItem('selectedSubCategoryId');
+            sessionStorage.setItem('selectedSubCategoryId', subCategoryId);
+            window.location.href = '@Url.Action("ProductList", "Website")';
+        }
+
+        function getCookie(name) {
+            const value = "; " + document.cookie;
+            const parts = value.split("; " + name + "=");
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return null;
+        }
+
+        function fnUserLogout(){
+            sessionStorage.clear();
+            document.cookie.split(";").forEach(function (c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+             window.location.href = '@Url.Action("userLogout", "Auth")';
+        }
+
+        function scrollToSummerCollection() {
+            var target = document.getElementById('summer-collection');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+                window.location.href = '@(Url.Content("~/"))#summer-collection';
+        }
+
+        // Mark Wishlist Products
+        function markWishlistProducts(productIds) {
+            $.ajax({
+                url: '@Url.Action("checkWishlistStatus", "Website")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    mstUserId: userId,
+                    productIds
+                }),
+                success: res => {
+                    if (!res.success || !Array.isArray(res.data)) {
+                        return;
+                    }
+
+                    res.data.filter(x => x.isWishlisted).forEach(x => {
+                               const heart = $(`.wishlist-heart[data-id="${x.mstProductId}"]`);
+
+        heart.addClass('active');
+
+        heart.find('.wishlist-icon')
+             .attr('src', '/images/heart-filled.png');
+                    });
+                }
+            });
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    
+</body>
+</html>

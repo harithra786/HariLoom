@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Product Grouping";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products Management /</span> Product Grouping</h4>
+    </div>
+    <div class="d-flex align-content-center flex-wrap">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productGroupingAddModal"> Add </button>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="productGroupingAddModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" data-parsley-validate id="groupingForm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productGroupingAddModalTitle">Add Product Grouping</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="fnClrModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="groupingId" />
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="groupingName" class="form-label">Product Grouping Name</label>
+                        <input type="text" id="groupingName" class="form-control only-letters-spaces" placeholder="Enter Product Grouping Name"
+                               autocomplete="off" required data-parsley-errors-container="#groupingNameError" />
+                        <span class="text-danger parsley-errors" id="groupingNameError"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fnClrModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="saveBtn" onclick="addOrUpdateGrouping()">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Product Grouping Details</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>Product Grouping Heading</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function loadGrouping() {
+            $.get('@Url.Action("GetAllProductGrouping", "ProductsManagement")', function (response) {
+                let tbody = '';
+                response.data.forEach((cat, idx) => {
+                    tbody += `<tr>
+                        <td>${idx + 1}</td>
+                        <td>${cat.groupingName}</td>
+                        <td><div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" ${cat.isActive ? 'checked' : ''}  onchange="toggleActive(${cat.mstProductGroupingId}, this.checked)">
+                        </div></td>
+                        <td><button class="btn btn-sm btn-warning" onclick="editCategory(${cat.mstProductGroupingId})">Edit</button></td>
+                    </tr>`;
+                });
+                $('table tbody').html(tbody);
+            });
+        }
+
+        function addOrUpdateGrouping() {
+            const form = $('#groupingForm');
+            if (!form.parsley().validate()) {
+                return false;
+            }
+
+            const id = $('#groupingId').val();
+            const name = $('#groupingName').val().trim();
+            const payload = {
+                mstProductGroupingId: id ? parseInt(id) : 0,
+                groupingName: name,
+                createdBy: sessionStorage.getItem('userId')
+            };
+
+            $.ajax({
+                url: '@Url.Action("SaveOrUpdateProductGrouping", "ProductsManagement")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (response) {
+                    if(response.success == true){
+                        fnClrModal();
+                        loadGrouping();
+                        toastr.success(response.message);
+                    }else{
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseText);
+                }
+            });
+        }
+
+        function editCategory(id) {
+            $.get('@Url.Action("GetGroupingById", "ProductsManagement")', { id }, function (response) {
+                if (response.success) {
+                    const cat = response.data;
+                    $('#groupingId').val(cat.mstProductGroupingId);
+                    $('#groupingName').val(cat.groupingName);
+                    $('#productGroupingAddModalTitle').text('Edit Product Grouping');
+                    $('#productGroupingAddModal').modal('show');
+                } else {
+                    toastr.error(response.message);
+                }
+            });
+        }
+
+        function toggleActive(id, isActive) {
+            $.post('@Url.Action("DeactivateProductGrouping", "ProductsManagement")', {
+                id: id,
+                isActive: isActive,
+                updatedBy: 1
+            }, function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    loadGrouping();
+                } else {
+                    toastr.error(response.message);
+                }
+            }).fail(function (xhr) {
+                toastr.error('Error: ' + xhr.responseText);
+            });
+        }
+
+        function fnClrModal() {
+            $('#groupingId').val('');
+            $('#groupingName').val('');
+            $('#groupingForm').parsley().reset();
+            $('#productGroupingAddModalTitle').text('Add Product Grouping');
+            $('#productGroupingAddModal').modal('hide');
+        }
+
+        $(function () {
+            loadGrouping();
+        });
+    </script>
+
+}

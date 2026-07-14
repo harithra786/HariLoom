@@ -1,0 +1,815 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" class="light-style customizer-hide" dir="ltr" data-theme="theme-default" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>Hariloom - Sign Up</title>
+    <meta name="description" content="" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Helpers -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+
+        /* BACKGROUND */
+       @* body {
+            min-height: 100vh;
+            background-color: #2a2a2a;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }*@
+        body {
+            min-height: 100vh;
+            background-color: #F7F4ED;
+        }
+
+        /* OVERLAY */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: transparent;
+            z-index: 1;
+        }
+
+        /* POSITION LEFT */
+        @*
+        .signup-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center; /* vertical center */
+            justify-content: flex-start; /* align to left */
+            position: relative;
+            z-index: 2;
+            padding: 20px 20px 20px 72px; /* left padding to push card to left edge */
+        }*@
+        .signup-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        /* CARD */
+        @*
+        .signup-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 30px 35px;
+            /* slight translucent background for readability but no blur */
+            background: rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+            color: #fff;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            max-height: 90vh;
+            overflow-y: auto;
+        }*@
+        .signup-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 30px 35px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar styling */
+        .signup-card::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .signup-card::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .signup-card::-webkit-scrollbar-thumb {
+            background: rgba(90, 140, 201, 0.5);
+            border-radius: 10px;
+        }
+
+        .signup-card::-webkit-scrollbar-thumb:hover {
+            background: rgba(90, 140, 201, 0.7);
+        }
+
+        /* LOGO */
+        .logo {
+            width: 65px;
+            height: 65px;
+            border-radius: 16px;
+            background: #5a8cc9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .logo img {
+            width: 70%;
+        }
+
+        /* TEXT */
+        .signup-card h2 {
+            font-size: 26px;
+            margin-bottom: 4px;
+            color: #222;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        /* INPUT */
+        .field {
+            margin-bottom: 14px;
+        }
+
+       @* .field label {
+            font-size: 13px;
+            color: #ddd;
+            margin-bottom: 6px;
+            display: block;
+        }*@
+        .field label {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 500;
+        }
+
+        @*.field input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }*@
+        .field input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #dcdcdc;
+            outline: none;
+            background: #fff;
+            color: #333;
+        }
+
+        .field input::placeholder {
+            color: #888;
+            ;
+        }
+
+        .field input:focus {
+            outline: 2px solid #5a8cc9;
+        }
+
+        @*.field input:disabled {
+            background: rgba(255,255,255,0.08);
+            opacity: 0.6;
+        }*@
+        .field input:disabled {
+            background: #f5f5f5;
+            color: #666;
+            opacity: 1;
+        }
+
+        /* ROW */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .col {
+            margin-bottom: 0;
+        }
+
+        .col .field {
+            margin-bottom: 0;
+        }
+
+        /* BUTTON GROUP */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: linear-gradient(135deg, #5a8cc9, #4a7fcc);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(90,140,201,0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #888, #666);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #5a8cc9, #4a7fcc);
+            color: #fff;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(90,140,201,0.4);
+        }
+
+        /* FOOTER */
+        @*
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 18px;
+        }*@
+
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 18px;
+        }
+
+        .footer-text a {
+            color: #5a8cc9;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sign in link */
+        .signin-link {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+
+        .signin-link span {
+                color: #555;
+        }
+
+        .signin-link a {
+            color: #5a8cc9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signin-link a:hover {
+            text-decoration: underline;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+            .password-wrapper input {
+                padding-right: 45px;
+            }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #777;
+            font-size: 16px;
+        }
+
+            .toggle-password:hover {
+                color: #5a8cc9;
+            }
+
+        #password::-ms-reveal,
+        #password::-ms-clear {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Signup Container -->
+    <div class="signup-container">
+        <div class="signup-card">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="~/img/avatars/hariloom_logo_blue.png" alt="Hariloom Logo" />
+            </div>
+
+            <!-- Welcome Text -->
+            <h2>Join Hariloom</h2>
+            <p class="subtitle">Create your account and start shopping</p>
+            <!-- Part one -->
+            <div id="step1">
+
+            <!-- Username Field -->
+            <div class="field">
+                <label for="username">Full Name</label>
+                <input type="text" id="username" name="username" placeholder="Enter your full name" autocomplete="off" autofocus />
+            </div>
+
+            <!-- Phone Number Field -->
+            <div class="field">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" class="only-numbers" maxlength="10" autocomplete="off" />
+            </div>
+
+            <!-- Email Field -->
+            <div class="field">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="off" />
+            </div>
+
+            <!-- Send OTP Button -->
+            <button type="button" class="btn-secondary" id="sendOtpBtn">Send OTP</button>
+
+            <!-- OTP Field -->
+            <div class="field" style="margin-top: 14px;">
+                <label for="otp">OTP</label>
+                <input type="text" id="otp" name="otp" placeholder="Enter OTP" disabled maxlength="4" />
+            </div>
+                <!-- PART one ending -->
+                <button type="button" id="nextBtn">Proceed</button>
+            </div>
+            
+            <!-- PART two -->
+            <div id="step2" style="display:none;">
+
+
+
+            <!-- Password Field -->
+            <div class="field">
+                <label for="password">Password</label>
+
+                <div class="password-wrapper">
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           placeholder="Enter your password"
+                           autocomplete="new-password"
+                           disabled />
+
+                    <i class="fa-solid fa-eye toggle-password"
+                       id="togglePassword"></i>
+                </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="field" style="margin-top: 15px; margin-bottom: 20px;">
+                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-weight: normal; color: #555;">
+                    <input type="checkbox" id="termsCheckbox" style="width: auto; margin-top: 3px;" />
+                    <span>I accept the <a href="~/documents/About.pdf" target="_blank" style="color: #5a8cc9; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">privacy policy</a> and <a href="~/documents/Terms.pdf" target="_blank" style="color: #5a8cc9; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">terms of use</a>.</span>
+                </label>
+                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; margin-top: 10px; font-weight: normal; color: #555;">
+                    <input type="checkbox" id="promoCheckbox" style="width: auto; margin-top: 3px;" />
+                    <span>I accept promotional emails from Hariloom.</span>
+                </label>
+            </div>
+
+            <!-- Sign Up Button -->
+            <button id="registerBtn" disabled>Create Account</button>
+                <!-- PART two ending -->
+            </div>
+            <!-- Sign In Link -->
+            <div class="signin-link">
+                <span>Already have an account?</span>
+                <a href='@Url.Action("Login","Auth")'>Sign In</a>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-text">
+                © 2026 Hariloom
+            </div>
+        </div>
+    </div>
+    <script src="~/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/vendor/js/bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Track OTP state
+        let generatedOTP = '';
+        let userEmail = '';
+        let otpExpiryTime = 0;
+        let otpTimerInterval = null;
+
+        // Function to test EmailJS credentials with common parameter variations
+        function testEmailJSCredentials() {
+            console.log('🧪 Testing EmailJS credentials with common parameter names...');
+
+            // Common parameter name variations to test
+            const paramVariations = [
+                {
+                    name: 'email',
+                    params: {
+                        email: 'test@example.com',
+                        user_name: 'Test User',
+                        otp_code: '1234',
+                        phone_number: '9999999999'
+                    }
+                },
+                {
+                    name: 'email',
+                    params: {
+                        email: 'test@example.com',
+                        user_name: 'Test User',
+                        passcode: '1234',
+                        time: '15 minutes',
+                        phone_number: '9999999999'
+                    }
+                },
+                {
+                    name: 'recipient_email',
+                    params: {
+                        recipient_email: 'test@example.com',
+                        user_name: 'Test User',
+                        passcode: '1234',
+                        time: '15 minutes',
+                        phone_number: '9999999999'
+                    }
+                },
+                {
+                    name: 'my_email',
+                    params: {
+                        my_email: 'test@example.com',
+                        user_name: 'Test User',
+                        passcode: '1234',
+                        time: '15 minutes',
+                        phone_number: '9999999999'
+                    }
+                },
+                {
+                    name: 'user_email',
+                    params: {
+                        user_email: 'test@example.com',
+                        user_name: 'Test User',
+                        passcode: '1234',
+                        time: '15 minutes',
+                        phone_number: '9999999999'
+                    }
+                }
+            ];
+
+            console.log('📋 Testing these parameter variations:');
+            paramVariations.forEach((v, i) => console.log(`  ${i + 1}. ${v.name}`));
+
+            // Test each variation
+            paramVariations.forEach(variation => {
+                const testPayload = {
+                    service_id: 'service_w1opyin',
+                    template_id: 'template_jiy86uh',
+                    user_id: 'SSCTqGrDcd8r_fK3O',
+                    template_params: variation.params
+                };
+
+                fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testPayload)
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        console.log(`✅ SUCCESS with "${variation.name}"!`);
+                        console.log(`   Use this in your code: ${JSON.stringify(variation.params, null, 2)}`);
+                    } else {
+                        return response.text().then(errorText => {
+                            console.log(`❌ "${variation.name}" failed: ${errorText}`);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error(`❌ "${variation.name}" error:`, error.message);
+                });
+            });
+        }
+
+        // Test credentials on page load (comment out after testing)
+        // Uncomment the line below to test your EmailJS setup:
+        //testEmailJSCredentials();
+
+        // Generate random 4-digit OTP
+        function generateOTP() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        // Only allow numbers in phone field
+        $('.only-numbers').on('keyup', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+        // Function to validate user details on blur
+        function validateUserDetails() {
+            const email = $('#email').val();
+            const phone = $('#phoneNumber').val();
+            
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            const isEmailValid = email && emailRegex.test(email);
+            const isPhoneValid = phone && phone.length === 10;
+
+            if (!isEmailValid && !isPhoneValid) return;
+
+            $.ajax({
+                url: '@Url.Action("CheckUserExists", "Auth")',
+                type: 'GET',
+                data: { 
+                    email: isEmailValid ? email : null, 
+                    phoneNumber: isPhoneValid ? phone : null 
+                },
+                success: function(response) {
+                    if (!response.success) {
+                        toastr.error(response.message);
+                        $('#sendOtpBtn').prop('disabled', true);
+                    } else {
+                        $('#sendOtpBtn').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        $('#email, #phoneNumber').on('blur', validateUserDetails);
+
+        $('#sendOtpBtn').click(function () {
+            const phoneNumber = $('#phoneNumber').val();
+            userEmail = $('#email').val();
+
+            // Validate phone number
+            if (!phoneNumber || phoneNumber.length !== 10) {
+                toastr.error('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            // Validate email
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            if (!userEmail || !emailRegex.test(userEmail)) {
+                toastr.error('Please enter a valid email address');
+                return;
+            }
+
+            // Disable button and show checking status
+            $('#sendOtpBtn').prop('disabled', true).text('Checking...');
+
+            $.ajax({
+                url: '@Url.Action("CheckUserExists", "Auth")',
+                type: 'GET',
+                data: { email: userEmail, phoneNumber: phoneNumber },
+                success: function(response) {
+                    if (!response.success) {
+                        // User exists (email or phone)
+                        toastr.error(response.message);
+                        $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
+                        return;
+                    }
+
+                    // Generate OTP
+                    generatedOTP = generateOTP();
+                    otpExpiryTime = new Date().getTime() + (5 * 60 * 1000); // 5 minutes expiry
+
+                    // Show sending status
+                    $('#sendOtpBtn').text('Sending OTP...');
+
+                    // Send OTP via backend
+                    $.ajax({
+                        url: '@Url.Action("SendOtpEmail", "Auth")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            email: userEmail,
+                            userName: $('#username').val() || 'User',
+                            otp: generatedOTP,
+                            phoneNumber: phoneNumber
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('OTP sent successfully to ' + userEmail);
+                                $('#sendOtpBtn').prop('disabled', true);
+
+                                // Enable OTP and other fields
+                                $('#otp').prop('disabled', false).focus();
+
+                                // Start OTP expiry timer
+                                startOTPTimer();
+                            } else {
+                                toastr.error('Failed to send OTP. Please try again.');
+                                $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error sending OTP:', error);
+                            toastr.error('Failed to send OTP. Please verify your email address and try again.');
+                            $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
+                        }
+                    });
+                },
+                error: function() {
+                    toastr.error('Error verifying user details. Please try again later.');
+                    $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
+                }
+            });
+        });
+
+        // OTP Expiry Timer
+        function startOTPTimer() {
+            if (otpTimerInterval) {
+                clearInterval(otpTimerInterval);
+            }
+            otpTimerInterval = setInterval(function () {
+                const currentTime = new Date().getTime();
+                const timeRemaining = otpExpiryTime - currentTime;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(otpTimerInterval);
+                    otpTimerInterval = null;
+                    $('#otp').prop('disabled', true).val('');
+                    toastr.warning('OTP has expired. Please request a new one.');
+                    resetForm();
+                } else {
+                    const minutes = Math.floor(timeRemaining / 60000);
+                    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+                    $('#sendOtpBtn').text(`Resend OTP (${minutes}:${seconds.toString().padStart(2, '0')})`);
+                }
+            }, 1000);
+        }
+
+        // Reset form after OTP expiry
+        function resetForm() {
+            $('#otp').prop('disabled', true).val('');
+            $('#password').prop('disabled', true);
+            $('#registerBtn').prop('disabled', true);
+            $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
+        }
+
+        $('#registerBtn').click(function (e) {
+            e.preventDefault();
+
+            if (!$('#termsCheckbox').is(':checked')) {
+                toastr.error('You must accept the privacy policy and terms and conditions to sign up.');
+                return;
+            }
+
+            // Verify OTP before proceeding
+            if ($('#otp').val() !== generatedOTP) {
+                toastr.error('Invalid OTP. Please enter the correct OTP.');
+                return;
+            }
+
+            // Check OTP expiry
+            const currentTime = new Date().getTime();
+            if (currentTime > otpExpiryTime) {
+                toastr.error('OTP has expired. Please request a new one.');
+                resetForm();
+                return;
+            }
+
+            let model = {
+                name: $('#username').val(),
+                phoneNumber: $('#phoneNumber').val(),
+                email: $('#email').val(),
+                password: $('#password').val(),
+                isPromotionalEmailOptIn: $('#promoCheckbox').is(':checked')
+            };
+
+            if (!model.name || !model.phoneNumber || !model.email || !model.password) {
+                toastr.error('Please fill in all required fields');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("userRegister", "Auth")',
+                type: 'POST',
+                dataType: 'json',
+                data: { model: model },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message || 'Account created successfully!');
+                        setTimeout(function () {
+                            window.location.href = '@Url.Action("Login", "Auth")';
+                        }, 2000);
+                    } else {
+                        toastr.error(response.message || 'Registration failed');
+                        if (response.message === "Email ID already in use" || response.message === "Phone number already exists") {
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Login", "Auth")';
+                            }, 2000);
+                        }
+                    }
+                },
+                error: function (response) {
+                    toastr.error('Registration failed! Please try again later.');
+                }
+            });
+        });
+        
+        $('#togglePassword').click(function () {
+
+            const passwordField = $('#password');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                $(this)
+                    .removeClass('fa-eye')
+                    .addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                $(this)
+                    .removeClass('fa-eye-slash')
+                    .addClass('fa-eye');
+            }
+        });
+                       
+        $('#nextBtn').click(function () {
+                    
+            if (!generatedOTP) {
+            toastr.error('Please send OTP first');
+            return;
+        }
+
+            if ($('#otp').val() !== generatedOTP) {
+                toastr.error('Please enter a valid OTP');
+                return;
+            }
+                    
+            if (new Date().getTime() > otpExpiryTime) {
+            toastr.error('OTP has expired');
+            return;
+        }
+            $('#step1').hide();
+
+            $('#password').prop('disabled', false);
+            $('#registerBtn').prop('disabled', false);
+
+            $('#step2').show();
+        });
+    </script>
+    
+</body>
+</html>

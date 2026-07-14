@@ -1,0 +1,259 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Wishlist";
+}
+
+@section Styles {
+    <style>
+        body {
+            background: #f4f1eb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .wishlist-container {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .wishlist-header,
+        .wishlist-card,
+        .empty-wishlist {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        }
+
+        .wishlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+            .wishlist-header h1,
+            .product-name,
+            .empty-title {
+                color: #0b1d39;
+                font-family: 'Josefin Sans', sans-serif;
+            }
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+            gap: 24px;
+        }
+
+        .wishlist-card {
+            overflow: hidden;
+            transition: .3s;
+        }
+
+            .wishlist-card:hover {
+                transform: translateY(-4px);
+            }
+
+        .product-image {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+
+        .wishlist-card-content {
+            padding: 18px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0b1d39;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #e74c3c;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-view,
+        .btn-remove,
+        .btn-continue-shopping {
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .btn-view,
+        .btn-continue-shopping {
+            background: #0b1d39;
+            color: #fff;
+            padding: 10px 16px;
+        }
+
+        .btn-view {
+            flex: 1;
+        }
+
+        .btn-remove {
+            padding: 10px 14px;
+            border: 1px solid #e74c3c;
+            background: #fff;
+            color: #e74c3c;
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        @@media(max-width:768px) {
+            .wishlist-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .product-image {
+                height: 240px;
+            }
+        }
+    </style>
+}
+
+<div class="wishlist-container">
+    <div class="wishlist-header">
+        <h1>My Wishlist</h1>
+        <span id="wishlistCount">Loading...</span>
+    </div>
+
+    <div id="wishlistContent" class="loading">
+        Loading wishlist...
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            loadWishlist();
+        });
+
+        function loadWishlist() {
+            const userId = sessionStorage.getItem('userId');
+            if (!userId) {
+                $("#loginPromptModal").modal("show");
+                return;
+            }
+
+            $.get('@Url.Action("getUserWishlist", "Website")',{ mstUserId: userId },
+                function (res) {
+                    renderWishlist(res.success ? res.data : []);
+                }
+            ).fail(function () {
+                renderWishlist([]);
+            });
+        }
+
+        function renderWishlist(wishlist) {
+            $('#wishlistCount').text(`${wishlist.length} item${wishlist.length !== 1 ? 's' : ''}`);
+
+            if (!wishlist.length) {
+                return $('#wishlistContent').html(`
+                    <div class="empty-wishlist">
+                        <h2 class="empty-title">Wishlist is Empty</h2>
+                        <p>Add your favourite products to wishlist</p>
+                        <a href="@Url.Action("Home", "Website")" class="btn-continue-shopping">
+                            Continue Shopping
+                        </a>
+                    </div>
+                `);
+            }
+
+            let html = '<div class="wishlist-grid">';
+
+            wishlist.forEach(item => {
+                const oldPrice = item.basePrice || 0;
+                const discount = item.discountedPrice || 0;
+                const newPrice = oldPrice - discount;
+                const discountPercent = oldPrice ? Math.round((discount / oldPrice) * 100) : 0;
+                const image = item.coverImagePath ? `/${item.coverImagePath}` : '/img/avatars/hariloom_logo_blue.png';
+
+                html += `<div class="wishlist-card">
+                    <div style="position:relative">
+                        <img src="${image}" class="product-image" alt="${item.productName}">
+                        ${discountPercent ? `<span class="discount-badge">${discountPercent}% OFF</span>` : ''}
+                    </div>
+                    <div class="wishlist-card-content">
+                        <h3 class="product-name">${item.productName}</h3>
+                        <div>
+                            <span class="product-price">₹${newPrice.toFixed(2)}</span>
+                            ${discountPercent ? `<span class="old-price">₹${oldPrice.toFixed(2)}</span>` : ''}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-view" onclick="fnGoToProductDetails(${item.mstProductId})">
+                                View
+                            </button>
+                            <button class="btn-remove" onclick="removeWishlist(${item.mstProductId})">
+                                <i class='bx bx-trash'></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            html += '</div>';
+            $('#wishlistContent').html(html);
+        }
+
+        function removeWishlist(productId) {
+            $.ajax({
+                url: '@Url.Action("removeFromWishlist", "Website")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    mstUserId: parseInt(sessionStorage.getItem('userId')),
+                    mstProductId: productId
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success('Removed from wishlist');
+                        loadWishlist();
+                    } else {
+                        toastr.error(res.message);
+                    }
+                }
+            });
+        }
+    </script>
+}

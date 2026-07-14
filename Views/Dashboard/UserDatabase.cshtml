@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "User Database";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Management /</span> User Database</h4>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="col-md-3 float-end">
+    <input type="text" id="userSearch" class="form-control" placeholder="Search by name, phone, email, or IP address..." autocomplete="off"/>
+    </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+            <h5 class="card-header bg-white border-bottom">User Accounts Log</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Email</th>
+                            <th>Created Timestamp</th>
+                            <th>IP Address</th>
+                            <th>Total Visits</th>
+                            <th>Promotional Emails</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadUserDatabase();
+        });
+
+        function loadUserDatabase() {
+            $.ajax({
+                url: '@Url.Action("GetAllUserAccounts", "Dashboard")',
+                type: 'GET',
+                cache: false,
+                success: function (response) {
+                    var users = [];
+                    if (response && response.success && Array.isArray(response.data)) {
+                        users = response.data;
+                    } else if (Array.isArray(response)) {
+                        users = response;
+                    }
+
+                    let tbody = '';
+                    if (users.length === 0) {
+                        tbody = '<tr><td colspan="8" class="text-center py-4 text-muted">No user accounts found.</td></tr>';
+                    } else {
+                        users.forEach((u, idx) => {
+                            const dateObj = new Date(u.createdDate);
+                            const formattedDate = dateObj.toLocaleDateString(undefined, { 
+                                year: 'numeric', month: 'short', day: 'numeric',
+                                hour: '2-digit', minute: '2-digit'
+                            });
+
+                            const promoBadge = u.isPromotionalEmailOptIn 
+                                ? '<span class="badge bg-success rounded-pill px-3 py-2">Opted In</span>' 
+                                : '<span class="badge bg-secondary bg-opacity-50 text-dark rounded-pill px-3 py-2">Not Subscribed</span>';
+
+                            // Highlight rows visually if they opted in
+                            const rowClass = u.isPromotionalEmailOptIn ? 'table-success-subtle' : '';
+
+                            tbody += `<tr class="${rowClass}">
+                                <td class="fw-medium">${idx + 1}</td>
+                                <td class="fw-semibold text-primary">${u.name || '-'}</td>
+                                <td>${u.phoneNumber || '-'}</td>
+                                <td>${u.email || '-'}</td>
+                                <td class="text-muted"><i class="bx bx-clock me-1"></i>${formattedDate}</td>
+                                <td><code class="text-dark bg-light px-2 py-1 rounded">${u.ipAddress || 'Unknown'}</code></td>
+                                <td><span class="badge bg-primary rounded-pill">${u.visitCount}</span></td>
+                                <td>${promoBadge}</td>
+                            </tr>`;
+                        });
+                    }
+                    $('#userTableBody').html(tbody);
+                    initializeTableSearch('#userSearch','#userTableBody',[1, 2, 3, 5]);
+                },
+                error: function (xhr) {
+                    console.error('Failed to load user database', xhr);
+                    $('#userTableBody').html('<tr><td colspan="8" class="text-center text-danger py-4"><i class="bx bx-error me-2"></i>Failed to load data.</td></tr>');
+                }
+            });
+        }
+    </script>
+}

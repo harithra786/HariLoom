@@ -1,0 +1,299 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "Journey";
+}
+
+@section Styles {
+    <style>
+        /* Use the same light yellow/beige as the footer for the Journey page background */
+        body {
+            background: #F7F4ED !important;
+        }
+
+        .site-content-bg {
+            background-color: #F7F4ED !important;
+        }
+
+        .journey-page {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .journey-title {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+            .journey-title h1 {
+                font-size: 48px;
+                letter-spacing: 2px;
+                margin-bottom: 15px;
+                font-weight: 700;
+            }
+
+            .journey-title p {
+                font-size: 16px;
+                color: #666;
+                letter-spacing: 0.5px;
+            }
+
+        .journey-timeline {
+            position: relative;
+        }
+
+        .thread-knot {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 100px;
+            height: 210px;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .journey-row {
+            margin-bottom: 100px;
+            display: flex;
+            justify-content: flex-start;
+            padding-top: 50px;
+        }
+
+            .journey-row.left {
+                flex-direction: row;
+            }
+
+            .journey-row.right {
+                flex-direction: row-reverse;
+            }
+
+        .journey-content {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .journey-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+            .journey-text span {
+                font-size: 12px;
+                letter-spacing: 2px;
+                color: #999;
+                text-transform: uppercase;
+            }
+
+            .journey-text h3 {
+                font-size: 24px;
+                margin: 15px 0;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .journey-text p {
+                font-size: 14px;
+                line-height: 1.8;
+                color: #555;
+                letter-spacing: 0.3px;
+            }
+
+        .journey-content img {
+            flex: 1;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            min-width: 300px;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .journey-page {
+                padding: 40px 20px;
+            }
+
+            .journey-title h1 {
+                font-size: 32px;
+            }
+
+            .journey-content {
+                flex-direction: column !important;
+                gap: 30px;
+            }
+
+            .journey-row {
+                margin-bottom: 50px;
+            }
+
+            .journey-content img, 
+            .journey-text {
+                min-width: 0;
+            }
+
+            .thread-knot {
+                display: none;
+            }
+        }
+    </style>
+}
+
+<section class="journey-page" id="journey-section">
+    <div class="journey-title">
+        <h1>Journey</h1>
+        <p>From flax to final fold, every Hariloom piece is made with care.</p>
+    </div>
+
+    <div class="journey-timeline">
+
+        <!-- THREAD KNOT -->
+        <div class="thread-knot">
+            <svg viewBox="0 0 100 210" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 0 L50 80" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round" />
+                <path d="M50 80 C48 105 35 115 23 113 C8 110 8 88 24 86 C41 84 52 101 50 125 L50 210" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+
+        <!-- STEP 01 -->
+        <div class="journey-row left">
+            <div class="journey-content">
+
+                <div class="journey-text">
+                    <span>Step 01</span>
+                    <h3>Starts with flax</h3>
+                    <p>
+                        Every piece begins with flax — pure, enduring,
+                        and responsibly cultivated. The foundation of our linen.
+                    </p>
+                </div>
+
+                <img src="@(Url.Content("~/images/journey/flax.jpeg"))"
+                     alt="Starts with flax" />
+
+            </div>
+        </div>
+
+        <!-- STEP 02 -->
+        <div class="journey-row right">
+            <div class="journey-content">
+
+                <img src="@(Url.Content("~/images/journey/fabric.jpeg"))"
+                     alt="Fabric" />
+
+                <div class="journey-text">
+                    <span>Step 02</span>
+                    <h3>Spun Into Breathable Fabric</h3>
+                    <p>
+                        Spun with precision and woven with restraint,
+                        flax becomes linen — breathable, strong,
+                        and made to endure.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STEP 03 -->
+        <div class="journey-row left">
+            <div class="journey-content">
+
+                <div class="journey-text">
+                    <span>Step 03</span>
+                    <h3>Thoughtfully dyed</h3>
+                    <p>
+                        A quiet wash of colour, achieved through mindful,
+                        low-impact methods.
+                    </p>
+                </div>
+
+                <img src="@(Url.Content("~/images/journey/dye.jpeg"))"
+                     alt="Dyed" />
+
+            </div>
+        </div>
+
+        <!-- STEP 04 -->
+        <div class="journey-row right">
+            <div class="journey-content">
+
+                <img src="@(Url.Content("~/images/journey/cut.jpeg"))"
+                     alt="Cut" />
+
+                <div class="journey-text">
+                    <span>Step 04</span>
+                    <h3>Cut with care</h3>
+                    <p>
+                        Each piece is carefully mapped and patterns placed
+                        with care to limit waste, maintaining integrity
+                        in both design and process.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STEP 05 -->
+        <div class="journey-row left">
+            <div class="journey-content">
+
+                <div class="journey-text">
+                    <span>Step 05</span>
+                    <h3>Crafted into being</h3>
+                    <p>
+                        Constructed by experienced makers, stitched with
+                        intention and a focus on enduring quality.
+                        Nothing overlooked.
+                    </p>
+                </div>
+
+                <img src="@(Url.Content("~/images/journey/craft.jpeg"))"
+                     alt="Craft" />
+
+            </div>
+        </div>
+
+        <!-- STEP 06 -->
+        <div class="journey-row right">
+            <div class="journey-content">
+
+                <img src="@(Url.Content("~/images/journey/finish.jpeg"))"
+                     alt="Finish" />
+
+                <div class="journey-text">
+                    <span>Step 06</span>
+                    <h3>Finished with intention</h3>
+                    <p>
+                        Each piece undergoes a considered finishing process,
+                        with every detail perfected. Buttons, lace,
+                        and final accents are added.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STEP 07 -->
+        <div class="journey-row left">
+            <div class="journey-content">
+
+                <div class="journey-text">
+                    <span>Step 07</span>
+                    <h3>Final fold</h3>
+                    <p>
+                        Each garment is carefully folded and placed within
+                        our reusable cloth dust bag before it begins
+                        its journey to you.
+                    </p>
+                </div>
+
+                <img src="@(Url.Content("~/images/journey/Finish.jpg"))"
+                     alt="Final Fold" />
+
+            </div>
+        </div>
+
+    </div>
+
+</section>

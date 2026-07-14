@@ -1,0 +1,62 @@
+@{
+    Layout = "_ShopLayout";
+}
+
+<div class="container">
+    <h2>Orders</h2>
+    <div id="tabs" class="mb-3">
+        <a href="#" data-status="Pending" class="btn btn-link active">Pending</a>
+        <a href="#" data-status="OnTransit" class="btn btn-link">On Transit</a>
+        <a href="#" data-status="Completed" class="btn btn-link">Completed</a>
+    </div>
+
+    <input type="hidden" id="adminUserId" value="@User?.Identity?.Name" />
+
+    <table id="orders-table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Total</th>
+                <th>Tracking</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Tracking Modal -->
+<div class="modal fade" id="trackingModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Tracking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="orderId" />
+        <div class="mb-3">
+          <label>Tracking Id</label>
+          <input id="trackingId" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label>Status</label>
+          <select id="status" class="form-select">
+            <option value="OnTransit">On Transit</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="saveTracking" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts{
+    <script src="/wwwroot/js/admin-orders.js"></script>
+}

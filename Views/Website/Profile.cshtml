@@ -1,0 +1,76 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Profile";
+}
+
+<div class="container-xxl py-5" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 mt-5">
+            <div class="card shadow-sm border-0 rounded-4 mt-5">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4 font-primary" style="color: #1f4fa3; font-weight: 700;">My Profile</h2>
+                    
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="avatar avatar-xl me-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold; background-color: #1535b7 !important;" id="profileInitial">
+                                U
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 font-primary fw-bold" id="profName">Loading...</h4>
+                            <small class="text-muted" id="profMemberSince"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold mb-1" style="letter-spacing: 1px;">NAME</label>
+                        <p class="fs-5 mb-0 font-primary" id="profFullName">-</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold mb-1" style="letter-spacing: 1px;">CONTACT</label>
+                        <p class="fs-5 mb-0 font-primary" id="profContact">-</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold mb-1" style="letter-spacing: 1px;">EMAIL ID</label>
+                        <p class="fs-5 mb-0 font-primary" id="profEmail">-</p>
+                    </div>
+
+                    @* <div class="text-center mt-5">
+                        <a href="/Website/Account" class="btn btn-outline-secondary px-4 py-2 rounded-pill" style="font-size: 14px; letter-spacing: 1px;">GO TO ACCOUNT DASHBOARD</a>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            const mstUserId = sessionStorage.getItem('userId');
+            if (!mstUserId) {
+                window.location.href = '/Auth/Login';
+                return;
+            }
+
+            $.get('/Website/getUserDashboardDetails?mstUserId=' + mstUserId, function (res) {
+                if (res && res.success && res.data) {
+                    const user = res.data;
+                    
+                    $('#profName').text(user.name);
+                    $('#profFullName').text(user.name);
+                    
+                    if (user.name) {
+                        $('#profileInitial').text(user.name.charAt(0).toUpperCase());
+                    }
+
+                    $('#profContact').text(user.phoneNumber || '-');
+                    $('#profEmail').text(user.email || '-');
+                    $('#profMemberSince').text('Member since ' + user.memberSinceYear);
+                }
+            });
+        });
+    </script>
+}

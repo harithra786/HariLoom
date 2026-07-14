@@ -1,0 +1,145 @@
+@{
+    ViewData["Title"] = "Product Inventory";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products Management /</span> Product Inventory</h4>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="productInventoryModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" data-parsley-validate id="inventoryForm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productInventoryModalTitle">Update Inventory</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="fnClrModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productId" />
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" id="productName" class="form-control" readonly />
+                        <input type="hidden" id="trnProductSizeId" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="quantityAvailable" class="form-label">Available Quantity</label>
+                        <input type="text" id="quantityAvailable" class="form-control only-numbers" placeholder="Enter Quantity"
+                               autocomplete="off" required data-parsley-errors-container="#quantityAvailableError" />
+                        <span class="text-danger parsley-errors" id="quantityAvailableError"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fnClrModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="saveBtn" onclick="updateInventory()">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Product Inventory Details</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Size</th>
+                            <th>Available Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadInventory() {
+            $.get('@Url.Action("GetProductInventory", "ProductsManagement")', function (response) {
+                if (response.success) {
+                    let tbody = '';
+                    response.data.forEach((prod, idx) => {
+                        let safeProdName = prod.productName ? prod.productName.replace(/'/g, "\\'") : '';
+                        tbody += `<tr>
+                            <td>${idx + 1}</td>
+                            <td>${prod.productDisplayId || 'N/A'}</td>
+                            <td>${prod.productName}</td>
+                            <td>${prod.size || 'N/A'}</td>
+                            <td><span class="badge bg-${prod.quantityAvailable > 0 ? 'success' : 'danger'}">${prod.quantityAvailable}</span></td>
+                            <td><button class="btn btn-sm btn-warning" onclick="editInventory(${prod.trnProductSizeId}, '${safeProdName} - ${prod.size}', ${prod.quantityAvailable})">Update</button></td>
+                        </tr>`;
+                    });
+                    $('table tbody').html(tbody);
+                } else {
+                    toastr.error(response.message);
+                }
+            });
+        }
+
+        function editInventory(sizeId, name, qty) {
+            $('#trnProductSizeId').val(sizeId);
+            $('#productName').val(name);
+            $('#quantityAvailable').val(qty);
+            $('#productInventoryModal').modal('show');
+        }
+
+        function updateInventory() {
+            const form = $('#inventoryForm');
+            if (!form.parsley().validate()) {
+                return false;
+            }
+
+            const sizeId = $('#trnProductSizeId').val();
+            const qty = $('#quantityAvailable').val().trim();
+            const payload = {
+                trnProductSizeId: parseInt(sizeId),
+                quantityAvailable: parseInt(qty)
+            };
+
+            $.ajax({
+                url: '@Url.Action("UpdateProductInventory", "ProductsManagement")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (response) {
+                    if (response.success == true) {
+                        fnClrModal();
+                        loadInventory();
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseText);
+                }
+            });
+        }
+
+        function fnClrModal() {
+            $('#trnProductSizeId').val('');
+            $('#productName').val('');
+            $('#quantityAvailable').val('');
+            $('#inventoryForm').parsley().reset();
+            $('#productInventoryModal').modal('hide');
+        }
+
+        $(function () {
+            loadInventory();
+        });
+    </script>
+}

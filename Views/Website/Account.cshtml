@@ -1,0 +1,1347 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Account";
+
+    var section = Context.Request.Query["section"].ToString().ToLower();
+
+    if (string.IsNullOrEmpty(section) || section == "dashboard")
+    {
+        section = "orders";
+    }
+}
+
+@section Styles {
+
+    <style>
+
+        body {
+            background: #f4f1eb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .account-wrapper {
+            max-width: 1450px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .account-body {
+            display: flex;
+            align-items: flex-start;
+            min-height: 850px;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 300px;
+            border-right: 1px solid #ececec;
+            padding: 30px 24px;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .profile-box {
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 24px 18px;
+        }
+
+        .profile-letter {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: #1535b7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .profile-name {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .member-text {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #222;
+            transition: 0.2s ease;
+            font-size: 15px;
+        }
+
+            .menu-item:hover {
+                background: #f5f5f5;
+            }
+
+            .menu-item.active {
+                background: #eef1ff;
+                color: #1535b7;
+                font-weight: 600;
+            }
+
+        /* CONTENT */
+
+        .content-area {
+            flex: 1;
+            padding: 45px;
+        }
+
+        .welcome-title {
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1.05;
+            color: #111;
+            margin-bottom: 20px;
+        }
+
+        .welcome-subtitle {
+            color: #666;
+            font-size: 20px;
+            line-height: 1.7;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 30px 0 40px;
+        }
+
+        .section-title {
+            font-size: 34px;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 24px;
+        }
+
+        /* ORDERS */
+
+        .orders-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .order-card {
+            width: 320px;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+            transition: 0.2s ease;
+        }
+
+            .order-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            }
+
+            .order-card img {
+                width: 100%;
+                height: 280px;
+                object-fit: cover;
+            }
+
+        .order-content {
+            padding: 18px;
+        }
+
+        .order-product {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #111;
+        }
+
+        .order-details {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .btn-primary-custom {
+            width: 100%;
+            border: none;
+            background: #1535b7;
+            color: white;
+            padding: 13px;
+            border-radius: 10px;
+            margin-top: 18px;
+            cursor: pointer;
+        }
+
+        /* INFO GRID */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .info-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 24px;
+            background: #fff;
+        }
+
+        .card-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .payment-card {
+            width: 240px;
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .card-brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1535b7;
+            margin-bottom: 18px;
+        }
+
+        .card-number {
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+            color: #333;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .btn-outline-custom {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #1535b7;
+            background: transparent;
+            border-radius: 10px;
+            color: #1535b7;
+            margin-top: 18px;
+            cursor: pointer;
+        }
+
+        .address-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* WISHLIST */
+
+        .wishlist-wrapper {
+            margin-top: 50px;
+        }
+
+        .wishlist-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .wishlist-card {
+            width: 230px;
+        }
+
+            .wishlist-card img {
+                width: 100%;
+                height: 300px;
+                object-fit: cover;
+                border-radius: 14px;
+                margin-bottom: 12px;
+            }
+
+        .wishlist-name {
+            font-size: 15px;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .wishlist-price {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        /* ADDRESSES */
+
+        .address-container {
+            margin-top: 30px;
+        }
+
+        .address-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 30px;
+            background: #fff;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .address-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111;
+            margin: 0;
+        }
+
+        .btn-update-address {
+            padding: 10px 24px;
+            background: #1535b7;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+            .btn-update-address:hover {
+                background: #0f2680;
+            }
+
+        /* ADDRESS MODAL */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #111;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+            .modal-close:hover {
+                color: #333;
+            }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #1535b7;
+                box-shadow: 0 0 0 3px rgba(21, 53, 183, 0.1);
+            }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 14px;
+            background: #f5f5f5;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+            .btn-cancel:hover {
+                background: #eee;
+            }
+
+        .btn-save {
+            flex: 1;
+            padding: 14px;
+            background: #1535b7;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+            .btn-save:hover {
+                background: #0f2680;
+            }
+
+        /* RESPONSIVE */
+
+        @@media(max-width:1100px) {
+
+            .account-body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ececec;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-title {
+                font-size: 52px;
+            }
+        }
+
+        @@media(max-width:768px) {
+
+            .content-area {
+                padding: 25px;
+            }
+
+            .orders-grid,
+            .wishlist-grid,
+            .card-list {
+                flex-direction: column;
+            }
+
+            .order-card,
+            .wishlist-card,
+            .payment-card {
+                width: 100%;
+            }
+
+            .welcome-title {
+                font-size: 40px;
+            }
+        }
+
+        @@media(max-width:480px) {
+            .content-area { padding: 15px; }
+            .welcome-title { font-size: 28px; }
+            .section-title { font-size: 22px; }
+            .sidebar { padding: 15px; }
+            .profile-letter { width: 65px; height: 65px; font-size: 28px; }
+            .profile-name { font-size: 18px; }
+            .form-row { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; }
+            .modal-title { font-size: 20px; }
+            .account-wrapper { margin: 10px; border-radius: 12px; }
+        }
+
+    </style>
+}
+
+<div class="account-wrapper">
+
+    <div class="account-body">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+            <div class="profile-box">
+
+                <div class="profile-letter" id="profileLetter">
+                    U
+                </div>
+
+                <div class="profile-name" id="profileName">
+                    Loading...
+                </div>
+
+                <div class="member-text" id="memberSinceText">
+                    Member since -
+                </div>
+
+                <div class="menu-list">
+
+                    <a class="menu-item @(section == "orders" ? "active" : "")"
+                       href="?section=orders">
+                        <span>📦</span>
+                        <span>Orders</span>
+                    </a>
+
+                    <a class="menu-item @(section == "wishlist" ? "active" : "")"
+                       href="?section=wishlist">
+                        <span>♡</span>
+                        <span>Wishlist</span>
+                    </a>
+
+                    <a class="menu-item @(section == "addresses" ? "active" : "")"
+                       href="?section=addresses">
+                        <span>📍</span>
+                        <span>Addresses</span>
+                    </a>
+
+                    <div class="menu-item" onclick="handleLogout()">
+                        <span>↩</span>
+                        <span>Logout</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content-area">
+
+            <!-- DASHBOARD REMOVED -->
+
+            <!-- ORDERS SECTION -->
+            <div id="ordersSection" style="display: none;">
+                <div class="section-title">
+                    Your Orders
+                </div>
+
+                <div class="orders-grid" id="ordersGridPage">
+                </div>
+            </div>
+
+            <!-- ADDRESSES SECTION -->
+            <div id="addressesSection" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <div class="section-title" style="margin:0;">
+                        My Addresses
+                    </div>
+                    <button class="btn-update-address" onclick="openAddressEditModal()">+ Add New Address</button>
+                </div>
+
+                <div class="address-container" id="addressGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- Addresses injected here -->
+                    <p style="color:#999;">Loading addresses...</p>
+                </div>
+            </div>
+
+            <!-- WISHLIST SECTION -->
+            <div id="wishlistSection" style="display: none;">
+                <div class="section-title">
+                    My Wishlist
+                </div>
+
+                <div class="wishlist-grid" id="wishlistGrid">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ADDRESS EDIT MODAL -->
+<div class="modal-overlay" id="addressEditModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Address</h2>
+            <button class="modal-close" onclick="closeAddressEditModal()">&times;</button>
+        </div>
+
+        <form id="addressForm" onsubmit="saveAddress(event)">
+            
+            <div class="form-group">
+                <label for="addressLabel">Label *</label>
+                <select id="addressLabel" name="addressLabel" required>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="addressLine1">Address Line 1 *</label>
+                <input type="text" id="addressLine1" name="addressLine1" required />
+            </div>
+
+            <div class="form-group">
+                <label for="addressLine2">Address Line 2</label>
+                <input type="text" id="addressLine2" name="addressLine2" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" name="city" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State *</label>
+                    <input type="text" id="state" name="state" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="zipCode">Zip Code *</label>
+                <input type="text" id="zipCode" name="zipCode" required />
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeAddressEditModal()">Cancel</button>
+                <button type="submit" class="btn-save" id="saveAddressBtn">Save Address</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+
+        let currentUserData = null;
+
+        $(function () {
+
+            // Check if user is logged in
+            const userId = sessionStorage.getItem('userId');
+
+            if (!userId) {
+                // User is not logged in
+                console.warn("User not logged in");
+                showLoginPrompt();
+                return;
+            }
+
+            loadUserDashboardDetails();
+            loadUserCompletedOrders();
+            handleSectionNavigation();
+
+        });
+
+        function handleSectionNavigation() {
+
+            let section = new URLSearchParams(window.location.search).get('section') || 'orders';
+            if (section === 'dashboard') section = 'orders';
+
+            // Hide all sections
+            $('#ordersSection').hide();
+            $('#addressesSection').hide();
+            $('#wishlistSection').hide();
+
+            // Show the selected section
+            if (section === 'orders') {
+                $('#ordersSection').show();
+                loadUserCompletedOrders();
+            } else if (section === 'addresses') {
+                $('#addressesSection').show();
+                loadAddressData();
+            } else if (section === 'wishlist') {
+                $('#wishlistSection').show();
+                loadUserWishlist();
+            }
+
+        }
+
+        function loadUserDashboardDetails() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                showLoginPrompt();
+                return;
+            }
+
+            const url = '@Url.Action("getUserDashboardDetails", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+
+                    console.warn("User details not found");
+                    return;
+                }
+
+                const user = res.data;
+                currentUserData = user;
+
+                // PROFILE NAME
+
+                $('#profileName').text(user.name);
+
+                // MEMBER SINCE
+
+                $('#memberSinceText')
+                    .text('Member since ' + user.memberSinceYear);
+
+                // WELCOME TITLE
+
+                $('#welcomeTitle')
+                    .text('Welcome Back, ' + user.name);
+
+                // PROFILE LETTER
+
+                if (user.name && user.name.trim() !== '') {
+
+                    const firstLetter = user.name.trim().charAt(0);
+
+                    $('#profileLetter')
+                        .text(firstLetter);
+                }
+
+                // ADDRESS DISPLAY
+                displayAddress(user);
+
+            }).fail(function () {
+
+                console.warn("Failed to fetch user details");
+
+            });
+
+        }
+
+        function loadAddressData() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                showLoginPrompt();
+                return;
+            }
+
+            const url = '@Url.Action("GetUserAddresses", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+
+                    $('#addressGrid').html('<p style="color: #999;">No addresses found. Click "Add New Address" to add one.</p>');
+                    return;
+                }
+
+                displayAddresses(res.data);
+
+            }).fail(function () {
+
+                $('#addressGrid').html('<p style="color: #d9534f;">Failed to load addresses.</p>');
+
+            });
+
+        }
+
+        function displayAddresses(addresses) {
+            if (!addresses || addresses.length === 0) {
+                $('#addressGrid').html('<p style="color: #999;">No addresses found. Click "Add New Address" to add one.</p>');
+                return;
+            }
+
+            let html = '';
+            addresses.forEach(addr => {
+                let cityStateZip = '';
+                if (addr.city) cityStateZip += addr.city;
+                if (addr.state) cityStateZip += (cityStateZip ? ', ' : '') + addr.state;
+                if (addr.zipCode) cityStateZip += (cityStateZip ? ' - ' : '') + addr.zipCode;
+
+                html += `
+                    <div class="address-card">
+                        <div class="address-header">
+                            <h4 class="address-label">
+                                <span style="background:#eef1ff; color:#1535b7; padding:4px 10px; border-radius:6px; font-size:13px; font-weight:700;">${addr.label || 'Home'}</span>
+                            </h4>
+                        </div>
+                        <div class="address-text">
+                            ${addr.addressLine1 || ''}<br/>
+                            ${addr.addressLine2 ? addr.addressLine2 + '<br/>' : ''}
+                            ${cityStateZip}
+                        </div>
+                    </div>
+                `;
+            });
+
+            $('#addressGrid').html(html);
+        }
+
+        function openAddressEditModal() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                showLoginPrompt();
+                return;
+            }
+
+            // Clear form
+            $('#addressLabel').val('Home');
+            $('#addressLine1').val('');
+            $('#addressLine2').val('');
+            $('#city').val('');
+            $('#state').val('');
+            $('#zipCode').val('');
+
+            // Show modal
+            $('#addressEditModal').addClass('active');
+
+        }
+
+        function closeAddressEditModal() {
+
+            $('#addressEditModal').removeClass('active');
+
+        }
+
+        function saveAddress(event) {
+
+            event.preventDefault();
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                showLoginPrompt();
+                return;
+            }
+
+            const addressData = {
+                mstUserId: parseInt(mstUserId),
+                label: $('#addressLabel').val(),
+                addressLine1: $('#addressLine1').val().trim(),
+                addressLine2: $('#addressLine2').val().trim(),
+                city: $('#city').val().trim(),
+                state: $('#state').val().trim(),
+                zipCode: $('#zipCode').val().trim()
+            };
+
+            // Validate required fields
+            if (!addressData.addressLine1 || !addressData.city || !addressData.state || !addressData.zipCode) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Disable button during save
+            const $saveBtn = $('#saveAddressBtn');
+            $saveBtn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: '@Url.Action("AddUserAddress", "Website")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(addressData),
+                success: function (res) {
+
+                    if (res.success) {
+                        alert('Address added successfully!');
+                        closeAddressEditModal();
+                        loadAddressData();
+                    } else {
+                        alert('Failed to add address: ' + (res.message || 'Unknown error'));
+                    }
+
+                    $saveBtn.prop('disabled', false).text('Save Address');
+
+                },
+                error: function (err) {
+
+                    console.error('Error:', err);
+                    alert('Failed to add address');
+                    $saveBtn.prop('disabled', false).text('Save Address');
+
+                }
+            });
+
+        }
+
+        // Close modal when clicking outside
+        $('#addressEditModal').click(function (e) {
+            if (e.target === this) {
+                closeAddressEditModal();
+            }
+        });
+
+        function editAddress() {
+
+            openAddressEditModal();
+
+        }
+
+        function showLoginPrompt() {
+
+            // Hide account content and show login message
+            const accountWrapper = document.querySelector('.account-wrapper');
+            if (accountWrapper) {
+                accountWrapper.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; min-height: 600px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <h2 style="margin-bottom: 20px; color: #333;">You need to login first</h2>
+                        <p style="margin-bottom: 30px; color: #666; font-size: 16px;">Please login to your account to access the account details.</p>
+                        <a href="@Url.Action("Login", "Auth")" class="btn btn-primary" style="padding: 10px 30px; text-decoration: none;">Go to Login</a>
+                    </div>
+                `;
+            }
+
+        }
+
+        function handleLogout() {
+            // Clear session storage
+            sessionStorage.removeItem('userId');
+
+            // Redirect to logout action
+            window.location.href = '@Url.Action("userLogout", "Auth")';
+        }
+
+        function loadUserCompletedOrders() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                return;
+            }
+
+            const url = '@Url.Action("getUserCompletedOrders", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+
+                    console.warn("No orders found");
+                    $('#ordersGrid').html('<p style="text-align: center; color: #999; padding: 40px;">No completed orders yet</p>');
+                    $('#ordersGridPage').html('<p style="text-align: center; color: #999; padding: 40px;">No completed orders yet</p>');
+                    return;
+                }
+
+                const orders = res.data;
+
+                if (orders.length === 0) {
+                    $('#ordersGrid').html('<p style="text-align: center; color: #999; padding: 40px;">No completed orders yet</p>');
+                    $('#ordersGridPage').html('<p style="text-align: center; color: #999; padding: 40px;">No completed orders yet</p>');
+                    return;
+                }
+
+                let ordersHtml = '';
+
+                orders.forEach(order => {
+                    order.orderItems.forEach(item => {
+                        // Calculate total price for this item (quantity * price)
+                        const totalItemPrice = item.quantity * item.price;
+
+                        ordersHtml += `
+                            <div class="order-card">
+                                <img src="${item.coverImagePath}" alt="${item.productName}" />
+                                <div class="order-content">
+                                    <div class="order-product">
+                                        ${item.productName}
+                                    </div>
+                                    <div class="order-details">
+                                        <strong>Order Details:</strong><br />
+                                        Order ID: #${item.orderNumber} <br />
+                                        Order Date: ${formatDate(item.orderDate)} <br />
+                                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0;" />
+
+                                        <strong>Item Details:</strong><br />
+                                        Quantity: ${item.quantity} <br />
+                                        Unit Price: ₹${item.price} <br />
+                                        Total Price: ₹${totalItemPrice} <br />
+                                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0;" />
+
+                                        <strong>Delivery Info:</strong><br />
+                                        Status: <span style="color: #22c55e; font-weight: 600;">✓ Delivered</span> <br />
+                                        Delivered Date: ${formatDate(item.deliveredDate)}
+                                    </div>
+                                    <button class="btn-primary-custom">
+                                        Reorder
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+
+                $('#ordersGrid').html(ordersHtml);
+                $('#ordersGridPage').html(ordersHtml);
+
+            }).fail(function () {
+
+                console.warn("Failed to fetch user orders");
+                $('#ordersGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Failed to load orders</p>');
+                $('#ordersGridPage').html('<p style="text-align: center; color: #999; padding: 40px;">Failed to load orders</p>');
+
+            });
+
+        }
+
+        function formatDate(dateString) {
+
+            if (!dateString) return 'N/A';
+
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+
+            return date.toLocaleDateString('en-US', options);
+
+        }
+
+        function loadUserWishlist() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                $('#wishlistGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Please login to view your wishlist</p>');
+                return;
+            }
+
+            const url = '@Url.Action("getUserWishlist", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+
+                    console.warn("No wishlist items found");
+                    $('#wishlistGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Your wishlist is empty</p>');
+                    return;
+                }
+
+                const wishlistItems = res.data;
+
+                if (wishlistItems.length === 0) {
+                    $('#wishlistGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Your wishlist is empty</p>');
+                    return;
+                }
+
+                let wishlistHtml = '';
+
+                wishlistItems.forEach(item => {
+                    // Display discounted price if available, otherwise base price
+                    const originalPrice = item.basePrice || 0;
+                    const discountAmount = item.discountedPrice || 0; // treated as amount
+                    const displayPrice = Math.max(0, originalPrice - discountAmount);
+                    const showOriginal = discountAmount > 0;
+
+                    // Ensure image has proper path
+                    const imageSrc = item.coverImagePath && item.coverImagePath.length > 0 
+                        ? '/' + item.coverImagePath
+                        : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="230" height="300"%3E%3Crect fill="%23f0f0f0" width="230" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14"%3ENo Image%3C/text%3E%3C/svg%3E';
+
+                    wishlistHtml += `
+                        <div class="wishlist-card" onclick="fnGoToProductDetails(${item.mstProductId})" style="cursor: pointer;">
+                            <img src="${imageSrc}" alt="${item.productName}" />
+                            <div class="wishlist-name">
+                                ${item.productName}
+                            </div>
+                            <div class="wishlist-price">
+                                ₹${displayPrice}
+                                ${showOriginal ? '<span style="text-decoration: line-through; color: #999; font-size: 12px; margin-left: 8px;">₹' + originalPrice + '</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#wishlistGrid').html(wishlistHtml);
+
+            }).fail(function () {
+
+                console.warn("Failed to fetch user wishlist");
+                $('#wishlistGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Failed to load wishlist</p>');
+
+            });
+
+        }
+
+        function loadUserWishlistPreview() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                $('#wishlistPreviewGrid').html('<p style="text-align: center; color: #999; padding: 40px;">Please login to view your wishlist</p>');
+                return;
+            }
+
+            const url = '@Url.Action("getUserWishlist", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+
+                    console.warn("No wishlist items found");
+                    $('#wishlistPreviewGrid').html('<p style="text-align: center; color: #999; padding: 20px;">Your wishlist is empty</p>');
+                    return;
+                }
+
+                const wishlistItems = res.data;
+
+                if (wishlistItems.length === 0) {
+                    $('#wishlistPreviewGrid').html('<p style="text-align: center; color: #999; padding: 20px;">Your wishlist is empty</p>');
+                    return;
+                }
+
+                let wishlistHtml = '';
+
+                // Display only first 4 items for preview
+                wishlistItems.slice(0, 4).forEach(item => {
+                    // Display discounted price if available, otherwise base price
+                    const originalPrice = item.basePrice || 0;
+                    const discountAmount = item.discountedPrice || 0;
+                    const displayPrice = Math.max(0, originalPrice - discountAmount);
+                    const showOriginal = discountAmount > 0;
+
+                    // Ensure image has proper path
+                    const imageSrc = item.coverImagePath && item.coverImagePath.length > 0 
+                        ? '/' + item.coverImagePath
+                        : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="230" height="300"%3E%3Crect fill="%23f0f0f0" width="230" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14"%3ENo Image%3C/text%3E%3C/svg%3E';
+
+                    wishlistHtml += `
+                        <div class="wishlist-card" onclick="fnGoToProductDetails(${item.mstProductId})" style="cursor: pointer;">
+                            <img src="${imageSrc}" alt="${item.productName}" />
+                            <div class="wishlist-name">
+                                ${item.productName}
+                            </div>
+                            <div class="wishlist-price">
+                                ₹${displayPrice}
+                                ${showOriginal ? '<span style="text-decoration: line-through; color: #999; font-size: 12px; margin-left: 8px;">₹' + originalPrice + '</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#wishlistPreviewGrid').html(wishlistHtml);
+
+            }).fail(function () {
+
+                console.warn("Failed to fetch user wishlist preview");
+                $('#wishlistPreviewGrid').html('<p style="text-align: center; color: #999; padding: 20px;">Failed to load wishlist</p>');
+
+            });
+
+        }
+
+        function displayAddressPreview() {
+
+            const mstUserId = sessionStorage.getItem('userId');
+
+            if (!mstUserId) {
+                return;
+            }
+
+            const url = '@Url.Action("getUserDashboardDetails", "Website")'
+                + '?mstUserId=' + mstUserId;
+
+            $.get(url, function (res) {
+
+                if (!res || !res.success || !res.data) {
+                    $('#addressPreview').html('<p style="color: #999; font-size: 14px;">Failed to load address</p>');
+                    return;
+                }
+
+                const user = res.data;
+
+                // Build address string
+                let addressHtml = '';
+
+                if (user.addressLine1) {
+                    addressHtml += '<strong style="color: #111;">Shipping Address</strong><br />';
+                    addressHtml += user.addressLine1 + '<br />';
+                }
+
+                if (user.addressLine2) {
+                    addressHtml += user.addressLine2 + '<br />';
+                }
+
+                if (user.city || user.state || user.zipCode) {
+                    let cityStateZip = '';
+
+                    if (user.city) cityStateZip += user.city;
+                    if (user.state) {
+                        if (cityStateZip) cityStateZip += ', ' + user.state;
+                        else cityStateZip += user.state;
+                    }
+                    if (user.zipCode) {
+                        if (cityStateZip) cityStateZip += ' - ' + user.zipCode;
+                        else cityStateZip += user.zipCode;
+                    }
+
+                    if (cityStateZip) {
+                        addressHtml += cityStateZip + '<br />';
+                    }
+                }
+
+                if (!addressHtml || addressHtml.trim() === '') {
+                    $('#addressPreview').html('<p style="color: #999; font-size: 14px;">No address saved yet</p>');
+                } else {
+                    $('#addressPreview').html('<p style="color: #555; font-size: 14px; line-height: 1.8;">' + addressHtml + '</p>');
+                }
+
+            }).fail(function () {
+                $('#addressPreview').html('<p style="color: #999; font-size: 14px;">Failed to load address</p>');
+            });
+
+        }
+
+        function displayPaymentMethods() {
+
+            // Mock payment methods - In a real app, you would fetch this from the server
+            const paymentMethods = [
+                {
+                    brand: 'VISA',
+                    lastDigits: '4242',
+                    expiryMonth: '12',
+                    expiryYear: '25',
+                    icon: '🔵'
+                },
+                {
+                    brand: 'MASTERCARD',
+                    lastDigits: '8888',
+                    expiryMonth: '06',
+                    expiryYear: '26',
+                    icon: '🔴'
+                }
+            ];
+
+            let paymentHtml = '';
+
+            if (paymentMethods.length === 0) {
+                $('#paymentMethodsList').html('<p style="color: #999; font-size: 14px;">No payment methods saved</p>');
+                return;
+            }
+
+            paymentMethods.forEach(method => {
+                paymentHtml += `
+                    <div class="payment-card">
+                        <div class="card-brand">${method.icon} ${method.brand}</div>
+                        <div class="card-number">•••• •••• •••• ${method.lastDigits}</div>
+                        <div class="card-meta">
+                            <span>${method.expiryMonth}/${method.expiryYear}</span>
+                            <span style="cursor: pointer; color: #e74c3c;">Delete</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            $('#paymentMethodsList').html(paymentHtml);
+
+        }
+
+    </script>
+
+}

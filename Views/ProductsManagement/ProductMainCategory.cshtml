@@ -1,0 +1,178 @@
+@{
+    ViewData["Title"] = "Product Main Category";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products Management /</span> Product Main Category</h4>
+    </div>
+    <div class="d-flex align-content-center flex-wrap">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productMainCategoryAddModal"> Add </button>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="productMainCategoryAddModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="categoryForm" data-parsley-validate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="productAddModalTitle">Add Product Main Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="fnClrModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="categoryId" />
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="categoryName" class="form-label">Product Main Category Name</label>
+                        <input type="text" id="categoryName" class="form-control only-letters-spaces" placeholder="Enter Product Main Category Name"
+                               autocomplete="off" required data-parsley-errors-container="#categoryNameError" />
+                        <span class="text-danger parsley-errors" id="categoryNameError"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="categoryName" class="form-label">Product Main Category Image</label>
+                        <input type="file" class="form-control" id="mainCategoryImage" name="mainCategoryImage" accept=".webp, image/webp"
+                               data-parsley-filemaxmegabytes="2" data-parsley-filemimetypes="image/webp"
+                               data-parsley-errors-container="#imageError" />
+                        <span class="text-danger parsley-errors" id="imageError"></span>
+                        <small class="text-muted">Upload a single category image.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fnClrModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="saveBtn" onclick="addOrUpdateCategory()">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Product Main Category Details</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Product Main Heading</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function loadCategories() {
+            $.get('@Url.Action("GetAllProductMainCategories", "ProductsManagement")', function (response) {
+                let tbody = '';
+                response.data.forEach((cat, idx) => {
+                    tbody += `<tr>
+                        <td>${idx + 1}</td>
+                        <td>${cat.mainCategoryImagePath ? `<img src="data:image/png;base64,${cat.mainCategoryImagePath}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />` : ''}</td>
+                        <td>${cat.mainCategoryName}</td>
+                        <td><div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" ${cat.isActive ? 'checked' : ''}  onchange="toggleActive(${cat.mstProductMainCategoryId}, this.checked)">
+                        </div></td>
+                        <td><button class="btn btn-sm btn-warning" onclick="editCategory(${cat.mstProductMainCategoryId})">Edit</button></td>
+                    </tr>`;
+                });
+                $('table tbody').html(tbody);
+            });
+        }
+
+
+        function addOrUpdateCategory() {
+            const form = $('#categoryForm');
+
+            if (!form.parsley().validate()) {
+                return false;
+            }
+
+            const id = $('#categoryId').val();
+            const name = $('#categoryName').val().trim();
+            const image = $('#mainCategoryImage')[0].files[0];
+
+            var formData = new FormData();
+            formData.append('mstProductMainCategoryId', id ? parseInt(id) : 0);
+            formData.append('mainCategoryName', name);
+            formData.append('createdBy', sessionStorage.getItem('userId'));
+            if (image) {
+                formData.append('mainCategoryImageFile', image);
+            }
+
+            $.ajax({
+                url: '@Url.Action("SaveOrUpdateProductMainCategory", "ProductsManagement")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if(response.success == true){
+                        $('#productMainCategoryAddModal').modal('hide');
+                        fnClrModal();
+                        loadCategories();
+                        toastr.success(response.message);
+                    }else{
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseText);
+                }
+            });
+        }
+
+
+        function editCategory(id) {
+            $.get('@Url.Action("GetMainCategoryById", "ProductsManagement")', { id }, function (response) {
+                if (response.success) {
+                    const cat = response.data;
+                    $('#categoryId').val(cat.mstProductMainCategoryId);
+                    $('#categoryName').val(cat.mainCategoryName);
+                    $('#productAddModalTitle').text('Edit Product Main Category');
+                    $('#productMainCategoryAddModal').modal('show');
+                } else {
+                    toastr.error(response.message);
+                }
+            });
+        }
+
+        function toggleActive(id, isActive) {
+            $.post('@Url.Action("DeactivateProductMainCategory", "ProductsManagement")', {
+                id: id,
+                isActive: isActive,
+                updatedBy: 1
+            }, function (response) {
+                if (response.success) {
+                    loadCategories();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            }).fail(function (xhr) {
+                toastr.error('Error: ' + xhr.responseText);
+            });
+        }
+
+        function fnClrModal() {
+            $('#categoryId').val('');
+            $('#categoryName').val('');
+            $('#mainCategoryImage').val('');
+            $('#categoryForm').parsley().reset();
+            $('#productAddModalTitle').text('Add Product Main Category');
+        }
+
+        $(function () {
+            loadCategories();
+        });
+    </script>
+
+}

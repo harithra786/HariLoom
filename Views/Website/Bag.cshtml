@@ -1,0 +1,560 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "Bag";
+}
+
+@section Styles {
+    <style>
+        .bn-container {
+            max-width: 1100px;
+            margin: 28px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px
+        }
+
+        .bn-card {
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-radius: 6px;
+            padding: 18px
+        }
+
+        .bn-product {
+            display: flex;
+            gap: 16px
+        }
+
+            .bn-product .thumb {
+                width: 180px;
+                height: 180px;
+                border: 1px solid #e8e8e8;
+                border-radius: 6px;
+                background: #f6f6f6;
+                display: flex;
+                align-items: center;
+                justify-content: center
+            }
+
+                .bn-product .thumb img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: cover
+                }
+
+            .bn-product .meta {
+                flex: 1
+            }
+
+            .bn-product h4 {
+                margin: 0 0 6px 0;
+                font-size: 18px;
+                color: #111
+            }
+
+        .bn-price {
+            font-size: 18px;
+            color: #111;
+            margin-bottom: 8px
+        }
+
+        .bn-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px
+        }
+
+            .bn-controls select, .bn-controls input {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px
+            }
+
+        .price-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+            .price-panel .row {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-radius: 6px
+            }
+
+            .price-panel .muted {
+                color: #666;
+                font-size: 13px
+            }
+
+            .price-panel .total {
+                font-size: 20px;
+                font-weight: 700
+            }
+
+        .place-order {
+            background: #0d47a1;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%
+        }
+
+        .product-thumbs {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px
+        }
+
+            .product-thumbs img {
+                width: 56px;
+                height: 56px;
+                object-fit: cover;
+                border-radius: 6px;
+                border: 1px solid #eee;
+                cursor: pointer
+            }
+
+        @@media(max-width:900px) {
+            .bn-container {
+                grid-template-columns: 1fr
+            }
+
+            .bn-topnav {
+                padding: 12px
+            }
+        }
+
+        @@media(max-width:600px) {
+            .bn-product { flex-direction: column; }
+            .bn-product .thumb { width: 100%; height: 200px; }
+            .bn-controls { flex-wrap: wrap; }
+            .bn-card { padding: 12px; }
+            .address-grid { grid-template-columns: 1fr !important; }
+        }
+        .address-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+        .address-input:focus { border-color: #0d47a1; }
+    </style>
+}
+
+<div id="bagItemsRoot">
+    <!-- JS will render one bn-container per cart item (left: product card, right: price panel) -->
+</div>
+
+@section Scripts {
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        (function(){
+            const isLoggedIn = () => document.cookie.split(';').some(c => c.trim().startsWith('hariloomAuthToken='));
+            if(!isLoggedIn()){
+                document.getElementById('bagItemsRoot').innerHTML = '<p>Please <a href="/Auth/Login">login</a> to view your bag.</p>';
+                return;
+            }
+
+            const userId = sessionStorage.getItem('userId');
+            if(!userId){ document.getElementById('bagItemsRoot').innerHTML = '<p>User not found. Please login again.</p>'; return; }
+
+            fetch('/Website/GetUserCart?userId=' + userId).then(r=>r.json()).then(res=>{
+                if(!res || !res.success){ document.getElementById('bagItemsRoot').innerHTML = '<p>Failed to load bag</p>'; return; }
+                const items = res.data || [];
+                if(items.length===0){ document.getElementById('bagItemsRoot').innerHTML = '<div style="text-align: center; padding: 80px 20px;"><h3 style="color: #666; font-weight: 500;">Your bag is empty</h3><p style="color: #999; margin-top: 10px;">Looks like you haven\'t added anything to your bag yet.</p></div>'; return; }
+
+                // Build a single container: left card lists all products, right card shows aggregated price details
+                let productsHtml = '';
+                let productSummaryHtml = '';
+                let totalQty = 0;
+                let sumMRP = 0;
+                let grandTotal = 0;
+
+                items.forEach(i=>{
+                    const qty = parseInt(i.quantity || 1);
+                    const basePrice = parseFloat(i.basePrice || 0) || 0;
+                    // discounts are not used; show only base price (MRP)
+                    const selling = basePrice;
+
+                    totalQty += qty;
+                    sumMRP += basePrice * qty;
+                    grandTotal += selling * qty;
+
+                    const pName = (i.productName || 'Product');
+                    const shortName = pName.length > 20 ? pName.substring(0, 20) + '...' : pName;
+                    productSummaryHtml += `
+                        <div style="display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:6px;">
+                            <div>&bull; ${shortName} - ${basePrice.toFixed(0)} x ${qty}</div>
+                            <div style="white-space:nowrap;">= ₹ ${(basePrice * qty).toFixed(2)}</div>
+                        </div>
+                    `;
+
+                    // prepare thumbnails HTML
+                    let thumbs = '';
+                    try{
+                        const imgs = i.productImages || [];
+                        for(let k=0;k<imgs.length;k++){
+                            const obj = imgs[k] || {};
+                            let src = obj.imageBase64 || obj || '';
+                            if(src && src.indexOf('data:')!==0 && src.indexOf('http')!==0 && src.indexOf('/')!==0){ src = 'data:image/png;base64,' + src; }
+                            const fallback = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%20800%20800%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e9ecef%22%20%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%23adb5bd%22%20font-family%3D%22sans-serif%22%20font-size%3D%2240%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E";
+                            thumbs += `<img class="thumb-item" src="${src || (i.coverImagePath ? '/' + i.coverImagePath : fallback)}" data-index="${k}" />`;
+                        }
+                    }catch(e){ thumbs = ''; }
+
+                    productsHtml += `
+                        <div class="bn-product-item position-relative" style="margin-bottom:18px; padding-right:24px;">
+                            <i class="bx bx-x btn-remove-item" data-product-id="${i.mstProductId}" style="position:absolute; right:0; top:0; font-size:24px; color:#999; cursor:pointer; transition:0.2s;" title="Remove from bag" onmouseover="this.style.color='#d9534f'" onmouseout="this.style.color='#999'"></i>
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                                <div style="display:flex;gap:12px;align-items:flex-start" class="bn-product">
+                                    <div class="thumb" onclick="window.location='/Product/Details/${i.mstProductId}'">
+                                        <img src="${i.coverImagePath ? '/' + i.coverImagePath : fallback}" alt="Product" />
+                                    </div>
+                                    <div class="meta">
+                                        <h4>${(i.productName||'').replace(/</g,'&lt;')}</h4>
+                                        <div class="bn-price">₹ <span class="unitPrice">${selling.toFixed(2)}</span></div>
+                                        <div class="bn-controls">
+                                            <div>
+                                                <label style="display:block;font-size:12px;color:#666">Size</label>
+                                                <select class="size-select" data-product-id="${i.mstProductId}" data-current-size="${i.size||''}">
+                                                    <option value="${i.size||0}">${i.size||'Loading...'}</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style="display:block;font-size:12px;color:#666">Qty</label>
+                                                <input type="number" class="qty-input" min="1" max="${i.quantityAvailable || 20}" value="${qty}" data-cart-id="${i.trnCartId}" data-max-qty="${i.quantityAvailable || 20}" style="width:80px" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="product-thumbs">${thumbs}</div>
+                        </div>
+                    `;
+                });
+
+                const out = `
+                    <div class="bn-container">
+                        <div class="left-col">
+                            <div class="bn-card">
+                                ${productsHtml}
+                            </div>
+                            <div class="bn-card" style="margin-top:20px;">
+                                <div style="font-weight:600; font-size:16px; margin-bottom:15px;">Delivery Address</div>
+                                <div class="address-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                    <input type="text" id="addrLine1" class="address-input" placeholder="Address Line 1 *" />
+                                    <input type="text" id="addrLine2" class="address-input" placeholder="Address Line 2 (Optional)" />
+                                    <input type="text" id="addrCity" class="address-input" placeholder="City *" />
+                                    <input type="text" id="addrState" class="address-input" placeholder="State *" />
+                                    <input type="text" id="addrZip" class="address-input" placeholder="Zip Code *" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bn-card price-panel">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                <div style="font-weight:600">PRICE DETAILS <span style="font-weight:400;color:#666;font-size:13px">(${totalQty} item${totalQty>1?'s':''})</span></div>
+                            </div>
+                            
+                            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e6e6e6;">
+                                ${productSummaryHtml}
+                            </div>
+
+                            <div class="row" style="background:#fff;border:1px solid #e6e6e6">
+                                <div class="muted">Total Amount</div>
+                                <div class="total">₹ ${sumMRP.toFixed(2)}</div>
+                            </div>
+                            
+                            <div style="margin-top: 15px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #555; display: flex; align-items: flex-start; gap: 8px;">
+                                <i class="bx bx-package" style="font-size: 18px; color: #0d47a1;"></i>
+                                <div>
+                                    <div style="font-weight: 600; color: #111; margin-bottom: 4px;">Shipping Details</div>
+                                    Standard delivery takes 3-5 business days. Free shipping on all orders!
+                                </div>
+                            </div>
+
+                            <div style="margin-top:15px;">
+                                <button class="place-order" data-total-qty="${totalQty}" disabled style="opacity:0.5; cursor:not-allowed;">PLACE ORDER</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const root = document.getElementById('bagItemsRoot');
+                root.innerHTML = out;
+
+                // Load user address
+                fetch('/Website/GetUserAddresses?mstUserId=' + userId)
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res && res.success && res.data && res.data.length > 0) {
+                            const addr = res.data[0];
+                            $('#addrLine1').val(addr.addressLine1 || '');
+                            $('#addrLine2').val(addr.addressLine2 || '');
+                            $('#addrCity').val(addr.city || '');
+                            $('#addrState').val(addr.state || '');
+                            $('#addrZip').val(addr.zipCode || '');
+                            validateAddress();
+                        }
+                    });
+
+                function validateAddress() {
+                    const l1 = $('#addrLine1').val()?.trim() || '';
+                    const city = $('#addrCity').val()?.trim() || '';
+                    const state = $('#addrState').val()?.trim() || '';
+                    const zip = $('#addrZip').val()?.trim() || '';
+                    const btn = $('.place-order');
+                    if (l1 && city && state && zip) {
+                        btn.prop('disabled', false).css({ opacity: 1, cursor: 'pointer' });
+                    } else {
+                        btn.prop('disabled', true).css({ opacity: 0.5, cursor: 'not-allowed' });
+                    }
+                }
+
+                $(document).on('input', '.address-input', validateAddress);
+
+                // Load available sizes for each product
+                const sizeSelects = root.querySelectorAll('.size-select');
+                sizeSelects.forEach(select => {
+                    const productId = select.getAttribute('data-product-id');
+                    const currentSize = select.getAttribute('data-current-size')?.trim();
+
+                    if(productId){
+                        fetch(`/ProductsManagement/GetAvailableSizesForProduct?productId=${productId}`)
+                            .then(r => r.json())
+                            .then(res => {
+                                if(res && res.success && Array.isArray(res.data) && res.data.length > 0){
+                                    select.innerHTML = '';
+                                    res.data.forEach(s => {
+                                        const opt = document.createElement('option');
+                                        opt.value = s.trnProductSizeId || 0;
+                                        opt.text = s.size || 'Unknown';
+                                        if(s.size?.trim() === currentSize) opt.selected = true;
+                                        select.appendChild(opt);
+                                    });
+                                }
+                            })
+                            .catch(err => console.log('Failed to load sizes for product ' + productId, err));
+                    }
+                });
+
+                // delegated handlers
+                root.addEventListener('click', function(e){
+                    const p = e.target.closest('.place-order');
+                    if(p){
+                        // trigger cart checkout
+                        handleCartCheckout();
+                        return;
+                    }
+
+                    const rm = e.target.closest('.btn-remove-item');
+                    if(rm){
+                        const productId = rm.getAttribute('data-product-id');
+                        if(!productId) return;
+                        if(confirm('Are you sure you want to remove this item from your bag?')){
+                            fetch('/Website/RemoveFromBag', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId: parseInt(userId), productId: parseInt(productId) })
+                            })
+                            .then(r => r.json())
+                            .then(res => {
+                                if(res && res.success){
+                                    window.location.reload();
+                                } else {
+                                    alert(res.message || 'Failed to remove item');
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Error removing item:', err);
+                                alert('An error occurred while removing item.');
+                            });
+                        }
+                        return;
+                    }
+
+                    const t = e.target.closest('.product-thumbs img');
+                    if(t){
+                        const container = t.closest('.bn-product-item');
+                        const main = container ? container.querySelector('.thumb img') : null;
+                        if(main) main.src = t.src;
+                    }
+                });
+
+                root.addEventListener('change', function(e){
+                    if(e.target.classList.contains('qty-input')){
+                        const cartId = e.target.getAttribute('data-cart-id');
+                        const maxQty = parseInt(e.target.getAttribute('data-max-qty')) || 20;
+                        let newQty = parseInt(e.target.value);
+                        if(isNaN(newQty) || newQty < 1) newQty = 1;
+                        if(newQty > maxQty) {
+                            newQty = maxQty;
+                            e.target.value = maxQty;
+                            alert(`Only ${maxQty} items available in stock.`);
+                        }
+                        if(!cartId) return;
+
+                        fetch('/Website/UpdateCartQuantity', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                cartId: parseInt(cartId),
+                                quantity: newQty,
+                                userId: parseInt(userId)
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(res => {
+                            if(res && res.success) {
+                                // Reload page to reflect updated prices
+                                window.location.reload();
+                            } else {
+                                alert(res.message || 'Failed to update quantity');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error updating quantity:', err);
+                            alert('An error occurred while updating quantity.');
+                        });
+                    }
+                });
+            }).catch(()=>{ document.getElementById('bagItemsRoot').innerHTML = '<p>Failed to load bag</p>'; });
+        })();
+
+        async function handleCartCheckout() {
+            try {
+                const userId = sessionStorage.getItem('userId');
+                if (!userId) {
+                    alert('Please log in first.');
+                    return;
+                }
+
+                const l1 = $('#addrLine1').val()?.trim() || '';
+                const city = $('#addrCity').val()?.trim() || '';
+                const state = $('#addrState').val()?.trim() || '';
+                const zip = $('#addrZip').val()?.trim() || '';
+                if (!l1 || !city || !state || !zip) {
+                    alert('Please fill in all required address fields.');
+                    return;
+                }
+
+                // Optionally save address
+                await fetch('/Website/AddUserAddress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mstUserId: parseInt(userId),
+                        label: 'Delivery',
+                        addressLine1: l1,
+                        addressLine2: $('#addrLine2').val()?.trim() || '',
+                        city: city,
+                        state: state,
+                        zipCode: zip
+                    })
+                });
+
+                // Create Order & Razorpay Order for Cart
+                const response = await $.ajax({
+                    url: '@Url.Action("CreateCartOrderMarkStatus", "Website")',
+                    type: 'GET',
+                    data: { userId: userId }
+                });
+
+                if (!response.success) {
+                    alert(response.message || 'Failed to create order');
+                    return;
+                }
+
+                const orderData = response.data;
+                const options = {
+                    key: orderData.key,
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "Hariloom",
+                    description: "Cart Checkout",
+                    order_id: orderData.razorpayOrderId,
+                    handler: async function (razorpayResponse) {
+                        const verifyResponse = await $.ajax({
+                            url: '@Url.Action("VerifyPayment", "Website")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                orderId: orderData.orderId,
+                                razorpayOrderId: razorpayResponse.razorpay_order_id,
+                                razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+                                razorpaySignature: razorpayResponse.razorpay_signature,
+                                isCartCheckout: true
+                            })
+                        });
+
+                        if (verifyResponse.success) {
+                            alert('Payment successful!');
+                            window.location.href = '@Url.Action("Orders", "Website")'; // Redirect to orders page
+                        } else {
+                            alert(verifyResponse.message || 'Payment verification failed.');
+                        }
+                    },
+                    prefill: {
+                        name: sessionStorage.getItem('name'),
+                        email: sessionStorage.getItem('email'),
+                        contact: sessionStorage.getItem('contact')
+                    },
+                    modal: {
+                        ondismiss: async function() {
+                            await $.post('@Url.Action("MarkPaymentFailed", "Website")', { orderId: orderData.orderId });
+                            window.location.href = '@Url.Action("Orders", "Website")';
+                        }
+                    },
+                    theme: {
+                        color: "#000000"
+                    },
+                    config: {
+                        display: {
+                            blocks: {
+                                upi: {
+                                    name: "Pay via UPI / GPay",
+                                    instruments: [
+                                        { method: "upi" }
+                                    ]
+                                },
+                                other: {
+                                    name: "Other Payment Modes",
+                                    instruments: [
+                                        { method: "card" },
+                                        { method: "netbanking" },
+                                        { method: "wallet" }
+                                    ]
+                                }
+                            },
+                            sequence: ["block.upi", "block.other"],
+                            preferences: {
+                                show_default_blocks: false
+                            }
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.on('payment.failed', async function (response) {
+                    await $.post('@Url.Action("MarkPaymentFailed", "Website")', { orderId: orderData.orderId });
+                    // Let Razorpay's own UI handle the retry, no need for confirm box
+                });
+
+                razorpay.open();
+
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred during checkout.');
+            }
+        }
+    </script>
+}

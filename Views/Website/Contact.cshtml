@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Contact";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.HideNavigation = true;
+}
+
+<style>
+    .contact-page {
+        background: #F7F4ED;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 40px;
+    }
+
+    .contact-container {
+        max-width: 800px;
+        text-align: center;
+    }
+
+    .contact-container h1 {
+        font-size: 48px;
+        color: #0b1d39;
+        margin-bottom: 30px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .contact-container p {
+        font-size: 18px;
+        color: #333;
+        line-height: 1.8;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="contact-page">
+    <div class="contact-container">
+        <h1>Contact Us</h1>
+        <p>For any assistance please mail to <strong>contact@hariloom.com</strong></p>
+    </div>
+</div>

@@ -1,0 +1,405 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Orders";
+}
+
+@section Styles {
+    <style>
+        .orders-container {
+            padding: clamp(20px, 5vw, 60px) clamp(10px, 5vw, 80px);
+            background: #F7F4ED;
+            min-height: 100vh;
+        }
+
+        .orders-title {
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .order-info {
+            flex: 1;
+        }
+
+        .order-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b1d39;
+            margin-bottom: 8px;
+        }
+
+        .order-date {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .order-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0b1d39;
+            text-align: right;
+        }
+
+        .order-status-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 20px;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-items {
+            margin-top: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0b1d39;
+            margin-bottom: 5px;
+        }
+
+        .item-specs {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .item-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0b1d39;
+        }
+
+        .item-status {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            width: fit-content;
+            margin-top: 5px;
+        }
+
+        .item-status.delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .item-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .item-status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .no-orders-icon {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .no-orders-text {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .no-orders-link {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #0b1d39;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: .3s;
+        }
+
+        .no-orders-link:hover {
+            background: #1a2d4f;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: flex-end;
+            gap: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 15px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .total-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b1d39;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0b1d39;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spinner-spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @@media (max-width: 768px) {
+            .order-header { flex-direction: column; gap: 10px; }
+            .order-amount { text-align: left; }
+            .order-status-badge { margin-left: 0; }
+            .order-total { flex-direction: column; gap: 8px; }
+        }
+
+        @@media (max-width: 480px) {
+            .orders-title { font-size: 20px; margin-bottom: 25px; }
+            .order-card { padding: 15px; }
+            .order-item { flex-direction: column; gap: 10px; }
+            .item-image { width: 100%; height: 200px; }
+        }
+    </style>
+
+    <style>
+        @@keyframes spinner-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+}
+
+<div class="orders-container">
+    <h1 class="orders-title">MY ORDERS</h1>
+
+    <div id="ordersContent">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading your orders...</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let userId = sessionStorage.getItem('userId');
+
+        if (!userId) {
+            document.getElementById('ordersContent').innerHTML = `
+                <div class="no-orders">
+                    <div class="no-orders-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <p class="no-orders-text">Please log in to view your orders</p>
+                    <a href="/Auth/Login" class="no-orders-link">Go to Login</a>
+                </div>
+            `;
+        } else {
+            fetchUserOrders(parseInt(userId));
+        }
+
+        function fetchUserOrders(mstUserId) {
+            fetch(`/Website/getUserOrders?mstUserId=${mstUserId}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayOrders(data.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                    document.getElementById('ordersContent').innerHTML = `
+                        <div class="no-orders">
+                            <p class="no-orders-text">Error loading orders. Please try again.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayOrders(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersContent').innerHTML = `
+                    <div class="no-orders">
+                        <div class="no-orders-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <p class="no-orders-text">You haven't placed any orders yet</p>
+                        <a href="/Website/Home" class="no-orders-link">Continue Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let ordersHTML = '';
+
+            orders.forEach(order => {
+                const orderDate = new Date(order.orderDate);
+                const formattedDate = orderDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                let statusClass = 'status-pending';
+                if (order.orderStatus === 0) statusClass = 'status-cancelled';
+                else if (order.orderStatus === 1) statusClass = 'status-completed';
+                else if (order.orderStatus === 2) statusClass = 'status-processing';
+                else if (order.orderStatus === 3) statusClass = 'status-completed';
+                else if (order.orderStatus === 4) statusClass = 'status-cancelled';
+
+                let statusText = getStatusText(order.orderStatus);
+                let badgeHtml = statusText === 'Unknown' ? '' : `<div class="order-status-badge ${statusClass}">${statusText}</div>`;
+
+                ordersHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-number">Order #${order.orderNumber}</div>
+                                <div class="order-date">Placed on ${formattedDate}</div>
+                                ${badgeHtml}
+                            </div>
+                            <div class="order-amount">Rs. ${order.totalAmount}</div>
+                        </div>
+
+                        <div class="order-items">
+                `;
+
+                order.orderItems.forEach(item => {
+                    let deliveredClass = item.isDelivered ? 'delivered' : 'pending';
+                    let deliveredText = item.isDelivered ? `Delivered on ${new Date(item.deliveredDate).toLocaleDateString()}` : 'Pending Delivery';
+
+                    if (order.orderStatus === 4 || order.orderStatus === 0) {
+                        deliveredClass = 'cancelled';
+                        deliveredText = order.orderStatus === 0 ? 'Payment Failed' : 'Cancelled';
+                    }
+
+                    const imagePath = item.coverImagePath 
+                        ? (item.coverImagePath.startsWith('data:') ? item.coverImagePath : '/' + item.coverImagePath)
+                        : '/img/avatars/hariloom_logo_blue.png';
+
+                    ordersHTML += `
+                        <div class="order-item">
+                            <div class="item-image">
+                                <img src="${imagePath}" alt="${item.productName}" onerror="this.src='/img/avatars/hariloom_logo_blue.png'">
+                            </div>
+                            <div class="item-details">
+                                <div>
+                                    <div class="item-name">${item.productName}</div>
+                                    <div class="item-specs">Size: ${item.size} | Quantity: ${item.quantity}</div>
+                                    <div class="item-price">Rs. ${item.price}</div>
+                                </div>
+                                <div class="item-status ${deliveredClass}">${deliveredText}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                ordersHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('ordersContent').innerHTML = ordersHTML;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                0: 'Payment Failed',
+                1: 'Payment Successful',
+                2: 'In Transit',
+                3: 'Completed',
+                4: 'Cancelled'
+            };
+            return statusMap[status] || 'Unknown';
+        }
+    </script>
+}

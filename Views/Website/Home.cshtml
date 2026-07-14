@@ -1,0 +1,358 @@
+@{
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "Home";
+    ViewBag.IsHome = true;
+}
+
+@section Styles {
+    <style>
+        body {
+            background: #F7F4ED;
+        }
+
+        .hero-section {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+
+        .hero-text {
+            position: absolute;
+            top: 80%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 clamp(15px, 4vw, 40px);
+            font-size: clamp(28px, 8vw, 100px);
+            font-weight: 700;
+            letter-spacing: clamp(2px, 1vw, 8px);
+            color: #0b1d39;
+            opacity: 0;
+            transform: translateY(80px);
+            transition: .5s ease;
+        }
+
+            .hero-text.show {
+                opacity: 1;
+                transform: translateY(-50%);
+            }
+
+            .hero-text.hide {
+                opacity: 0;
+                transform: translateY(-60%);
+            }
+
+            .hero-text .center {
+                color: transparent;
+                -webkit-text-stroke: 2px rgba(255,255,255,0.98);
+                -webkit-text-fill-color: transparent;
+            }
+
+        .collection-section {
+            width: 100%;
+            max-width: 100%;
+            padding: 40px 40px 80px;
+            background: #F7F4ED;
+        }
+
+        .collection-title {
+            text-align: center;
+            font-size: clamp(16px, 3vw, 22px);
+            letter-spacing: 2px;
+            margin-bottom: clamp(20px, 4vw, 40px);
+            font-weight: 600;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+
+        .product-card {
+            position: relative;
+            cursor: pointer;
+        }
+
+            .product-card img {
+                width: 100%;
+                height: auto;
+                display: block;
+                object-fit: contain;
+            }
+
+        .product-card {
+            position: relative;
+            width: 100%;
+        }
+
+        .product-info {
+            margin-top: 10px;
+        }
+
+        .product-name {
+            font-size: clamp(11px, 1.5vw, 13px);
+            letter-spacing: 1px;
+        }
+
+        .product-price {
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .old-price {
+            margin-left: 8px;
+            font-size: clamp(11px, 1.3vw, 13px);
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .explore-btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: clamp(20px, 4vw, 40px);
+        }
+
+        .explore-btn {
+            padding: clamp(8px, 1.5vw, 12px) clamp(20px, 3vw, 30px);
+            border: none;
+            background: #e5e5e5;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+            .explore-btn:hover {
+                background: #d5d5d5;
+            }
+
+        /* Tablet */
+        @@media (max-width: 1024px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Mobile */
+        @@media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .hero-section {
+                height: auto;
+                aspect-ratio: 16 / 9;
+                display: block;
+            }
+
+            .hero-video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                transform: none;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        /* Small phones */
+        @@media (max-width: 480px) {
+            .collection-section {
+                padding: 20px 10px;
+            }
+        }
+
+        /* Scroll Transition */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+            .fade-in-up.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+    </style>
+}
+
+<div class="hero-section">
+    <video class="hero-video" autoplay muted loop playsinline preload="auto">
+        <source src="@Url.Content("~/videos/hariloom_video.MP4")" type="video/mp4" />
+        Your browser does not support the video tag.
+    </video>
+
+    @* <div class="hero-text">
+        <span>STAY</span>
+        <span class="center">DRIPPED</span>
+        <span>DAILY</span>
+    </div> *@
+</div>
+
+<div id="summer-collection" class="collection-section" style="scroll-margin-top:130px;">
+    <h2 class="collection-title">THE LINEN EDIT</h2>
+    <div class="product-grid"></div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        const productGrid = $('.product-grid');
+        const userId = parseInt(sessionStorage.getItem('userId'));
+
+        // Hero animation
+        $(window).on('scroll', () => {
+            const scrollTop = $(window).scrollTop();
+            const heroHeight = $('.hero-section').height();
+            $('.hero-text').toggleClass('show', scrollTop > heroHeight * 0.1 && scrollTop < heroHeight * 0.6).toggleClass('hide', scrollTop >= heroHeight * 0.6);
+        });
+
+        // Wishlist Toggle
+        function toggleWishlist(e, productId) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!userId) {
+                $("#loginPromptModal").modal("show");
+                return;
+            }
+
+            const button = $(e.currentTarget);
+            const isActive = button.hasClass('active');
+
+            $.ajax({
+                url: '@Url.Action("addToWishlist", "Website")'.replace('addToWishlist', isActive ? 'removeFromWishlist' : 'addToWishlist'),
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    mstUserId: userId,
+                    mstProductId: productId
+                }),
+                success: res => {
+                           if (res.success) {
+            button.toggleClass('active');
+
+            const icon = button.find('.wishlist-icon');
+
+            if (button.hasClass('active')) {
+                icon.attr('src', '/images/heart-filled.png');
+            } else {
+                icon.attr('src', '/images/heart-outline.png');
+            }
+
+            if (isActive) {
+                toastr.info('Removed from wishlist');
+            } else {
+                toastr.success('Added to wishlist');
+            }
+        }
+                }
+            });
+        }
+
+        // Load Products
+        function loadProducts() {
+            $.get('@Url.Action("GetAllProductDetails", "ProductsManagement")', function (res) {
+                var items = [];
+                if (res && res.success && Array.isArray(res.data)) items = res.data;
+                else if (res && Array.isArray(res.data)) items = res.data;
+                else if (Array.isArray(res)) items = res;
+
+                // Filter only active and available products
+                items = items.filter(function (p) { return p.isActive && p.isAvailable; });
+
+                if (!items.length) {
+                    $('.collection-section').hide();
+                    return;
+                }
+
+                var html = items.map(function (item, index) {
+                    var sellingPrice = Math.max(0, (item.basePrice || 0) - (item.discountedPrice || 0));
+                    var priceHtml = item.discountedPrice > 0
+                        ? `<p class="product-price"> ₹ ${sellingPrice} <span class="old-price">₹ ${item.basePrice}</span></p>`
+                        : `<p class="product-price">₹ ${item.basePrice}</p>`;
+
+                    var imgHtml = item.coverImagePath
+                        ? `<img src="/${item.coverImagePath}" />`
+                        : `<div style="width:100%;height:420px;background:#e9ecef;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:48px;"><i class="bx bx-image-alt"></i></div>`;
+
+                    // Apply a slight transition delay based on grid column (index % 3)
+                    var delay = (index % 3) * 0.15;
+
+                    return `<div class="product-card fade-in-up" style="transition-delay: ${delay}s;" onclick="fnGoToProductDetails(${item.productId})">
+                                ${imgHtml}
+                                <div class="product-info">
+                                    <p class="product-name">${item.productName || ''}</p> ${priceHtml}
+                                </div>
+                                                                <button class="wishlist-heart"
+            onclick="toggleWishlist(event, ${item.productId})"
+            data-id="${item.productId}">
+            <img class="wishlist-icon"
+                 src="/images/heart-outline.png"
+                 alt="Wishlist"
+                 style="width:22px;height:22px;">
+        </button>
+                            </div>`;
+                }).join('');
+
+                productGrid.html(html);
+
+                // Initialize scroll transition observer
+                const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+                if (userId) {
+                    markWishlistProducts(items.map(function (x) { return x.productId; }));
+                }
+            }).fail(function (err) {
+                console.error('Failed to load products', err);
+                $('.collection-section').hide();
+            });
+        }
+
+        // Initial Load
+        $(document).ready(function () {
+            loadProducts();
+        });
+
+        // Scroll to Journey section when header link clicked
+        function scrollToJourney() {
+            const target = document.getElementById('journey-section');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // If on a different page, navigate home then scroll
+                window.location.href = '@(Url.Content("~/"))#journey-section';
+            }
+        }
+    </script>
+}

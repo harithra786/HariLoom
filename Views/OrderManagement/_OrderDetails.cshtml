@@ -1,0 +1,33 @@
+@model dynamic
+
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order #@Model.Id - @Model.TrackingNumber</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Customer:</strong> @Model.Customer</p>
+        <p><strong>Total:</strong> @Model.Total</p>
+        <h6>Items</h6>
+        <table class="table">
+            <thead><tr><th>Name</th><th>Qty</th><th>Price</th></tr></thead>
+            <tbody>
+            @foreach(var it in Model.Items)
+            {
+                <tr>
+                    <td>@it.Name</td>
+                    <td>@it.Qty</td>
+                    <td>@it.Price</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

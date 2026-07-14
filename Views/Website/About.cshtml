@@ -1,0 +1,70 @@
+@{
+    ViewData["Title"] = "About";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.HideNavigation = true;
+}
+
+<style>
+    .about-page {
+        background: #F7F4ED;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(20px, 5vw, 60px) clamp(15px, 4vw, 40px);
+    }
+
+    .about-container {
+        max-width: 800px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .about-container h1 {
+        font-size: clamp(28px, 6vw, 48px);
+        color: #0b1d39;
+        margin-bottom: clamp(15px, 3vw, 30px);
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .about-container p {
+        font-size: clamp(14px, 2.5vw, 18px);
+        color: #333;
+        line-height: 1.8;
+        letter-spacing: 0.5px;
+    }
+
+    .about-content {
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .about-content ul {
+        text-align: left;
+        padding-left: clamp(15px, 3vw, 25px);
+    }
+
+    .about-content li {
+        font-size: clamp(14px, 2vw, 16px);
+        line-height: 1.8;
+        margin-bottom: 8px;
+    }
+</style>
+
+<div class="about-page">
+    <div class="about-container">
+        <h1>About Us</h1>
+        <div class="about-content">
+        <ul>
+                <li>Hariloom is inspired by the idea of adding seasoning to your wardrobe, creating a lifestyle label centered around thoughtful dressing. We reimagine everyday essentials with a feminine touch and an understated sense of luxury.</li>
+
+                <li>Our designs balance comfort, versatility, and elevated detailing for the modern wardrobe. From relaxed linen shirts to refined evening silhouettes, every piece is crafted to feel effortless, breathable, and timeless.</li>
+
+                <li>Our debut collection, <strong>The Linen Edit</strong>, reflects our commitment to conscious and sustainable design. Sustainability is considered throughout our choice of fabrics and packaging.</li>
+
+            <li>At its core, Hariloom creates pieces that are easy to wear, thoughtfully made, and naturally elevated for everyday life.</li>
+        </ul>
+        </div>
+    </div>
+</div>

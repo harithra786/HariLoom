@@ -1,0 +1,198 @@
+@{
+    ViewData["Title"] = "Product Sub Category";
+}
+<div class="row">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Products Management /</span> Product Sub Category</h4>
+</div>
+<div class="row mb-3">
+    <div class="col-md-11"></div>
+    <div class="col-md-1">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#subCategoryAddModal"> Add </button>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="subCategoryAddModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="subCategoryForm" data-parsley-validate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="subCategoryAddModalTitle">Add Product Sub Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="fnClrSubModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="subCategoryId" />
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="mainCategorySelect" class="form-label">Main Category</label>
+                        <select id="mainCategorySelect" class="form-select" required data-parsley-errors-container="#mainCategoryError"></select>
+                        <span id="mainCategoryError" class="text-danger parsley-errors"></span>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="subCategoryName" class="form-label">Sub Category Name</label>
+                        <input type="text" id="subCategoryName" class="form-control only-letters-spaces" placeholder="Enter Sub Category Name"
+                               autocomplete="off" required data-parsley-errors-container="#subCategoryNameError" />
+                        <span id="subCategoryNameError" class="text-danger parsley-errors"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="categoryName" class="form-label">Sub Category Image</label>
+                        <input type="file" class="form-control" id="subCategoryImage" name="subCategoryImage" accept=".webp, image/webp"
+                               data-parsley-filemimetypes="image/webp" data-parsley-errors-container="#subCategoryImageError" />
+                        <span id="subCategoryImageError" class="text-danger parsley-errors"></span>
+                        <small class="text-muted">Upload a single category image.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="fnClrSubModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="saveSubBtn" onclick="addOrUpdateSubCategory()">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <h5 class="card-header">Product Sub Category Details</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>Main Category</th>
+                            <th>Sub Category</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function loadMainCategories() {
+            $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")', function (response) {
+                let options = '<option value="">Select Main Category</option>';
+                response.data.forEach(cat => {
+                    options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
+                });
+                $('#mainCategorySelect').html(options);
+            });
+        }
+
+        function loadSubCategories() {
+            $.get('@Url.Action("GetAllProductSubCategories", "ProductsManagement")', function (response) {
+                let tbody = '';
+                response.data.forEach((sub, idx) => {
+                    tbody += `<tr>
+                        <td>${idx + 1}</td>
+                        <td>${sub.mainCategoryName}</td>
+                        <td>${sub.subCategoryName}</td>
+                        <td>${sub.subCategoryImagePath ? `<img src="data:image/png;base64,${sub.subCategoryImagePath}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />` : ''}</td>
+                        <td><div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" ${sub.isActive ? 'checked' : ''} onchange="toggleSubActive(${sub.mstProductSubCategoryId}, this.checked)">
+                        </div></td>
+                        <td><button class="btn btn-sm btn-warning" onclick="editSubCategory(${sub.mstProductSubCategoryId})">Edit</button></td>
+                    </tr>`;
+                });
+                $('table tbody').html(tbody);
+            });
+        }
+
+        function addOrUpdateSubCategory() {
+            const form = $('#subCategoryForm');
+
+            if (!form.parsley().validate()) {
+                return;
+            }
+
+            const id = $('#subCategoryId').val();
+            const mainCategoryId = $('#mainCategorySelect').val();
+            const name = $('#subCategoryName').val().trim();
+            const image = $('#subCategoryImage')[0].files[0];
+
+            var formData = new FormData();
+            formData.append('mstProductSubCategoryId', id ? parseInt(id) : 0);
+            formData.append('mstProductMainCategoryId', parseInt(mainCategoryId));
+            formData.append('subCategoryName', name);
+            formData.append('createdBy', sessionStorage.getItem('userId'));
+            if (image) {
+                formData.append('subCategoryImageFile', image);
+            }
+
+            $.ajax({
+                url: '@Url.Action("SaveOrUpdateProductSubCategory", "ProductsManagement")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if(response.success == true){
+                        $('#subCategoryAddModal').modal('hide');
+                        fnClrSubModal();
+                        loadSubCategories();
+                        toastr.success(response.message);
+                    }else{
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseText);
+                }
+            });
+        }
+
+        function editSubCategory(id) {
+            $.get('@Url.Action("GetSubCategoryById", "ProductsManagement")', { id }, function (response) {
+                if (response.success) {
+                    const sub = response.data;
+                    $('#subCategoryId').val(sub.mstProductSubCategoryId);
+                    $('#mainCategorySelect').val(sub.mstProductMainCategoryId);
+                    $('#subCategoryName').val(sub.subCategoryName);
+                    $('#subCategoryAddModalTitle').text('Edit Product Sub Category');
+                    $('#subCategoryAddModal').modal('show');
+                } else {
+                    toastr.error(response.message);
+                }
+            });
+        }
+
+        function toggleSubActive(id, isActive) {
+            $.post('@Url.Action("DeactivateProductSubCategory", "ProductsManagement")', {
+                id: id,
+                isActive: isActive,
+                updatedBy: 1
+            }, function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    loadSubCategories();
+                } else {
+                    toastr.error(response.message);
+                }
+            }).fail(function (xhr) {
+                toastr.error('Error: ' + xhr.responseText);
+            });
+        }
+
+        function fnClrSubModal() {
+            $('#subCategoryId').val('');
+            $('#mainCategorySelect').val('');
+            $('#subCategoryName').val('');
+            $('#subCategoryImage').val('');
+            $('#subCategoryForm').parsley().reset();
+            $('#subCategoryAddModalTitle').text('Add Product Sub Category');
+        }
+
+        $(function () {
+            loadMainCategories();
+            loadSubCategories();
+        });
+    </script>
+}
