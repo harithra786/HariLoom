@@ -196,7 +196,17 @@
 </div>
 
 <div id="summer-collection" class="collection-section" style="scroll-margin-top:130px;">
-    <h2 class="collection-title">THE LINEN EDIT</h2>
+    <!-- Breadcrumb / Back button -->
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px;">
+        <button id="category-back-btn" class="explore-btn" style="display: none; border-radius: 8px; font-weight: 600; font-size: 14px; padding: 8px 16px;" onclick="fnGoBackCategory()">
+            <i class="bx bx-left-arrow-alt" style="font-size: 18px; vertical-align: middle; margin-right: 4px;"></i> Back
+        </button>
+        <div id="category-breadcrumb" style="font-size: 14px; font-weight: 500;">
+            <span style="color: #333; font-weight: 600;">Categories</span>
+        </div>
+    </div>
+
+    <h2 class="collection-title" id="section-title">SHOP BY CATEGORY</h2>
     <div class="product-grid"></div>
 </div>
 
@@ -257,80 +267,233 @@
             });
         }
 
-        // Load Products
-        function loadProducts() {
-            $.get('@Url.Action("GetAllProductDetails", "ProductsManagement")', function (res) {
-                var items = [];
+        let currentView = 'main';
+        let selectedMainCategoryId = null;
+        let selectedMainCategoryName = '';
+        let selectedSubCategoryId = null;
+        let selectedSubCategoryName = '';
+
+        // Load Main Categories
+        function loadMainCategories() {
+            currentView = 'main';
+            $('#category-back-btn').hide();
+            $('#section-title').text('SHOP BY CATEGORY');
+            $('#category-breadcrumb').html('<span style="color: #333; font-weight: 600;">Categories</span>');
+            
+            productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 18px; color: #666;"><i class="bx bx-loader-alt bx-spin" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>Loading categories...</div>');
+
+            $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")', function (res) {
+                let items = [];
                 if (res && res.success && Array.isArray(res.data)) items = res.data;
                 else if (res && Array.isArray(res.data)) items = res.data;
                 else if (Array.isArray(res)) items = res;
 
-                // Filter only active and available products
-                items = items.filter(function (p) { return p.isActive && p.isAvailable; });
+                items = items.filter(function (p) { return p.isActive; });
 
                 if (!items.length) {
-                    $('.collection-section').hide();
+                    productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #666;">No categories found</div>');
                     return;
                 }
 
-                var html = items.map(function (item, index) {
-                    var sellingPrice = Math.max(0, (item.basePrice || 0) - (item.discountedPrice || 0));
-                    var priceHtml = item.discountedPrice > 0
-                        ? `<p class="product-price"> ₹ ${sellingPrice} <span class="old-price">₹ ${item.basePrice}</span></p>`
-                        : `<p class="product-price">₹ ${item.basePrice}</p>`;
+                let html = items.map(function (cat, index) {
+                    let imgSrc = cat.mainCategoryImagePath 
+                        ? 'data:image/png;base64,' + cat.mainCategoryImagePath 
+                        : '/images/placeholder.png';
 
-                    var imgHtml = item.coverImagePath
-                        ? `<img src="/${item.coverImagePath}" />`
-                        : `<div style="width:100%;height:420px;background:#e9ecef;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:48px;"><i class="bx bx-image-alt"></i></div>`;
+                    let delay = (index % 3) * 0.15;
 
-                    // Apply a slight transition delay based on grid column (index % 3)
-                    var delay = (index % 3) * 0.15;
-
-                    return `<div class="product-card fade-in-up" style="transition-delay: ${delay}s;" onclick="fnGoToProductDetails(${item.productId})">
-                                ${imgHtml}
-                                <div class="product-info">
-                                    <p class="product-name">${item.productName || ''}</p> ${priceHtml}
+                    return `<div class="product-card fade-in-up" style="transition-delay: ${delay}s;" onclick="fnLoadSubCategories(${cat.mstProductMainCategoryId}, '${cat.mainCategoryName}')">
+                                <div style="position: relative; width: 100%; padding-top: 120%; border-radius: 12px; overflow: hidden; background: #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                    <img src="${imgSrc}" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
                                 </div>
-                                                                <button class="wishlist-heart"
-            onclick="toggleWishlist(event, ${item.productId})"
-            data-id="${item.productId}">
-            <img class="wishlist-icon"
-                 src="/images/heart-outline.png"
-                 alt="Wishlist"
-                 style="width:22px;height:22px;">
-        </button>
+                                <div class="product-info" style="text-align:center; padding: 12px 5px 0;">
+                                    <p class="product-name" style="font-weight: 600; font-size: clamp(14px, 2vw, 17px); letter-spacing: 1px; color: #222; text-transform: uppercase;">${cat.mainCategoryName}</p>
+                                </div>
                             </div>`;
                 }).join('');
 
                 productGrid.html(html);
+                initializeObserver();
+            }).fail(function (err) {
+                console.error('Failed to load main categories', err);
+                productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #ff3333;">Failed to load categories. Please try again.</div>');
+            });
+        }
 
-                // Initialize scroll transition observer
-                const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-                const observer = new IntersectionObserver((entries, obs) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                            obs.unobserve(entry.target);
-                        }
-                    });
-                }, observerOptions);
+        // Load Sub Categories
+        function fnLoadSubCategories(mainCategoryId, mainCategoryName) {
+            currentView = 'sub';
+            selectedMainCategoryId = mainCategoryId;
+            selectedMainCategoryName = mainCategoryName;
 
-                document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+            $('#category-back-btn').show();
+            $('#section-title').text(mainCategoryName.toUpperCase());
+            $('#category-breadcrumb').html(`
+                <a href="javascript:void(0);" onclick="loadMainCategories()" style="color: #1f4fa3; text-decoration: none; font-weight: 500;">Categories</a>
+                <span style="color: #888; margin: 0 6px;">&gt;</span>
+                <span style="color: #333; font-weight: 600;">${mainCategoryName}</span>
+            `);
+
+            productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 18px; color: #666;"><i class="bx bx-loader-alt bx-spin" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>Loading subcategories...</div>');
+
+            $.get('@Url.Action("GetAllActiveSubCategoryByIDWithImage", "ProductsManagement")', { id: mainCategoryId }, function (res) {
+                let items = [];
+                if (res && res.success && Array.isArray(res.data)) items = res.data;
+                else if (res && Array.isArray(res.data)) items = res.data;
+                else if (Array.isArray(res)) items = res;
+
+                items = items.filter(function (p) { return p.isActive; });
+
+                if (!items.length) {
+                    productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #666;">No subcategories found in this category</div>');
+                    return;
+                }
+
+                let html = items.map(function (sub, index) {
+                    let imgSrc = sub.subCategoryImagePath 
+                        ? 'data:image/png;base64,' + sub.subCategoryImagePath 
+                        : '/images/placeholder.png';
+
+                    let delay = (index % 3) * 0.15;
+
+                    return `<div class="product-card fade-in-up" style="transition-delay: ${delay}s;" onclick="fnLoadProducts(${sub.mstProductSubCategoryId}, '${sub.subCategoryName}')">
+                                <div style="position: relative; width: 100%; padding-top: 120%; border-radius: 12px; overflow: hidden; background: #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                    <img src="${imgSrc}" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+                                </div>
+                                <div class="product-info" style="text-align:center; padding: 12px 5px 0;">
+                                    <p class="product-name" style="font-weight: 600; font-size: clamp(13px, 1.8vw, 16px); letter-spacing: 1px; color: #222; text-transform: uppercase;">${sub.subCategoryName}</p>
+                                </div>
+                            </div>`;
+                }).join('');
+
+                productGrid.html(html);
+                initializeObserver();
+            }).fail(function (err) {
+                console.error('Failed to load subcategories', err);
+                productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #ff3333;">Failed to load subcategories.</div>');
+            });
+        }
+
+        // Load Products by Sub Category
+        function fnLoadProducts(subCategoryId, subCategoryName) {
+            currentView = 'products';
+            selectedSubCategoryId = subCategoryId;
+            selectedSubCategoryName = subCategoryName;
+
+            $('#category-back-btn').show();
+            $('#section-title').text(subCategoryName.toUpperCase());
+            $('#category-breadcrumb').html(`
+                <a href="javascript:void(0);" onclick="loadMainCategories()" style="color: #1f4fa3; text-decoration: none; font-weight: 500;">Categories</a>
+                <span style="color: #888; margin: 0 6px;">&gt;</span>
+                <a href="javascript:void(0);" onclick="fnLoadSubCategories(${selectedMainCategoryId}, '${selectedMainCategoryName}')" style="color: #1f4fa3; text-decoration: none; font-weight: 500;">${selectedMainCategoryName}</a>
+                <span style="color: #888; margin: 0 6px;">&gt;</span>
+                <span style="color: #333; font-weight: 600;">${subCategoryName}</span>
+            `);
+
+            productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 18px; color: #666;"><i class="bx bx-loader-alt bx-spin" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>Loading products...</div>');
+
+            $.get('/ProductsManagement/GetActiveProductsBySubCategoryId', { subCategoryId: subCategoryId }, function (res) {
+                let items = [];
+                if (res && res.success && Array.isArray(res.data)) items = res.data;
+                else if (res && Array.isArray(res.data)) items = res.data;
+                else if (Array.isArray(res)) items = res;
+
+                items = items.filter(function (p) { return p.isActive && p.isAvailable; });
+
+                if (!items.length) {
+                    productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #666;">No products found in this subcategory</div>');
+                    return;
+                }
+
+                let html = items.map(function (item, index) {
+                    let sellingPrice = Math.max(0, (item.basePrice || 0) - (item.discountedPrice || 0));
+                    let priceHtml = item.discountedPrice > 0
+                        ? `<p class="product-price"> ₹ ${sellingPrice} <span class="old-price">₹ ${item.basePrice}</span></p>`
+                        : `<p class="product-price">₹ ${item.basePrice}</p>`;
+
+                    let imgHtml = item.coverImagePath
+                        ? `<img src="/${item.coverImagePath}" style="width:100%; height:auto; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" />`
+                        : `<div style="width:100%;height:320px;background:#e9ecef;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:48px;"><i class="bx bx-image-alt"></i></div>`;
+
+                    let delay = (index % 3) * 0.15;
+
+                    return `<div class="product-card fade-in-up" style="transition-delay: ${delay}s;" onclick="fnGoToProductDetails(${item.productId})">
+                                <div style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                    ${imgHtml}
+                                </div>
+                                <div class="product-info" style="padding: 10px 5px 0;">
+                                    <p class="product-name" style="font-weight: 500; font-size: clamp(12px, 1.6vw, 14px); color: #333; margin-bottom: 2px;">${item.productName || ''}</p>
+                                    ${priceHtml}
+                                </div>
+                                <button class="wishlist-heart" onclick="toggleWishlist(event, ${item.productId})" data-id="${item.productId}">
+                                    <img class="wishlist-icon" src="/images/heart-outline.png" alt="Wishlist" style="width:22px;height:22px;">
+                                </button>
+                            </div>`;
+                }).join('');
+
+                productGrid.html(html);
+                initializeObserver();
 
                 if (userId) {
                     markWishlistProducts(items.map(function (x) { return x.productId; }));
                 }
             }).fail(function (err) {
                 console.error('Failed to load products', err);
-                $('.collection-section').hide();
+                productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #ff3333;">Failed to load products.</div>');
+            });
+        }
+
+        // Back button navigation
+        function fnGoBackCategory() {
+            if (currentView === 'products') {
+                fnLoadSubCategories(selectedMainCategoryId, selectedMainCategoryName);
+            } else if (currentView === 'sub') {
+                loadMainCategories();
+            }
+        }
+
+        // Helper to initialize Observer for transition animations
+        function initializeObserver() {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+        }
+
+        // Mark Wishlist logic
+        function markWishlistProducts(productIds) {
+            $.ajax({
+                url: '@Url.Action("checkWishlistStatus", "Website")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    mstUserId: userId,
+                    productIds: productIds
+                }),
+                success: function (res) {
+                    if (res && res.success && res.data) {
+                        res.data.forEach(function (status) {
+                            if (status.isInWishlist) {
+                                const btn = $(`.wishlist-heart[data-id="${status.productId}"]`);
+                                btn.addClass('active');
+                                btn.find('.wishlist-icon').attr('src', '/images/heart-filled.png');
+                            }
+                        });
+                    }
+                }
             });
         }
 
         // Initial Load
         $(document).ready(function () {
-            loadProducts();
+            loadMainCategories();
         });
-
-
     </script>
 }

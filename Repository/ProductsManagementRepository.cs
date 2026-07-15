@@ -79,274 +79,274 @@ namespace hariloom.Repository
         #endregion
 
         #region Repository Implementation of Product Main Category
-        //public async Task<List<ProductMainCategoryDetailsDto>> GetAllProductMainCategoriesAsync()
-        //{
-        //    var productList = await _context.mstProductMainCategory.Select(p => new ProductMainCategoryDetailsDto
-        //    {
-        //        mstProductMainCategoryId = p.mstProductMainCategoryId,
-        //        mainCategoryName = p.mainCategoryName,
-        //        mainCategoryImagePath = p.mainCategoryImagePath,
-        //        isActive = p.isActive,
-        //        createdBy = p.createdBy
-        //    }).ToListAsync();
+        public async Task<List<ProductMainCategoryDetailsDto>> GetAllProductMainCategoriesAsync()
+        {
+            var productList = await _context.mstProductMainCategory.Select(p => new ProductMainCategoryDetailsDto
+            {
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mainCategoryName = p.mainCategoryName,
+                mainCategoryImagePath = p.mainCategoryImagePath,
+                isActive = p.isActive,
+                createdBy = p.createdBy
+            }).ToListAsync();
 
-        //    var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
-        //    {
-        //        mstProductMainCategoryId = p.mstProductMainCategoryId,
-        //        mainCategoryName = p.mainCategoryName,
-        //        //mainCategoryImagePath = GetImageFromPathAndConvertToBase64(p.mainCategoryImagePath),
-        //        isActive = p.isActive,
-        //        createdBy = p.createdBy
-        //    }).ToList();
+            var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
+            {
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mainCategoryName = p.mainCategoryName,
+                mainCategoryImagePath = GetImageFromPathAndConvertToBase64(p.mainCategoryImagePath),
+                isActive = p.isActive,
+                createdBy = p.createdBy
+            }).ToList();
 
-        //    return returnResult;
-        //}
+            return returnResult;
+        }
 
-        //public async Task<List<ProductMainCategoryDetailsDto>> GetAllActiveProductMainCategoriesAsync()
-        //{
-        //    var productList = await _context.mstProductMainCategory.Where(a => a.isActive == true).Select(p => new ProductMainCategoryDetailsDto
-        //    {
-        //        mstProductMainCategoryId = p.mstProductMainCategoryId,
-        //        mainCategoryName = p.mainCategoryName,
-        //        mainCategoryImagePath = p.mainCategoryImagePath,
-        //        isActive = p.isActive,
-        //        createdBy = p.createdBy
-        //    }).ToListAsync();
+        public async Task<List<ProductMainCategoryDetailsDto>> GetAllActiveProductMainCategoriesAsync()
+        {
+            var productList = await _context.mstProductMainCategory.Where(a => a.isActive == true).Select(p => new ProductMainCategoryDetailsDto
+            {
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mainCategoryName = p.mainCategoryName,
+                mainCategoryImagePath = p.mainCategoryImagePath,
+                isActive = p.isActive,
+                createdBy = p.createdBy
+            }).ToListAsync();
 
-        //    var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
-        //    {
-        //        mstProductMainCategoryId = p.mstProductMainCategoryId,
-        //        mainCategoryName = p.mainCategoryName,
-        //        //mainCategoryImagePath = GetImageFromPathAndConvertToBase64(p.mainCategoryImagePath),
-        //        isActive = p.isActive,
-        //        createdBy = p.createdBy
-        //    }).ToList();
+            var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
+            {
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mainCategoryName = p.mainCategoryName,
+                mainCategoryImagePath = GetImageFromPathAndConvertToBase64(p.mainCategoryImagePath),
+                isActive = p.isActive,
+                createdBy = p.createdBy
+            }).ToList();
 
-        //    return returnResult;
-        //}
+            return returnResult;
+        }
 
 
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductMainCategoryAsync(ProductMainCategoryDetailsDto model)
-        //{
-        //    var checkforDuplicate = _context.mstProductMainCategory.Where(x => x.mainCategoryName == model.mainCategoryName && x.isActive && x.mstProductMainCategoryId != model.mstProductMainCategoryId).FirstOrDefault();
-        //    if (checkforDuplicate != null)
-        //    {
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
-        //    }
+        public async Task<ApiResponseDTO> SaveOrUpdateProductMainCategoryAsync(ProductMainCategoryDetailsDto model)
+        {
+            var checkforDuplicate = _context.mstProductMainCategory.Where(x => x.mainCategoryName == model.mainCategoryName && x.isActive && x.mstProductMainCategoryId != model.mstProductMainCategoryId).FirstOrDefault();
+            if (checkforDuplicate != null)
+            {
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
+            }
 
-        //    if (model.mstProductMainCategoryId > 0)
-        //    {
-        //        var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == model.mstProductMainCategoryId);
-        //        if (entity != null)
-        //        {
-        //            entity.mainCategoryName = model.mainCategoryName;
-        //            entity.isActive = model.isActive;
-        //            entity.updatedBy = model.createdBy;
-        //            entity.updatedDate = DateTime.Now;
+            if (model.mstProductMainCategoryId > 0)
+            {
+                var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == model.mstProductMainCategoryId);
+                if (entity != null)
+                {
+                    entity.mainCategoryName = model.mainCategoryName;
+                    entity.isActive = model.isActive;
+                    entity.updatedBy = model.createdBy;
+                    entity.updatedDate = DateTime.Now;
 
-        //            if (model.mainCategoryImageFile != null)
-        //            {
-        //                entity.mainCategoryImagePath = await SaveMainCategoryImageAsync(model.mainCategoryImageFile);
-        //            }
+                    if (model.mainCategoryImageFile != null)
+                    {
+                        entity.mainCategoryImagePath = await SaveMainCategoryImageAsync(model.mainCategoryImageFile);
+                    }
 
-        //            _context.SaveChanges();
-        //            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
-        //        }
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
-        //    }
-        //    else
-        //    {
-        //        mstProductMainCategory newCategory = new mstProductMainCategory();
-        //        newCategory.mainCategoryName = model.mainCategoryName;
+                    _context.SaveChanges();
+                    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
+                }
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+            }
+            else
+            {
+                mstProductMainCategory newCategory = new mstProductMainCategory();
+                newCategory.mainCategoryName = model.mainCategoryName;
 
-        //        if (model.mainCategoryImageFile != null)
-        //        {
-        //            newCategory.mainCategoryImagePath = await SaveMainCategoryImageAsync(model.mainCategoryImageFile);
-        //        }
-        //        await _context.mstProductMainCategory.AddAsync(newCategory);
-        //        _context.SaveChanges();
-        //        return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Saved Successfully" });
-        //    }
-        //}
+                if (model.mainCategoryImageFile != null)
+                {
+                    newCategory.mainCategoryImagePath = await SaveMainCategoryImageAsync(model.mainCategoryImageFile);
+                }
+                await _context.mstProductMainCategory.AddAsync(newCategory);
+                _context.SaveChanges();
+                return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Saved Successfully" });
+            }
+        }
 
-        //private async Task<string> SaveMainCategoryImageAsync(IFormFile image)
-        //{
-        //    if (image == null) return null;
+        private async Task<string> SaveMainCategoryImageAsync(IFormFile image)
+        {
+            if (image == null) return null;
 
-        //    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "maincategories");
-        //    if (!Directory.Exists(folderPath))
-        //        Directory.CreateDirectory(folderPath);
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "maincategories");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
 
-        //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        //    var filePath = Path.Combine(folderPath, fileName);
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var filePath = Path.Combine(folderPath, fileName);
 
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await image.CopyToAsync(stream);
-        //    }
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
 
-        //    // Return relative path for use in <img src="...">
-        //    return filePath.Replace("\\", "/");
-        //}
+            // Return relative path for use in <img src="...">
+            return filePath.Replace("\\", "/");
+        }
 
-        //public async Task<mstProductMainCategory> GetMainCategoryByIdAsync(int id)
-        //{
-        //    return await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
-        //}
+        public async Task<mstProductMainCategory> GetMainCategoryByIdAsync(int id)
+        {
+            return await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
+        }
 
-        //public async Task<ApiResponseDTO> DeactivateProductMainCategoryAsync(int id, bool isActive, int updatedBy)
-        //{
-        //    var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
-        //    if (entity != null)
-        //    {
-        //        entity.isActive = isActive;
-        //        entity.updatedBy = updatedBy;
-        //        entity.updatedDate = DateTime.Now;
-        //        _context.SaveChanges();
-        //        return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
-        //    }
-        //    return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
-        //}
+        public async Task<ApiResponseDTO> DeactivateProductMainCategoryAsync(int id, bool isActive, int updatedBy)
+        {
+            var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
+            if (entity != null)
+            {
+                entity.isActive = isActive;
+                entity.updatedBy = updatedBy;
+                entity.updatedDate = DateTime.Now;
+                _context.SaveChanges();
+                return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
+            }
+            return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+        }
         #endregion
 
         #region Repository Implementation of Product Sub Category
-        //public async Task<List<ProductSubCategoryDetailsDto>> GetAllProductSubCategoriesAsync()
-        //{
-        //    var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.MainCategory.isActive).ToListAsync();
+        public async Task<List<ProductSubCategoryDetailsDto>> GetAllProductSubCategoriesAsync()
+        {
+            var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.MainCategory.isActive).ToListAsync();
 
-        //    return subCategories.Select(x => new ProductSubCategoryDetailsDto
-        //    {
-        //        mstProductSubCategoryId = x.mstProductSubCategoryId,
-        //        mstProductMainCategoryId = x.mstProductMainCategoryId,
-        //        mainCategoryName = x.MainCategory.mainCategoryName,
-        //        subCategoryName = x.subCategoryName,
-        //        //subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
-        //        isActive = x.isActive,
-        //        createdBy = x.createdBy
-        //    }).ToList();
-        //}
-
-
-        //public async Task<List<ProductSubCategoryDetailsDto>> GetAllActiveProductSubCategoriesAsync()
-        //{
-        //    var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.MainCategory.isActive).Where(x => x.isActive).ToListAsync();
-
-        //    return subCategories.Select(x => new ProductSubCategoryDetailsDto
-        //    {
-        //        mstProductSubCategoryId = x.mstProductSubCategoryId,
-        //        mstProductMainCategoryId = x.mstProductMainCategoryId,
-        //        mainCategoryName = x.MainCategory.mainCategoryName,
-        //        subCategoryName = x.subCategoryName,
-        //        //subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
-        //        isActive = x.isActive,
-        //        createdBy = x.createdBy
-        //    }).ToList();
-        //}
+            return subCategories.Select(x => new ProductSubCategoryDetailsDto
+            {
+                mstProductSubCategoryId = x.mstProductSubCategoryId,
+                mstProductMainCategoryId = x.mstProductMainCategoryId,
+                mainCategoryName = x.MainCategory.mainCategoryName,
+                subCategoryName = x.subCategoryName,
+                subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
+                isActive = x.isActive,
+                createdBy = x.createdBy
+            }).ToList();
+        }
 
 
-        //public async Task<List<mstProductSubCategory>> GetAllActiveProductSubCategoriesByMainCategoryIdAsync(int id)
-        //{
-        //    return await _context.mstProductSubCategory.Where(a => a.isActive && a.mstProductMainCategoryId == id).ToListAsync();
-        //}
+        public async Task<List<ProductSubCategoryDetailsDto>> GetAllActiveProductSubCategoriesAsync()
+        {
+            var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.MainCategory.isActive).Where(x => x.isActive).ToListAsync();
 
-        //public async Task<List<mstProductSubCategory>> GetAllActiveSubCategoryByIDWithImageAsync(int id)
-        //{
-        //    var subCategories = await _context.mstProductSubCategory.Where(x => x.MainCategory.isActive).Where(x => x.isActive && x.mstProductMainCategoryId == id).ToListAsync();
+            return subCategories.Select(x => new ProductSubCategoryDetailsDto
+            {
+                mstProductSubCategoryId = x.mstProductSubCategoryId,
+                mstProductMainCategoryId = x.mstProductMainCategoryId,
+                mainCategoryName = x.MainCategory.mainCategoryName,
+                subCategoryName = x.subCategoryName,
+                subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
+                isActive = x.isActive,
+                createdBy = x.createdBy
+            }).ToList();
+        }
 
-        //    return subCategories.Select(x => new mstProductSubCategory
-        //    {
-        //        mstProductSubCategoryId = x.mstProductSubCategoryId,
-        //        mstProductMainCategoryId = x.mstProductMainCategoryId,
-        //        subCategoryName = x.subCategoryName,
-        //        //subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
-        //        isActive = x.isActive,
-        //        createdBy = x.createdBy
-        //    }).ToList();
-        //}
 
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductSubCategoryAsync(ProductSubCategoryDetailsDto model)
-        //{
-        //    var duplicate = _context.mstProductSubCategory.FirstOrDefault(x => x.subCategoryName == model.subCategoryName && x.mstProductMainCategoryId == model.mstProductMainCategoryId && x.isActive && x.mstProductSubCategoryId != model.mstProductSubCategoryId);
+        public async Task<List<mstProductSubCategory>> GetAllActiveProductSubCategoriesByMainCategoryIdAsync(int id)
+        {
+            return await _context.mstProductSubCategory.Where(a => a.isActive && a.mstProductMainCategoryId == id).ToListAsync();
+        }
 
-        //    if (duplicate != null)
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
+        public async Task<List<mstProductSubCategory>> GetAllActiveSubCategoryByIDWithImageAsync(int id)
+        {
+            var subCategories = await _context.mstProductSubCategory.Where(x => x.MainCategory.isActive).Where(x => x.isActive && x.mstProductMainCategoryId == id).ToListAsync();
 
-        //    if (model.mstProductSubCategoryId > 0)
-        //    {
-        //        var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == model.mstProductSubCategoryId);
-        //        if (entity != null)
-        //        {
-        //            entity.subCategoryName = model.subCategoryName;
-        //            entity.mstProductMainCategoryId = model.mstProductMainCategoryId;
-        //            entity.updatedBy = model.createdBy;
-        //            entity.updatedDate = DateTime.Now;
+            return subCategories.Select(x => new mstProductSubCategory
+            {
+                mstProductSubCategoryId = x.mstProductSubCategoryId,
+                mstProductMainCategoryId = x.mstProductMainCategoryId,
+                subCategoryName = x.subCategoryName,
+                subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
+                isActive = x.isActive,
+                createdBy = x.createdBy
+            }).ToList();
+        }
 
-        //            if (model.subCategoryImageFile != null)
-        //            {
-        //                entity.subCategoryImagePath = await SaveSubCategoryImageAsync(model.subCategoryImageFile);
-        //            }
+        public async Task<ApiResponseDTO> SaveOrUpdateProductSubCategoryAsync(ProductSubCategoryDetailsDto model)
+        {
+            var duplicate = _context.mstProductSubCategory.FirstOrDefault(x => x.subCategoryName == model.subCategoryName && x.mstProductMainCategoryId == model.mstProductMainCategoryId && x.isActive && x.mstProductSubCategoryId != model.mstProductSubCategoryId);
 
-        //            await _context.SaveChangesAsync();
-        //            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
-        //        }
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
-        //    }
-        //    else
-        //    {
-        //        var entity = new mstProductSubCategory
-        //        {
-        //            subCategoryName = model.subCategoryName,
-        //            mstProductMainCategoryId = model.mstProductMainCategoryId,
-        //        };
+            if (duplicate != null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
 
-        //        if (model.subCategoryImageFile != null)
-        //        {
-        //            entity.subCategoryImagePath = await SaveSubCategoryImageAsync(model.subCategoryImageFile);
-        //        }
+            if (model.mstProductSubCategoryId > 0)
+            {
+                var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == model.mstProductSubCategoryId);
+                if (entity != null)
+                {
+                    entity.subCategoryName = model.subCategoryName;
+                    entity.mstProductMainCategoryId = model.mstProductMainCategoryId;
+                    entity.updatedBy = model.createdBy;
+                    entity.updatedDate = DateTime.Now;
 
-        //        await _context.mstProductSubCategory.AddAsync(entity);
-        //        await _context.SaveChangesAsync();
-        //        return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Saved Successfully" });
-        //    }
-        //}
+                    if (model.subCategoryImageFile != null)
+                    {
+                        entity.subCategoryImagePath = await SaveSubCategoryImageAsync(model.subCategoryImageFile);
+                    }
 
-        //private async Task<string> SaveSubCategoryImageAsync(IFormFile image)
-        //{
-        //    if (image == null) return null;
+                    await _context.SaveChangesAsync();
+                    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
+                }
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+            }
+            else
+            {
+                var entity = new mstProductSubCategory
+                {
+                    subCategoryName = model.subCategoryName,
+                    mstProductMainCategoryId = model.mstProductMainCategoryId,
+                };
 
-        //    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "subcategories");
-        //    if (!Directory.Exists(folderPath))
-        //        Directory.CreateDirectory(folderPath);
+                if (model.subCategoryImageFile != null)
+                {
+                    entity.subCategoryImagePath = await SaveSubCategoryImageAsync(model.subCategoryImageFile);
+                }
 
-        //    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        //    var filePath = Path.Combine(folderPath, fileName);
+                await _context.mstProductSubCategory.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Saved Successfully" });
+            }
+        }
 
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await image.CopyToAsync(stream);
-        //    }
+        private async Task<string> SaveSubCategoryImageAsync(IFormFile image)
+        {
+            if (image == null) return null;
 
-        //    return filePath.Replace("\\", "/");
-        //}
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "subcategories");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
 
-        //public async Task<mstProductSubCategory> GetSubCategoryByIdAsync(int id)
-        //{
-        //    return await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
-        //}
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var filePath = Path.Combine(folderPath, fileName);
 
-        //public async Task<ApiResponseDTO> DeactivateProductSubCategoryAsync(int id, bool isActive, int updatedBy)
-        //{
-        //    var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
-        //    if (entity != null)
-        //    {
-        //        entity.isActive = isActive;
-        //        entity.updatedBy = updatedBy;
-        //        entity.updatedDate = DateTime.Now;
-        //        _context.SaveChanges();
-        //        return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
-        //    }
-        //    return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
-        //}
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            return filePath.Replace("\\", "/");
+        }
+
+        public async Task<mstProductSubCategory> GetSubCategoryByIdAsync(int id)
+        {
+            return await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
+        }
+
+        public async Task<ApiResponseDTO> DeactivateProductSubCategoryAsync(int id, bool isActive, int updatedBy)
+        {
+            var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
+            if (entity != null)
+            {
+                entity.isActive = isActive;
+                entity.updatedBy = updatedBy;
+                entity.updatedDate = DateTime.Now;
+                _context.SaveChanges();
+                return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Updated Successfully" });
+            }
+            return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+        }
         #endregion
 
         #region Repository Implementation of Product Details
@@ -367,6 +367,29 @@ namespace hariloom.Repository
             }).ToListAsync();
 
             // Base64 conversion removed for performance reasons. The frontend will use coverImagePath directly.
+
+            return productList;
+        }
+        #endregion
+
+        #region Get Active Products By Sub Category Id
+        public async Task<List<ProductDetailsDTO>> GetActiveProductsBySubCategoryIdAsync(int subCategoryId)
+        {
+            var productList = await _context.mstProduct
+                .Where(p => p.isActive && p.isAvailable && p.mstProductSubCategoryId == subCategoryId)
+                .OrderByDescending(p => p.createdDate)
+                .Select(p => new ProductDetailsDTO
+                {
+                    productId = p.mstProductId,
+                    productName = p.productName,
+                    productDisplayId = p.productDisplayId,
+                    productDescription = p.description,
+                    basePrice = p.basePrice,
+                    discountedPrice = p.discountedPrice ?? 0,
+                    coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                    isActive = p.isActive,
+                    isAvailable = p.isAvailable
+                }).ToListAsync();
 
             return productList;
         }

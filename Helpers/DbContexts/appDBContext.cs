@@ -9,8 +9,8 @@ namespace hariloom.Helpers.DbContexts
 
         public DbSet<mstUser> mstUser { get; set; }
         //public DbSet<mstProductGrouping> mstProductGrouping { get; set; }
-        //public DbSet<mstProductMainCategory> mstProductMainCategory { get; set; }
-        //public DbSet<mstProductSubCategory> mstProductSubCategory { get; set; }
+        public DbSet<mstProductMainCategory> mstProductMainCategory { get; set; }
+        public DbSet<mstProductSubCategory> mstProductSubCategory { get; set; }
         public DbSet<mstProduct> mstProduct { get; set; }
         public DbSet<trnProductTags> trnProductTags { get; set; }
         public DbSet<trnProductSpecification> trnProductSpecification { get; set; }

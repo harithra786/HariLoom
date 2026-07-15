@@ -277,6 +277,29 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Organize Card -->
+                        <div class="card mb-2 shadow-lg">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Organize</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Main Category -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="mainCategory">Main Category</label>
+                                    <select class="form-select text-dark" id="mainCategory" name="mstProductMainCategoryId" onchange="loadSubCategory(this)" required>
+                                        <option value="" selected disabled>Select main category</option>
+                                    </select>
+                                </div>
+                                <!-- Sub Category -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="subCategory">Sub Category</label>
+                                    <select class="form-select text-dark" id="subCategory" name="mstProductSubCategoryId" required>
+                                        <option value="" selected disabled>Select sub category</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -343,13 +366,13 @@
                         $('#productTableId').val(0);
                     }
 
-                    // await loadMainCategory();
+                    await loadMainCategory();
 
-                    // // If there is a selected main category (from session), load subcategories
-                    // const mainVal = $('#mainCategory').val();
-                    // if (mainVal) {
-                    //     await loadSubCategory($('#mainCategory'));
-                    // }
+                    // If there is a selected main category (from session), load subcategories
+                    const mainVal = $('#mainCategory').val();
+                    if (mainVal) {
+                        await loadSubCategory($('#mainCategory'));
+                    }
                 } catch (err) {
                     console.error('Error loading categories on modal show', err);
                 }
@@ -617,57 +640,62 @@
         //     });
         // }
 
-        // function loadMainCategory() {
-        //     return new Promise(function (resolve, reject) {
-        //         $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")')
-        //             .done(function (response) {
-        //                 $('#mainCategory').html("");
+        function loadMainCategory() {
+            return new Promise(function (resolve, reject) {
+                $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")')
+                    .done(function (response) {
+                        $('#mainCategory').html("");
 
-        //                 let options = `<option value="" selected disabled>Select main category</option>`;
-        //                 response.data.forEach((cat, idx) => {
-        //                     options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
-        //                 });
-        //                 $('#mainCategory').html(options);
+                        let options = `<option value="" selected disabled>Select main category</option>`;
+                        response.data.forEach((cat, idx) => {
+                            options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
+                        });
+                        $('#mainCategory').html(options);
 
-        //                 // Session value selection
-        //                 const $mainCategory = $('#mainCategory');
-        //                 const selectedCategoryId = sessionStorage.getItem('selectedCategoryId');
-        //                 if (selectedCategoryId) {
-        //                     $mainCategory.val(selectedCategoryId).trigger('change');
-        //                 } else {
-        //                     $mainCategory.prop("selectedIndex", 0); // select default
-        //                 }
-        //                 resolve();
-        //             })
-        //             .fail(function (err) { console.error('Failed to load main categories', err); reject(err); });
-        //     });
-        // }
+                        // Session value selection
+                        const $mainCategory = $('#mainCategory');
+                        const selectedCategoryId = sessionStorage.getItem('selectedCategoryId');
+                        if (selectedCategoryId) {
+                            $mainCategory.val(selectedCategoryId).trigger('change');
+                        } else {
+                            $mainCategory.prop("selectedIndex", 0); // select default
+                        }
+                        resolve();
+                    })
+                    .fail(function (err) { console.error('Failed to load main categories', err); reject(err); });
+            });
+        }
 
-        // function loadSubCategory(ele) {
-        //     return new Promise(function (resolve, reject) {
-        //         var id = $(ele).val();
-        //         $.get('@Url.Action("GetAllActiveProductSubCategoriesByMainCategoryId", "ProductsManagement")', { id: id })
-        //             .done(function (response) {
-        //                 $('#subCategory').html("");
+        function loadSubCategory(ele) {
+            return new Promise(function (resolve, reject) {
+                var id = $(ele).val();
+                if (!id) {
+                    $('#subCategory').html('<option value="" selected disabled>Select sub category</option>');
+                    resolve();
+                    return;
+                }
+                $.get('@Url.Action("GetAllActiveProductSubCategoriesByMainCategoryId", "ProductsManagement")', { id: id })
+                    .done(function (response) {
+                        $('#subCategory').html("");
 
-        //                 let options = `<option value="" selected disabled>Select sub category</option>`;
-        //                 response.data.forEach((cat) => {
-        //                     options += `<option value="${cat.mstProductSubCategoryId}">${cat.subCategoryName}</option>`;
-        //                 });
-        //                 $('#subCategory').html(options);
+                        let options = `<option value="" selected disabled>Select sub category</option>`;
+                        response.data.forEach((cat) => {
+                            options += `<option value="${cat.mstProductSubCategoryId}">${cat.subCategoryName}</option>`;
+                        });
+                        $('#subCategory').html(options);
 
-        //                 const $subCategory = $('#subCategory');
-        //                 const selectedSubCategoryId = sessionStorage.getItem('selectedSubCategoryId');
-        //                 if (selectedSubCategoryId) {
-        //                     $subCategory.val(selectedSubCategoryId);
-        //                 } else {
-        //                     $subCategory.prop("selectedIndex", 0);
-        //                 }
-        //                 resolve();
-        //             })
-        //             .fail(function (err) { console.error('Failed to load sub categories', err); reject(err); });
-        //     });
-        // }
+                        const $subCategory = $('#subCategory');
+                        const selectedSubCategoryId = sessionStorage.getItem('selectedSubCategoryId');
+                        if (selectedSubCategoryId) {
+                            $subCategory.val(selectedSubCategoryId);
+                        } else {
+                            $subCategory.prop("selectedIndex", 0);
+                        }
+                        resolve();
+                    })
+                    .fail(function (err) { console.error('Failed to load sub categories', err); reject(err); });
+            });
+        }
 
 
         function fnSaveOrUpdateProductDetails() {
@@ -703,26 +731,26 @@
                 $('#productImages').prop('required', true);
             }
 
-            // Grouping is optional/removed; do not require it here.
-            // if ($('#mainCategory').length) {
-            //     if ($('#mainCategory option').length <= 1) {
-            //         loadMainCategory();
-            //         alert('Loading main categories. Please wait a moment and try Save again.');
-            //         return;
-            //     }
-            // }
+            // Validate category selection
+            if ($('#mainCategory').length && $('#mainCategory').is(':visible')) {
+                if (!$('#mainCategory').val()) {
+                    alert('Please select a main category.');
+                    $('#mainCategory').focus();
+                    isSaving = false;
+                    $('#saveBtn').prop('disabled', false);
+                    return false;
+                }
+            }
 
-            // // If subcategory options are not yet loaded, try to load based on current mainCategory
-            // if ($('#subCategory').length) {
-            //     if ($('#subCategory option').length <= 1) {
-            //         var mainVal = $('#mainCategory').val();
-            //         if (mainVal) {
-            //             loadSubCategory($('#mainCategory'));
-            //             alert('Loading sub categories for the selected main category. Please wait and try Save again.');
-            //             return;
-            //         }
-            //     }
-            // }
+            if ($('#subCategory').length && $('#subCategory').is(':visible')) {
+                if (!$('#subCategory').val()) {
+                    alert('Please select a sub category.');
+                    $('#subCategory').focus();
+                    isSaving = false;
+                    $('#saveBtn').prop('disabled', false);
+                    return false;
+                }
+            }
 
             // Minimal client-side validation (avoid Parsley binding issues)
             // var requiredFields = [
@@ -766,6 +794,8 @@
             formData.append("productDescription", $('#productDescriptionEditor').summernote('code'));
             formData.append("basePrice", parseInt($('#productPrice').val()) || 0);
             formData.append("createdBy", sessionStorage.getItem('userId') || 1);
+            formData.append("mstProductMainCategoryId", $('#mainCategory').val() || 0);
+            formData.append("mstProductSubCategoryId", $('#subCategory').val() || 0);
 
             // Only append cover image if a new one is selected
             const coverImage = $('#coverImage')[0].files[0];
@@ -839,13 +869,13 @@
             });
         }
 
-        function fnEditProduct(id) {
+        async function fnEditProduct(id) {
             $.ajax({
                 url: '@Url.Action("GetProductById", "ProductsManagement")',
                 type: 'GET',
                 data: { id: id },
                 dataType: "json",
-                success: function (res) {
+                success: async function (res) {
                     if (res.success) {
                         const data = res.data;
                         $('#productTableId').val(data.productId);
@@ -855,10 +885,15 @@
                         $('#productPrice').val(data.basePrice);
                         $('#discountPrice').val(data.discountedPrice);
                         
-                        // For single grouping selection
-                        // const groupingId = data.mstProductGroupingIds ? data.mstProductGroupingIds.split(',')[0] : '';
-                        // $('#prodGrouping').val(groupingId).trigger('change');
-                        // $('#mainCategory').val(data.mstProductMainCategoryId).trigger('change');
+                        // Populate categories during edit mode
+                        await loadMainCategory();
+                        if (data.mstProductMainCategoryId) {
+                            $('#mainCategory').val(data.mstProductMainCategoryId);
+                            await loadSubCategory($('#mainCategory'));
+                            if (data.mstProductSubCategoryId) {
+                                $('#subCategory').val(data.mstProductSubCategoryId);
+                            }
+                        }
 
                         // Tags
                         // tags.clear(); // assuming `tags` is a global Set

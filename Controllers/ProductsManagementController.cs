@@ -69,109 +69,109 @@ namespace hariloom.Controllers
         #endregion
 
         #region Product Main Category Page Functionality
-        //[RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        //public IActionResult ProductMainCategory()
-        //{
-        //    return View();
-        //}
+        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
+        public IActionResult ProductMainCategory()
+        {
+            return View();
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllProductMainCategories()
-        //{
-        //    var categories = await _productsManagementRepository.GetAllProductMainCategoriesAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllProductMainCategories()
+        {
+            var categories = await _productsManagementRepository.GetAllProductMainCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllActiveProductMainCategories()
-        //{
-        //    var categories = await _productsManagementRepository.GetAllActiveProductMainCategoriesAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllActiveProductMainCategories()
+        {
+            var categories = await _productsManagementRepository.GetAllActiveProductMainCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
+        }
 
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductMainCategory([FromForm] ProductMainCategoryDetailsDto model)
-        //{
-        //    var response = await _productsManagementRepository.SaveOrUpdateProductMainCategoryAsync(model);
-        //    return response;
-        //}
+        [HttpPost]
+        public async Task<ApiResponseDTO> SaveOrUpdateProductMainCategory([FromForm] ProductMainCategoryDetailsDto model)
+        {
+            var response = await _productsManagementRepository.SaveOrUpdateProductMainCategoryAsync(model);
+            return response;
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetMainCategoryById(int id)
-        //{
-        //    var category = await _productsManagementRepository.GetMainCategoryByIdAsync(id);
-        //    if (category == null)
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetMainCategoryById(int id)
+        {
+            var category = await _productsManagementRepository.GetMainCategoryByIdAsync(id);
+            if (category == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
 
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = category });
-        //}
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = category });
+        }
 
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> DeactivateProductMainCategory(int id, bool isActive, int updatedBy)
-        //{
-        //    var response = await _productsManagementRepository.DeactivateProductMainCategoryAsync(id, isActive, updatedBy);
-        //    return response;
-        //}
+        [HttpPost]
+        public async Task<ApiResponseDTO> DeactivateProductMainCategory(int id, bool isActive, int updatedBy)
+        {
+            var response = await _productsManagementRepository.DeactivateProductMainCategoryAsync(id, isActive, updatedBy);
+            return response;
+        }
         #endregion
 
         #region Product Sub Category Page Functionality
-        //[RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        //public IActionResult ProductSubCategory()
-        //{
-        //    return View();
-        //}
+        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
+        public IActionResult ProductSubCategory()
+        {
+            return View();
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllProductSubCategories()
-        //{
-        //    var subCategories = await _productsManagementRepository.GetAllProductSubCategoriesAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllProductSubCategories()
+        {
+            var subCategories = await _productsManagementRepository.GetAllProductSubCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllActiveProductSubCategories()
-        //{
-        //    var subCategories = await _productsManagementRepository.GetAllActiveProductSubCategoriesAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllActiveProductSubCategories()
+        {
+            var subCategories = await _productsManagementRepository.GetAllActiveProductSubCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllActiveProductSubCategoriesByMainCategoryId(int id)
-        //{
-        //    var subCategories = await _productsManagementRepository.GetAllActiveProductSubCategoriesByMainCategoryIdAsync(id);
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllActiveProductSubCategoriesByMainCategoryId(int id)
+        {
+            var subCategories = await _productsManagementRepository.GetAllActiveProductSubCategoriesByMainCategoryIdAsync(id);
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllActiveSubCategoryByIDWithImage(int id)
-        //{
-        //    var subCategories = await _productsManagementRepository.GetAllActiveSubCategoryByIDWithImageAsync(id);
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
-        //}
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetAllActiveSubCategoryByIDWithImage(int id)
+        {
+            var subCategories = await _productsManagementRepository.GetAllActiveSubCategoryByIDWithImageAsync(id);
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
+        }
 
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductSubCategory([FromForm] ProductSubCategoryDetailsDto model)
-        //{
-        //    var response = await _productsManagementRepository.SaveOrUpdateProductSubCategoryAsync(model);
-        //    return response;
-        //}
+        [HttpPost]
+        public async Task<ApiResponseDTO> SaveOrUpdateProductSubCategory([FromForm] ProductSubCategoryDetailsDto model)
+        {
+            var response = await _productsManagementRepository.SaveOrUpdateProductSubCategoryAsync(model);
+            return response;
+        }
 
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetSubCategoryById(int id)
-        //{
-        //    var subCategory = await _productsManagementRepository.GetSubCategoryByIdAsync(id);
-        //    if (subCategory == null)
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetSubCategoryById(int id)
+        {
+            var subCategory = await _productsManagementRepository.GetSubCategoryByIdAsync(id);
+            if (subCategory == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
 
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategory });
-        //}
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategory });
+        }
 
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> DeactivateProductSubCategory(int id, bool isActive, int updatedBy)
-        //{
-        //    var response = await _productsManagementRepository.DeactivateProductSubCategoryAsync(id, isActive, updatedBy);
-        //    return response;
-        //}
+        [HttpPost]
+        public async Task<ApiResponseDTO> DeactivateProductSubCategory(int id, bool isActive, int updatedBy)
+        {
+            var response = await _productsManagementRepository.DeactivateProductSubCategoryAsync(id, isActive, updatedBy);
+            return response;
+        }
         #endregion
 
         #region Product Details Page Functionality
@@ -185,6 +185,13 @@ namespace hariloom.Controllers
         public async Task<ApiResponseDTO> GetAllProductDetails()
         {
             var products = await _productsManagementRepository.GetAllProductDetailsAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = products });
+        }
+
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetActiveProductsBySubCategoryId(int subCategoryId)
+        {
+            var products = await _productsManagementRepository.GetActiveProductsBySubCategoryIdAsync(subCategoryId);
             return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = products });
         }
 
