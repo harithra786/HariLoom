@@ -36,11 +36,11 @@
         body, html, .layout-page {
             font-family: var(--font-primary);
             overflow-x: hidden;
-            background-color: #F7F4ED !important;
+            background-color: #f6d5ea !important;
         }
 
         .bg-navbar-theme {
-            background-color: #F7F4ED !important;
+            background-color: #f6d5ea !important;
         }
 
         .font-primary { font-family: var(--font-primary); }
@@ -218,7 +218,7 @@
 
         /* Footer */
         .hariloom-footer {
-            background: #F7F4ED;
+            background: #f6d5ea;
             padding: clamp(20px, 5vw, 30px) clamp(15px, 3vw, 20px) 0;
             overflow: hidden;
             position: relative;
@@ -296,7 +296,7 @@
         }
 
         .site-content-bg {
-            background-color: #F7F4ED;
+            background-color: #f6d5ea;
         }
 
         /* Override Bootstrap toast styling for Toastr */
@@ -402,7 +402,6 @@
                             </button>
                             <!-- LEFT MENU (desktop) -->
                             <div class="nav-left-menu">
-                                <a class="nav-link" href="@Url.Action("Journey", "Website")">JOURNEY</a>
                                 <a class="nav-link" href="javascript:void(0);" onclick="scrollToSummerCollection()">SUMMER COLLECTION</a>
                             </div>
                             <!-- CENTER LOGO -->
@@ -421,7 +420,6 @@
                     <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
                     <div class="mobile-menu" id="mobileMenu">
                         <button class="mobile-menu-close" onclick="toggleMobileMenu()">&times;</button>
-                        <a class="mobile-nav-link" href="@Url.Action("Journey", "Website")">JOURNEY</a>
                         <a class="mobile-nav-link" href="javascript:void(0);" onclick="scrollToSummerCollection(); toggleMobileMenu();">SUMMER COLLECTIONS</a>
                         <a class="mobile-nav-link" href="@Url.Action("Home", "Website")">HOME</a>
                         <div id="mobileUserLinks"></div>

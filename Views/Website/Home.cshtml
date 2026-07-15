@@ -7,7 +7,7 @@
 @section Styles {
     <style>
         body {
-            background: #F7F4ED;
+            background: #f6d5ea;
         }
 
         .hero-section {
@@ -61,7 +61,7 @@
             width: 100%;
             max-width: 100%;
             padding: 40px 40px 80px;
-            background: #F7F4ED;
+            background: #f6d5ea;
         }
 
         .collection-title {
@@ -331,15 +331,6 @@
             loadProducts();
         });
 
-        // Scroll to Journey section when header link clicked
-        function scrollToJourney() {
-            const target = document.getElementById('journey-section');
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                // If on a different page, navigate home then scroll
-                window.location.href = '@(Url.Content("~/"))#journey-section';
-            }
-        }
+
     </script>
 }

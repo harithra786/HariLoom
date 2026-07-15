@@ -270,14 +270,7 @@ namespace hariloom.Controllers
 
         #endregion
 
-        #region Functions to load Journey Page
 
-        public IActionResult Journey()
-        {
-            return View();
-        }
-
-        #endregion
 
         #region Functions to load Info Pages
 

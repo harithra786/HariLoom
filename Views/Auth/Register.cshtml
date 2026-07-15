@@ -28,25 +28,22 @@
             font-family: "Inter", "Segoe UI", sans-serif;
         }
 
-        /* BACKGROUND */
-       @* body {
+        body {
             min-height: 100vh;
-            background-color: #2a2a2a;
+            background-image: url('@Url.Content("~/images/Login.png")');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-        }*@
-        body {
-            min-height: 100vh;
-            background-color: #F7F4ED;
+            position: relative;
         }
 
-        /* OVERLAY */
+        /* OVERLAY - GLASS FROSTED EFFECT */
         .overlay {
             position: fixed;
             inset: 0;
-            background: transparent;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             z-index: 1;
         }
 
