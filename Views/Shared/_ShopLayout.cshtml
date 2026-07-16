@@ -49,7 +49,7 @@
         body::-webkit-scrollbar { display: none; }
 
         .navbar {
-            padding: 15px 0 !important;
+            padding: 0 !important;
         }
 
         .logo-text {
@@ -65,7 +65,7 @@
             display: flex !important;
             align-items: center;
             justify-content: space-between;
-            min-height: 120px;
+            min-height: 62px;
             width: 100%;
             padding: 0 clamp(10px, 2vw, 20px);
         }
@@ -82,7 +82,7 @@
 
         .center-logo img {
             pointer-events: auto;
-            height: 120px;
+            height: 52px;
             width: auto;
             display: block;
         }
@@ -200,9 +200,9 @@
 
         /* Mobile (max-width: 768px) */
         @@media (max-width: 768px) {
-            .navbar { padding: 10px 0 !important; }
-            .navbar-inner { min-height: 90px; }
-            .center-logo img { height: 90px; }
+            .navbar { padding: 0 !important; }
+            .navbar-inner { min-height: 54px; }
+            .center-logo img { height: 46px; }
 
             .nav-right-menu .nav-link { font-size: 12px; }
 
@@ -211,9 +211,9 @@
 
         /* Small phones (max-width: 480px) */
         @@media (max-width: 480px) {
-            .navbar { padding: 8px 0 !important; }
-            .navbar-inner { min-height: 75px; }
-            .center-logo img { height: 75px; }
+            .navbar { padding: 0 !important; }
+            .navbar-inner { min-height: 48px; }
+            .center-logo img { height: 40px; }
         }
 
         /* Footer */
@@ -443,14 +443,11 @@
                         <footer class="hariloom-footer">
 
                             <!-- TOP LINKS -->
-                            <div class="footer-top">
-                                <a href="@Url.Action("About", "Website")">ABOUT</a>
+                            <div class="footer-top" style="align-items: center;">
                                 <a href="@Url.Action("Shipping", "Website")">SHIPPING</a>
-                                <a href="@Url.Action("Contact", "Website")">CONTACT</a>
-                                <a href="https://www.instagram.com/hariloom.in?igsh=MXE5cHVwdDdwdzgzMA%3D%3D&utm_source=qr" target="_blank">INSTAGRAM</a>
-                                <a href="~/documents/About.pdf">PRIVACY</a>
-                                <a href="~/documents/Terms.pdf">TERMS</a>
-                                <a href="@Url.Action("Faq", "Website")" target="_self">FAQ</a>
+                                <a href="https://www.instagram.com/harithras_handloom?igsh=MXY4a3p1Z2phZW8yNg==" target="_blank">INSTAGRAM</a>
+                                <a href="tel:6382987768" title="Call" style="font-size: 1.1rem; display: inline-flex; align-items: center;"><i class="bi bi-telephone-fill"></i></a>
+                                <a href="https://wa.me/916382987768" target="_blank" title="WhatsApp" style="font-size: 1.2rem; display: inline-flex; align-items: center;"><i class="bi bi-whatsapp"></i></a>
                                 <span class="copyright">HARILOOM © 2026</span>
                             </div>
 
