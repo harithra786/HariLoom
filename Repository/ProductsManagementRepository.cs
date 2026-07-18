@@ -493,6 +493,10 @@ namespace hariloom.Repository
                 productDisplayId = p.productDisplayId,
                 productDescription = p.description,
                 basePrice = p.basePrice,
+                discountedPrice = p.discountedPrice ?? 0,
+                mstProductGroupingIds = p.mstProductGroupingIds,
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mstProductSubCategoryId = p.mstProductSubCategoryId,
                 coverImageBase64 = string.Empty, // Deprecated, use coverImagePath
                 coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
                 isActive = p.isActive,
@@ -529,6 +533,11 @@ namespace hariloom.Repository
                     entity.coverImagePath = await SaveProductImagesAsync(model.coverImage);
 
                 entity.basePrice = model.basePrice;
+                entity.discountedPrice = model.discountedPrice;
+                entity.mstProductGroupingIds = model.productGrouping ?? "";
+                entity.mstProductMainCategoryId = model.mstProductMainCategoryId;
+                entity.mstProductSubCategoryId = model.mstProductSubCategoryId;
+                entity.quantityAvailable = model.quantityAvailable;
 
                 if (model.washCares != null && model.washCares.Count > 0)
                 {
@@ -578,6 +587,11 @@ namespace hariloom.Repository
                     description = model.productDescription,
                     coverImagePath = await SaveProductImagesAsync(model.coverImage),
                     basePrice = model.basePrice,
+                    discountedPrice = model.discountedPrice,
+                    mstProductGroupingIds = model.productGrouping ?? "",
+                    mstProductMainCategoryId = model.mstProductMainCategoryId,
+                    mstProductSubCategoryId = model.mstProductSubCategoryId,
+                    quantityAvailable = model.quantityAvailable,
                     productImages = string.Join(",", imagePaths),
                     washCareInstructions = model.washCares != null && model.washCares.Count > 0 
                                             ? string.Join("|", model.washCares.Select(w => w.instruction).Where(i => !string.IsNullOrWhiteSpace(i))) 

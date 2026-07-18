@@ -104,8 +104,8 @@ namespace hariloom.Models.DTOs
         public int basePrice { get; set; }
         public int discountedPrice { get; set; }
         public string productGrouping { get; set; }
-        public int mainCategoryId { get; set; }
-        public int subCategoryId { get; set; }
+        public int mstProductMainCategoryId { get; set; }
+        public int mstProductSubCategoryId { get; set; }
         public int quantityAvailable { get; set; }
         public List<IFormFile> productImages { get; set; }
         public List<string> tags { get; set; }

@@ -27,11 +27,18 @@ namespace hariloom.Services
             {
                 var subject = "Your Hariloom OTP Code";
                 var body = $"<html><body><p>Hi {userName},</p><p>Your OTP code is <strong>{otp}</strong>. It will expire in 5 minutes.</p><p>Thanks,<br/>Hariloom Team</p></body></html>";
-                return await SendEmailSmtpAsync(toEmail, userName, subject, body);
+                var sent = await SendEmailSmtpAsync(toEmail, userName, subject, body);
+                if (!sent)
+                {
+                    _logger.LogWarning($"[DEVELOPMENT FALLBACK] Failed to send OTP email via SMTP. The generated OTP code is: {otp}");
+                    return false;
+                }
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send OTP email.");
+                _logger.LogWarning($"[DEVELOPMENT FALLBACK] Exception during SendOtpEmailAsync. The generated OTP code is: {otp}");
                 return false;
             }
         }

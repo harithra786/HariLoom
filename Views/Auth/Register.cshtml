@@ -629,6 +629,7 @@
 
                     // Generate OTP
                     generatedOTP = generateOTP();
+                    console.log("Generated OTP for testing:", generatedOTP);
                     otpExpiryTime = new Date().getTime() + (5 * 60 * 1000); // 5 minutes expiry
 
                     // Show sending status
