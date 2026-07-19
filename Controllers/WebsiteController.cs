@@ -437,21 +437,5 @@ namespace hariloom.Controllers
 
         #endregion
 
-        #region FAQ Page Functionality
-
-        public IActionResult Faq()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<ApiResponseDTO> GetAllFaqs()
-        {
-            var result = await _websiteUserRepository.getAllFaqsAsync();
-            return result;
-        }
-
-        #endregion
-
     }
 }

@@ -8,7 +8,6 @@ namespace hariloom.Helpers.DbContexts
         public appDBContext(DbContextOptions<appDBContext> options) : base(options) { }
 
         public DbSet<mstUser> mstUser { get; set; }
-        //public DbSet<mstProductGrouping> mstProductGrouping { get; set; }
         public DbSet<mstProductMainCategory> mstProductMainCategory { get; set; }
         public DbSet<mstProductSubCategory> mstProductSubCategory { get; set; }
         public DbSet<mstProduct> mstProduct { get; set; }
@@ -22,6 +21,5 @@ namespace hariloom.Helpers.DbContexts
         public DbSet<trnCart> trnCart { get; set; }
         public DbSet<trnPaymentLog> trnPaymentLog { get; set; }
         public DbSet<trnUserAddress> trnUserAddress { get; set; }
-        public DbSet<mstFAQ> mstFAQ { get; set; }
     }
 }

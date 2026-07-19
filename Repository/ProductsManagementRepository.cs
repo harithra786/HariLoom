@@ -19,65 +19,6 @@ namespace hariloom.Repository
         }
         #endregion
 
-        #region Repository Implementations of Product Grouping
-        //public async Task<List<mstProductGrouping>> GetAllProductGroupingAsync()
-        //{
-        //    return await _context.mstProductGrouping.ToListAsync();
-        //}
-
-        //public async Task<List<mstProductGrouping>> GetAllActiveProductGroupingAsync()
-        //{
-        //    return await _context.mstProductGrouping.Where(x => x.isActive).ToListAsync();
-        //}
-
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductGroupingAsync(mstProductGrouping model)
-        //{
-        //    var checkforDuplicate = _context.mstProductGrouping.Where(x => x.groupingName == model.groupingName && x.isActive && x.mstProductGroupingId != model.mstProductGroupingId).FirstOrDefault();
-        //    if (checkforDuplicate != null)
-        //    {
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
-        //    }
-
-        //    if (model.mstProductGroupingId == 0)
-        //    {
-        //        model.groupingName = model.groupingName;
-        //        await _context.mstProductGrouping.AddAsync(model);
-        //    }
-        //    else
-        //    {
-        //        var existing = await _context.mstProductGrouping.FindAsync(model.mstProductGroupingId);
-        //        if (existing == null)
-        //        {
-        //            return new ApiResponseDTO { success = false, message = "Record Not Found", statusCode = 404 };
-        //        }
-        //        existing.groupingName = model.groupingName;
-        //        existing.updatedBy = model.updatedBy;
-        //        existing.updatedDate = DateTime.UtcNow;
-        //    }
-        //    await _context.SaveChangesAsync();
-        //    return new ApiResponseDTO { success = true, message = "Saved Successfully", statusCode = 200 };
-        //}
-
-        //public async Task<mstProductGrouping> GetGroupingByIdAsync(int id)
-        //{
-        //    return await _context.mstProductGrouping.FindAsync(id);
-        //}
-
-        //public async Task<ApiResponseDTO> DeactivateProductGroupingAsync(int id, bool isActive, int updatedBy)
-        //{
-        //    var grouping = await _context.mstProductGrouping.FindAsync(id);
-        //    if (grouping == null)
-        //    {
-        //        return new ApiResponseDTO { success = false, message = "Record Not Found", statusCode = 404 };
-        //    }
-        //    grouping.isActive = isActive;
-        //    grouping.updatedBy = updatedBy;
-        //    grouping.updatedDate = DateTime.Now;
-        //    await _context.SaveChangesAsync();
-        //    return new ApiResponseDTO { success = true, message = "Status Updated", statusCode = 200 };
-        //}
-        #endregion
-
         #region Repository Implementation of Product Main Category
         public async Task<List<ProductMainCategoryDetailsDto>> GetAllProductMainCategoriesAsync()
         {
@@ -393,57 +334,6 @@ namespace hariloom.Repository
 
             return productList;
         }
-        #endregion
-
-        #region Get All Active Product Details By Grouping Name
-        //public async Task<List<ProductDetailsDTO>> GetAllActiveProductDetailsByGroupingNameAsync(string groupingName)
-        //{
-        //    if (string.IsNullOrWhiteSpace(groupingName))
-        //        return new List<ProductDetailsDTO>();
-
-        //    // 1. Get the matching grouping by name (case-insensitive)
-        //    var grouping = await _context.mstProductGrouping.FirstOrDefaultAsync(x => x.isActive && x.groupingName.ToLower() == groupingName.ToLower());
-
-        //    if (grouping == null)
-        //        return new List<ProductDetailsDTO>(); // No match found
-
-        //    int targetGroupingId = grouping.mstProductGroupingId;
-
-        //    // 2. Get only the columns we need and coalesce string columns to avoid DBNull -> string casting issues
-        //    var productList = await _context.mstProduct
-        //        .Where(p => p.isActive && p.isAvailable && p.mstProductGroupingIds != null)
-        //        .Select(p => new
-        //        {
-        //            p.mstProductId,
-        //            productName = p.productName ?? string.Empty,
-        //            mstProductGroupingIds = p.mstProductGroupingIds ?? string.Empty,
-        //            p.basePrice,
-        //            p.discountedPrice,
-        //            coverImagePath = p.coverImagePath ?? string.Empty
-        //        })
-        //        .ToListAsync();
-
-        //    // 3. Filter products that contain the target grouping ID (do client-side parsing now that strings are non-null)
-        //    var filteredProducts = productList.Where(p => p.mstProductGroupingIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(id => int.Parse(id)).Contains(targetGroupingId)).ToList();
-
-        //    // 4. Return mapped DTOs
-        //    var returnResult = filteredProducts.Select(p =>
-        //    {
-        //        var productGroupingIds = p.mstProductGroupingIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
-
-        //        return new ProductDetailsDTO
-        //        {
-        //            productId = p.mstProductId,
-        //            productName = p.productName,
-        //            basePrice = p.basePrice,
-        //            discountedPrice = p.discountedPrice,
-        //            coverImageBase64 = GetImageFromPathAndConvertToBase64(p.coverImagePath),
-        //        };
-
-        //    }).ToList();
-
-        //    return returnResult;
-        //}
         #endregion
 
         #region Get Product Details By Id

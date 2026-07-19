@@ -45,20 +45,6 @@
             padding-right: 0.75rem;
         }
 
-        /* Grouping dropdown styling */
-        #prodGrouping {
-            appearance: auto;
-        }
-
-            #prodGrouping option {
-                padding: 8px 12px;
-            }
-
-                #prodGrouping option:checked {
-                    background: linear-gradient(#1e4d8b, #1e4d8b);
-                    background-color: #1e4d8b !important;
-                }
-
         /* Image preview remove button */
         .img-preview-wrapper {
             position: relative;
@@ -612,32 +598,6 @@
         // function removeTag(btn, value) {
         //     tags.delete(value);
         //     btn.parentElement.remove();
-        // }
-
-        // function prodGrouping() {
-        //     return new Promise(function (resolve, reject) {
-        //         $.get('@Url.Action("GetAllActiveProductGrouping", "ProductsManagement")')
-        //             .done(function (response) {
-        //                 $('#prodGrouping').html("");
-
-        //                 let options = `<option value="" selected disabled>Select grouping</option>`;
-        //                 response.data.forEach((cat, idx) => {
-        //                     options += `<option value="${cat.mstProductGroupingId}">${cat.groupingName}</option>`;
-        //                 });
-        //                 $('#prodGrouping').html(options);
-
-        //                 const $grouping = $('#prodGrouping');
-        //                 const selectedGroupingId = sessionStorage.getItem('selectedGroupingId');
-        //                 if (selectedGroupingId) {
-        //                     $grouping.val(selectedGroupingId).trigger('change');
-        //                 } else {
-        //                     $grouping.prop("selectedIndex", 0); // select default
-        //                 }
-
-        //                 resolve();
-        //             })
-        //             .fail(function (err) { console.error('Failed to load grouping', err); reject(err); });
-        //     });
         // }
 
         function loadMainCategory() {

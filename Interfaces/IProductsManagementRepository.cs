@@ -5,15 +5,6 @@ namespace hariloom.Interfaces
 {
     public interface IProductsManagementRepository
     {
-        #region Product Grouping Interface Functions
-        //Task<List<mstProductGrouping>> GetAllProductGroupingAsync();
-        //Task<List<mstProductGrouping>> GetAllActiveProductGroupingAsync();
-        //Task<ApiResponseDTO> SaveOrUpdateProductGroupingAsync(mstProductGrouping model);
-        //Task<mstProductGrouping> GetGroupingByIdAsync(int id);
-        //Task<ApiResponseDTO> DeactivateProductGroupingAsync(int id, bool isActive, int updatedBy);
-
-        #endregion
-
         #region Product Main Category Interface Functions
         Task<List<ProductMainCategoryDetailsDto>> GetAllProductMainCategoriesAsync();
         Task<List<ProductMainCategoryDetailsDto>> GetAllActiveProductMainCategoriesAsync();
@@ -35,7 +26,6 @@ namespace hariloom.Interfaces
         #region Products Details Interface Functions
         Task<List<ProductDetailsDTO>> GetAllProductDetailsAsync();
         Task<List<ProductDetailsDTO>> GetActiveProductsBySubCategoryIdAsync(int subCategoryId);
-        //Task<List<ProductDetailsDTO>> GetAllActiveProductDetailsByGroupingNameAsync(string groupingName);
         Task<ApiResponseDTO> SaveOrUpdateProductAsync(CreateProductDTO model);
         Task<ProductDetailsDTO> GetProductByIdAsync(int id);
         Task<ApiResponseDTO> DeactivateProductAsync(int id, bool isActive, int updatedBy);

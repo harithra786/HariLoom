@@ -424,9 +424,7 @@
                         <a class="mobile-nav-link" href="@Url.Action("Home", "Website")">HOME</a>
                         <div id="mobileUserLinks"></div>
                     </div>
-                    <div class="container-xxl product-grouping-names">
-                        <!-- Names will be appended here -->
-                    </div>
+
                 }
 
                 <!-- / Navbar -->
@@ -512,7 +510,7 @@
                 "timeOut": "3000"
             };
 
-            //loadNames();
+
             const userName = sessionStorage.getItem('name');
             const hariloomAuthToken = getCookie('hariloomAuthToken');
             const $navbarUserSection = $('#navbarUserSection');
@@ -630,33 +628,10 @@
             document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('active') ? 'hidden' : '';
         }
 
-        function loadNames() {
-            $.get('@Url.Action("GetAllActiveProductGrouping", "ProductsManagement")', function (groupingRes) {
-
-                if (!groupingRes.data || !Array.isArray(groupingRes.data))
-                return;
-
-                const groupingBox = $('.product-grouping-names');
-                groupingBox.empty();
-
-                groupingRes.data.forEach(group => {
-                    const badge = $('<div class="grouping-name cursor-pointer" onclick="fnLoadProductListWithGrouping(' + group.mstProductGroupingId + ')"></div>').text(group.groupingName);
-                    groupingBox.append(badge);
-                });
-
-            });
-        }
-
         function fnGoToProductDetails(productId) {
             sessionStorage.removeItem('selectedProductId');
             sessionStorage.setItem('selectedProductId', productId);
             window.location.href = '@Url.Action("ProductDetail", "Website")';
-        }
-
-        function fnLoadProductListWithGrouping(groupingId) {
-            sessionStorage.removeItem('selectedGroupingId');
-            sessionStorage.setItem('selectedGroupingId', groupingId);
-            window.location.href = '@Url.Action("ProductList", "Website")';
         }
 
         function fnLoadProductListWithMainCategory(categoryId) {
@@ -672,10 +647,7 @@
         }
 
 
-        function fnOnClickBanner(groupingId,categoryId,subCategoryId) {
-            sessionStorage.removeItem('selectedGroupingId');
-            sessionStorage.setItem('selectedGroupingId', groupingId);
-
+        function fnOnClickBanner(categoryId,subCategoryId) {
             sessionStorage.removeItem('selectedCategoryId');
             sessionStorage.setItem('selectedCategoryId', categoryId);
 

@@ -226,20 +226,6 @@ CREATE TABLE `trnOrderItems` (
 ) CHARACTER SET=utf8mb4;
 
 
-CREATE TABLE `mstFAQ` (
-    `mstFAQId` int NOT NULL AUTO_INCREMENT,
-    `question` longtext CHARACTER SET utf8mb4 NOT NULL,
-    `answer` longtext CHARACTER SET utf8mb4 NOT NULL,
-    `isActive` tinyint(1) NOT NULL,
-    `createdBy` int NOT NULL,
-    `createdDate` datetime(6) NOT NULL,
-    `updatedBy` int NULL,
-    `updatedDate` datetime(6) NULL,
-    `deletedBy` int NULL,
-    `deletedDate` datetime(6) NULL,
-    CONSTRAINT `PK_mstFAQ` PRIMARY KEY (`mstFAQId`)
-) CHARACTER SET=utf8mb4;
-
 
 CREATE INDEX `IX_trnCart_mstProductId` ON `trnCart` (`mstProductId`);
 

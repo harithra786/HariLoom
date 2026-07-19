@@ -22,15 +22,6 @@ namespace hariloom.Interfaces
         Task<ApiResponseDTO> CreateCartOrderMarkStatusAsync(int mstUserId);
         Task<ApiResponseDTO> VerifyPaymentAsync(VerifyPaymentDTO request);
         Task<ApiResponseDTO> MarkOrderFailedAsync(int orderId);
-
-        #region Functions of FAQ
-        Task<ApiResponseDTO> addFaqAsync(AddFaqDTO payload);
-        Task<ApiResponseDTO> getAllFaqsAsync();
-        Task<ApiResponseDTO> getAdminFaqsAsync();
-        Task<ApiResponseDTO> updateFaqStatusAsync(int faqId, bool isActive);
-        Task<ApiResponseDTO> updateFaqAsync(UpdateFaqDTO payload);
-        Task<ApiResponseDTO> deleteFaqAsync(int faqId);
-        #endregion
     }
 }
 

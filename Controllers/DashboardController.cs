@@ -113,46 +113,5 @@ namespace hariloom.Controllers
         {
             return await userRepository.getAllUserAccountsAsync();
         }
-
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public IActionResult FaqAdd()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public async Task<ApiResponseDTO> AddFaq([FromBody] AddFaqDTO payload, [FromServices] hariloom.Interfaces.IWebsiteUserRepository websiteUserRepository)
-        {
-            return await websiteUserRepository.addFaqAsync(payload);
-        }
-
-        [HttpGet]
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public async Task<ApiResponseDTO> GetAdminFaqs([FromServices] hariloom.Interfaces.IWebsiteUserRepository websiteUserRepository)
-        {
-            return await websiteUserRepository.getAdminFaqsAsync();
-        }
-
-        [HttpPost]
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public async Task<ApiResponseDTO> UpdateFaqStatus(int faqId, bool isActive, [FromServices] hariloom.Interfaces.IWebsiteUserRepository websiteUserRepository)
-        {
-            return await websiteUserRepository.updateFaqStatusAsync(faqId, isActive);
-        }
-
-        [HttpPost]
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public async Task<ApiResponseDTO> UpdateFaq([FromBody] UpdateFaqDTO payload, [FromServices] hariloom.Interfaces.IWebsiteUserRepository websiteUserRepository)
-        {
-            return await websiteUserRepository.updateFaqAsync(payload);
-        }
-
-        [HttpPost]
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        public async Task<ApiResponseDTO> DeleteFaq(int faqId, [FromServices] hariloom.Interfaces.IWebsiteUserRepository websiteUserRepository)
-        {
-            return await websiteUserRepository.deleteFaqAsync(faqId);
-        }
     }
 }

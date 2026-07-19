@@ -256,7 +256,7 @@
 
         $(function () {
             loadProductDetails();
-            loadSimilarProducts("SUMMER COLLECTIONS");
+            loadSimilarProducts();
 
             $('#qtyPlus').click(() => {
                 let qty = parseInt($('#qtyInput').val());
@@ -346,7 +346,7 @@
             });
         });
 
-        function loadSimilarProducts(groupingName) {
+        function loadSimilarProducts() {
             $.ajax({
                 url: '@Url.Action("GetAllProductDetails", "ProductsManagement")',
                 type: 'GET',

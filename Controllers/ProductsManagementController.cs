@@ -22,52 +22,6 @@ namespace hariloom.Controllers
         }
         #endregion
 
-        #region Product Grouping Page Functionality
-        //[RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
-        //public IActionResult ProductGrouping()
-        //{
-        //    return View();
-        //}
-
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllProductGrouping()
-        //{
-        //    var categories = await _productsManagementRepository.GetAllProductGroupingAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
-        //}
-
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetAllActiveProductGrouping()
-        //{
-        //    var categories = await _productsManagementRepository.GetAllActiveProductGroupingAsync();
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
-        //}
-
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> SaveOrUpdateProductGrouping([FromBody] mstProductGrouping model)
-        //{
-        //    var response = await _productsManagementRepository.SaveOrUpdateProductGroupingAsync(model);
-        //    return response;
-        //}
-
-        //[HttpGet]
-        //public async Task<ApiResponseDTO> GetGroupingById(int id)
-        //{
-        //    var category = await _productsManagementRepository.GetGroupingByIdAsync(id);
-        //    if (category == null)
-        //        return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
-
-        //    return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = category });
-        //}
-
-        //[HttpPost]
-        //public async Task<ApiResponseDTO> DeactivateProductGrouping(int id, bool isActive, int updatedBy)
-        //{
-        //    var response = await _productsManagementRepository.DeactivateProductGroupingAsync(id, isActive, updatedBy);
-        //    return response;
-        //}
-        #endregion
-
         #region Product Main Category Page Functionality
         [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult ProductMainCategory()
