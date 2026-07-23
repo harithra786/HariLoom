@@ -102,7 +102,8 @@ namespace hariloom.Services
                 var itemsHtml = "";
                 foreach (var item in items)
                 {
-                    itemsHtml += $"<tr><td><img src=\"{item.ImageUrl}\" width=\"50\" /></td><td>{item.Name}</td><td>{item.Units}</td><td>₹{item.Price}</td></tr>";
+                    var imgTag = !string.IsNullOrEmpty(item.ImageUrl) ? $"<img src=\"{item.ImageUrl}\" width=\"50\" />" : "No Image";
+                    itemsHtml += $"<tr><td>{imgTag}</td><td>{item.Name}</td><td>{item.Units}</td><td>₹{item.Price}</td></tr>";
                 }
 
                 var htmlContent = $@"
@@ -154,6 +155,9 @@ namespace hariloom.Services
 
                 using var message = new MailMessage();
                 message.From = new MailAddress(fromEmail, fromName);
+                message.ReplyToList.Add(
+                    new MailAddress("harithrashandloom@gmail.com", "HariLoom")
+                );
                 if (string.IsNullOrEmpty(toName))
                 {
                     message.To.Add(new MailAddress(toEmail));

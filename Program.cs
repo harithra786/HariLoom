@@ -74,16 +74,12 @@ app.UseAuthorization();
 
 app.UseMiddleware<SecureAccessMiddleware>();
 
-app.MapStaticAssets();
-
 // app.MapControllerRoute(
 //     name: "default",
-//     pattern: "{controller=ProductMainCategory}/{action=ProductMainCategory}/{id?}")
-//     .WithStaticAssets();
+//     pattern: "{controller=ProductMainCategory}/{action=ProductMainCategory}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Website}/{action=Home}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Website}/{action=Home}/{id?}");
 
 app.Run();
