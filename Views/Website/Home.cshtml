@@ -186,7 +186,7 @@
 }
 
 <div class="hero-section">
-    <img class="hero-image" src="@Url.Content("~/images/Home.png")" alt="Home Banner" />
+    <img class="hero-image" src="@Url.Content("~/images/Home.webp")" alt="Home Banner" />
 
     @* <div class="hero-text">
         <span>STAY</span>
@@ -252,9 +252,9 @@
             const icon = button.find('.wishlist-icon');
 
             if (button.hasClass('active')) {
-                icon.attr('src', '/images/heart-filled.png');
+                icon.attr('src', '/images/heart-filled.webp');
             } else {
-                icon.attr('src', '/images/heart-outline.png');
+                icon.attr('src', '/images/heart-outline.webp');
             }
 
             if (isActive) {
@@ -297,8 +297,8 @@
 
                 let html = items.map(function (cat, index) {
                     let imgSrc = cat.mainCategoryImagePath 
-                        ? 'data:image/png;base64,' + cat.mainCategoryImagePath 
-                        : '/images/placeholder.png';
+                        ? 'data:image/webp;base64,' + cat.mainCategoryImagePath 
+                        : '/images/placeholder.webp';
 
                     let delay = (index % 3) * 0.15;
 
@@ -351,8 +351,8 @@
 
                 let html = items.map(function (sub, index) {
                     let imgSrc = sub.subCategoryImagePath 
-                        ? 'data:image/png;base64,' + sub.subCategoryImagePath 
-                        : '/images/placeholder.png';
+                        ? 'data:image/webp;base64,' + sub.subCategoryImagePath 
+                        : '/images/placeholder.webp';
 
                     let delay = (index % 3) * 0.15;
 
@@ -426,7 +426,7 @@
                                     ${priceHtml}
                                 </div>
                                 <button class="wishlist-heart" onclick="toggleWishlist(event, ${item.productId})" data-id="${item.productId}">
-                                    <img class="wishlist-icon" src="/images/heart-outline.png" alt="Wishlist" style="width:22px;height:22px;">
+                                    <img class="wishlist-icon" src="/images/heart-outline.webp" alt="Wishlist" style="width:22px;height:22px;">
                                 </button>
                             </div>`;
                 }).join('');
@@ -483,7 +483,7 @@
                             if (status.isInWishlist) {
                                 const btn = $(`.wishlist-heart[data-id="${status.productId}"]`);
                                 btn.addClass('active');
-                                btn.find('.wishlist-icon').attr('src', '/images/heart-filled.png');
+                                btn.find('.wishlist-icon').attr('src', '/images/heart-filled.webp');
                             }
                         });
                     }

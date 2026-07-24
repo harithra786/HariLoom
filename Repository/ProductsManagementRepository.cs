@@ -4,6 +4,7 @@ using hariloom.Interfaces;
 using hariloom.Models.DTOs;
 using hariloom.Models.Entity;
 using System.Drawing;
+using SixLabors.ImageSharp;
 
 namespace hariloom.Repository
 {
@@ -118,12 +119,13 @@ namespace hariloom.Repository
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var fileName = $"{Guid.NewGuid()}.webp";
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var stream = image.OpenReadStream())
+            using (var loadedImage = await SixLabors.ImageSharp.Image.LoadAsync(stream))
             {
-                await image.CopyToAsync(stream);
+                await loadedImage.SaveAsWebpAsync(filePath);
             }
 
             // Return relative path for use in <img src="...">
@@ -259,12 +261,13 @@ namespace hariloom.Repository
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var fileName = $"{Guid.NewGuid()}.webp";
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var stream = image.OpenReadStream())
+            using (var loadedImage = await SixLabors.ImageSharp.Image.LoadAsync(stream))
             {
-                await image.CopyToAsync(stream);
+                await loadedImage.SaveAsWebpAsync(filePath);
             }
 
             return filePath.Replace("\\", "/");
@@ -688,12 +691,13 @@ namespace hariloom.Repository
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var fileName = $"{Guid.NewGuid()}.webp";
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var stream = image.OpenReadStream())
+            using (var loadedImage = await SixLabors.ImageSharp.Image.LoadAsync(stream))
             {
-                await image.CopyToAsync(stream);
+                await loadedImage.SaveAsWebpAsync(filePath);
             }
 
             // Store as a relative path (portable across environments)

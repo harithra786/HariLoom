@@ -363,12 +363,12 @@
 
                     const imagePath = item.coverImagePath 
                         ? (item.coverImagePath.startsWith('data:') ? item.coverImagePath : '/' + item.coverImagePath)
-                        : '/images/Logo.jpeg';
+                        : '/images/Logo.webp';
 
                     ordersHTML += `
                         <div class="order-item">
                             <div class="item-image">
-                                <img src="${imagePath}" alt="${item.productName}" onerror="this.src='/images/Logo.jpeg'">
+                                <img src="${imagePath}" alt="${item.productName}" onerror="this.src='/images/Logo.webp'">
                             </div>
                             <div class="item-details">
                                 <div>
