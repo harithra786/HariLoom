@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using hariloom.Interfaces;
 using hariloom.Models.DTOs;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace hariloom.Services
 {
@@ -50,7 +51,6 @@ namespace hariloom.Services
                 var itemsHtml = "";
                 foreach (var item in items)
                 {
-                    // Basic fallback for ImageUrl if empty. Replace or adjust as needed.
                     var imgTag = !string.IsNullOrEmpty(item.ImageUrl) ? $"<img src=\"{item.ImageUrl}\" width=\"50\" />" : "No Image";
                     itemsHtml += $"<tr><td>{imgTag}</td><td>{item.Name}</td><td>{item.Units}</td><td>₹{item.Price}</td></tr>";
                 }
@@ -143,7 +143,7 @@ namespace hariloom.Services
                 var fromEmail = _config["Brevo:FromEmail"];
                 var fromName = _config["Brevo:FromName"];
 
-                if (string.IsNullOrEmpty(host) || password == "YOUR_SMTP_KEY")
+                if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(password) || password == "YOUR_SMTP_KEY")
                 {
                     _logger.LogWarning("SMTP credentials are not fully configured.");
                     return true; // Pretend it succeeds for development without key
@@ -151,42 +151,33 @@ namespace hariloom.Services
 
                 int port = int.TryParse(portStr, out var p) ? p : 587;
 
-                _logger.LogInformation($"Attempting to send email via SMTP {host}:{port} to {toEmail}");
+                _logger.LogInformation($"Attempting to send email via MailKit SMTP {host}:{port} to {toEmail}");
 
-                using var message = new MailMessage();
-                message.From = new MailAddress(fromEmail, fromName);
-                message.ReplyToList.Add(
-                    new MailAddress("harithrashandloom@gmail.com", "HariLoom")
-                );
-                if (string.IsNullOrEmpty(toName))
-                {
-                    message.To.Add(new MailAddress(toEmail));
-                }
-                else
-                {
-                    message.To.Add(new MailAddress(toEmail, toName));
-                }
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(fromName ?? "HariLoom", fromEmail));
+                message.To.Add(new MailboxAddress(string.IsNullOrEmpty(toName) ? toEmail : toName, toEmail));
+                message.ReplyTo.Add(new MailboxAddress("HariLoom", "harithrashandloom@gmail.com"));
                 message.Subject = subject;
-                message.Body = body;
-                message.IsBodyHtml = true;
 
-                using var client = new SmtpClient(host, port);
-                client.Credentials = new NetworkCredential(username, password);
-                client.EnableSsl = true;
+                var bodyBuilder = new BodyBuilder
+                {
+                    HtmlBody = body
+                };
+                message.Body = bodyBuilder.ToMessageBody();
 
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-                await client.SendMailAsync(message, cts.Token);
+                using var client = new MailKit.Net.Smtp.SmtpClient();
+                // Connect using STARTTLS
+                await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(username, password);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+
                 _logger.LogInformation($"Successfully sent email to {toEmail}");
                 return true;
             }
-            catch (TaskCanceledException ex)
-            {
-                _logger.LogError(ex, "SMTP Email sending timed out. DigitalOcean often blocks port 587. Try changing Brevo:Port to 2525 or 465 in appsettings.json.");
-                return false;
-            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "SMTP Email sending failed.");
+                _logger.LogError(ex, "MailKit SMTP email sending failed.");
                 return false;
             }
         }
