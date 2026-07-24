@@ -105,11 +105,18 @@ namespace hariloom.Controllers
         [HttpPost]
         public async Task<IActionResult> SendOtpEmail([FromBody] SendOtpRequestDTO request, [FromServices] IEmailService emailService)
         {
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
-                return BadRequest(new { success = false, message = "Invalid request" });
+            if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
+                return BadRequest(new { success = false, message = "Invalid request parameters" });
 
-            var success = await emailService.SendOtpEmailAsync(request.Email, request.UserName ?? "User", request.Otp);
-            return Ok(new { success = success });
+            try
+            {
+                var success = await emailService.SendOtpEmailAsync(request.Email, request.UserName ?? "User", request.Otp);
+                return Ok(new { success = success });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { success = false, message = ex.Message });
+            }
         }
         #endregion
     }
