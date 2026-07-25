@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,6 +18,7 @@ namespace hariloom.Services
     {
         private readonly IConfiguration _config;
         private readonly ILogger<EmailService> _logger;
+        private static readonly HttpClient _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
 
         public EmailService(IConfiguration config, ILogger<EmailService> logger)
         {
@@ -28,10 +32,10 @@ namespace hariloom.Services
             {
                 var subject = "Your Hariloom OTP Code";
                 var body = $"<html><body><p>Hi {userName},</p><p>Your OTP code is <strong>{otp}</strong>. It will expire in 5 minutes.</p><p>Thanks,<br/>Hariloom Team</p></body></html>";
-                var sent = await SendEmailSmtpAsync(toEmail, userName, subject, body);
+                var sent = await SendEmailAsync(toEmail, userName, subject, body);
                 if (!sent)
                 {
-                    _logger.LogWarning($"[DEVELOPMENT FALLBACK] Could not deliver email via Brevo SMTP. OTP for {toEmail} is: {otp}");
+                    _logger.LogWarning($"[DEVELOPMENT FALLBACK] Could not deliver email via Brevo API/SMTP. OTP for {toEmail} is: {otp}");
                     // Allow development registration to proceed with the logged console OTP
                     return true;
                 }
@@ -84,7 +88,7 @@ namespace hariloom.Services
                 </html>";
 
                 var subject = "Order confirmed — thank you for choosing Hariloom.";
-                return await SendEmailSmtpAsync(toEmail, firstName, subject, htmlContent);
+                return await SendEmailAsync(toEmail, firstName, subject, htmlContent);
             }
             catch (Exception ex)
             {
@@ -124,11 +128,76 @@ namespace hariloom.Services
                 </html>";
 
                 var subject = $"New Order Notification - {orderNumber}";
-                return await SendEmailSmtpAsync(adminEmail, "Admin", subject, htmlContent);
+                return await SendEmailAsync(adminEmail, "Admin", subject, htmlContent);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send admin order notification email.");
+                return false;
+            }
+        }
+
+        private async Task<bool> SendEmailAsync(string toEmail, string toName, string subject, string body)
+        {
+            var apiKey = _config["Brevo:ApiKey"];
+            
+            // Fallback: If Brevo:Password starts with xkeysib-, treat it as an API key
+            var pwd = _config["Brevo:Password"];
+            if (string.IsNullOrEmpty(apiKey) && !string.IsNullOrEmpty(pwd) && pwd.StartsWith("xkeysib-"))
+            {
+                apiKey = pwd;
+            }
+
+            // 1. Try Brevo REST API v3 over HTTPS (Port 443) if ApiKey is available
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                var apiSent = await SendEmailApiAsync(apiKey, toEmail, toName, subject, body);
+                if (apiSent) return true;
+                _logger.LogWarning("Brevo REST API sending failed. Attempting SMTP fallback...");
+            }
+
+            // 2. Fallback to MailKit SMTP (Port 587 / 465)
+            return await SendEmailSmtpAsync(toEmail, toName, subject, body);
+        }
+
+        private async Task<bool> SendEmailApiAsync(string apiKey, string toEmail, string toName, string subject, string body)
+        {
+            try
+            {
+                var fromEmail = _config["Brevo:FromEmail"] ?? "support@hariloom.in";
+                var fromName = _config["Brevo:FromName"] ?? "HariLoom";
+
+                _logger.LogInformation($"Attempting to send email via Brevo REST API v3 to {toEmail}");
+
+                var payload = new
+                {
+                    sender = new { name = fromName, email = fromEmail },
+                    to = new[] { new { email = toEmail, name = string.IsNullOrEmpty(toName) ? toEmail : toName } },
+                    replyTo = new { email = "harithrashandloom@gmail.com", name = "HariLoom" },
+                    subject = subject,
+                    htmlContent = body
+                };
+
+                var jsonPayload = JsonSerializer.Serialize(payload);
+                using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+                request.Headers.Add("accept", "application/json");
+                request.Headers.Add("api-key", apiKey);
+                request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Successfully sent email to {toEmail} via Brevo REST API v3");
+                    return true;
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Brevo REST API failed (Status {response.StatusCode}): {errorContent}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Brevo REST API exception during email delivery.");
                 return false;
             }
         }
@@ -147,7 +216,7 @@ namespace hariloom.Services
                 if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(password) || password == "YOUR_SMTP_KEY")
                 {
                     _logger.LogWarning("SMTP credentials are not fully configured.");
-                    return true; // Pretend it succeeds for development without key
+                    return false;
                 }
 
                 int port = int.TryParse(portStr, out var p) ? p : 587;
@@ -168,14 +237,13 @@ namespace hariloom.Services
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new MailKit.Net.Smtp.SmtpClient();
-                client.Timeout = 10000;
-                // Connect using STARTTLS
+                client.Timeout = 10000; // 10 seconds timeout
                 await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(username, password);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
 
-                _logger.LogInformation($"Successfully sent email to {toEmail}");
+                _logger.LogInformation($"Successfully sent email to {toEmail} via SMTP");
                 return true;
             }
             catch (Exception ex)
