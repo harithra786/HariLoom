@@ -168,6 +168,7 @@ namespace hariloom.Services
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new MailKit.Net.Smtp.SmtpClient();
+                client.Timeout = 10000;
                 // Connect using STARTTLS
                 await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(username, password);

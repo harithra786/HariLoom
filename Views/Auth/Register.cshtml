@@ -657,19 +657,25 @@
                                 // Start OTP expiry timer
                                 startOTPTimer();
                             } else {
-                                toastr.error('Failed to send OTP. Please try again.');
+                                toastr.error(response.message || 'Failed to send OTP. Please try again.');
                                 $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
                             }
                         },
                         error: function (xhr, status, error) {
-                            console.error('Error sending OTP:', error);
-                            toastr.error('Failed to send OTP. Please verify your email address and try again.');
+                            console.error('Error sending OTP:', xhr, status, error);
+                            const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to send OTP. Please check your network connection and try again.';
+                            toastr.error(msg);
                             $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
                         }
                     });
                 },
-                error: function() {
-                    toastr.error('Error verifying user details. Please try again later.');
+                error: function(xhr, status, error) {
+                    console.error('CheckUserExists error:', xhr, status, error);
+                    let msg = 'Error verifying user details. Please ensure the local server is running and try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    toastr.error(msg);
                     $('#sendOtpBtn').prop('disabled', false).text('Send OTP');
                 }
             });

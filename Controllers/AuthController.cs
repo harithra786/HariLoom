@@ -30,9 +30,17 @@ namespace hariloom.Controllers
         }
 
         [HttpGet]
-        public async Task<ApiResponseDTO> CheckUserExists(string email, string phoneNumber)
+        public async Task<IActionResult> CheckUserExists(string email, string phoneNumber)
         {
-            return await _authRepository.CheckUserExistsAsync(email, phoneNumber);
+            try
+            {
+                var result = await _authRepository.CheckUserExistsAsync(email, phoneNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ApiResponseDTO { success = false, message = "Server verification error: " + ex.Message });
+            }
         }
         #endregion
 
