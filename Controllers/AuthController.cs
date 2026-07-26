@@ -111,14 +111,29 @@ namespace hariloom.Controllers
 
         #region Email Functionalities
         [HttpPost]
-        public async Task<IActionResult> SendOtpEmail([FromBody] SendOtpRequestDTO request, [FromServices] IEmailService emailService)
+        public async Task<IActionResult> SendOtpEmail([FromBody] SendOtpRequestDTO request, [FromServices] IEmailService emailService, [FromServices] hariloom.Helpers.DbContexts.appDBContext context)
         {
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
                 return BadRequest(new { success = false, message = "Invalid request parameters" });
 
+            string displayName = request.UserName;
+            if (string.IsNullOrWhiteSpace(displayName) || displayName.Equals("User", StringComparison.OrdinalIgnoreCase))
+            {
+                var user = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(context.mstUser, u => u.email == request.Email || (!string.IsNullOrEmpty(request.PhoneNumber) && u.phoneNumber == request.PhoneNumber));
+                if (user != null && !string.IsNullOrWhiteSpace(user.name))
+                {
+                    displayName = user.name;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = "Customer";
+            }
+
             try
             {
-                var success = await emailService.SendOtpEmailAsync(request.Email, request.UserName ?? "User", request.Otp);
+                var success = await emailService.SendOtpEmailAsync(request.Email, displayName, request.Otp);
                 return Ok(new { success = success });
             }
             catch (Exception ex)

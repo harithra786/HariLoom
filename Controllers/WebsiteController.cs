@@ -224,12 +224,22 @@ namespace hariloom.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendOrderConfirmationEmail([FromBody] SendOrderConfirmationRequestDTO request, [FromServices] IEmailService emailService)
+        public async Task<IActionResult> SendOrderConfirmationEmail([FromBody] SendOrderConfirmationRequestDTO request, [FromServices] IEmailService emailService, [FromServices] hariloom.Helpers.DbContexts.appDBContext context)
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OrderId))
                 return BadRequest(new { success = false, message = "Invalid request" });
 
-            var success = await emailService.SendOrderConfirmationEmailAsync(request.Email, request.FirstName ?? "Customer", request.OrderId, request.OrderDate ?? DateTime.Now.ToString("dd MMM yyyy"), request.Items ?? new List<OrderEmailItemDTO>());
+            string firstName = request.FirstName;
+            if (string.IsNullOrWhiteSpace(firstName) || firstName.Equals("Customer", StringComparison.OrdinalIgnoreCase) || firstName.Equals("User", StringComparison.OrdinalIgnoreCase))
+            {
+                var user = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(context.mstUser, u => u.email == request.Email);
+                if (user != null && !string.IsNullOrWhiteSpace(user.name))
+                {
+                    firstName = user.name;
+                }
+            }
+
+            var success = await emailService.SendOrderConfirmationEmailAsync(request.Email, firstName ?? "Customer", request.OrderId, request.OrderDate ?? DateTime.Now.ToString("dd MMM yyyy"), request.Items ?? new List<OrderEmailItemDTO>());
             return Ok(new { success = success });
         }
         #endregion

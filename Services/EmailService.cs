@@ -27,9 +27,10 @@ namespace hariloom.Services
         {
             try
             {
+                var recipientName = !string.IsNullOrWhiteSpace(userName) ? userName.Trim() : "Customer";
                 var subject = "Your Hariloom OTP Code";
-                var body = $"<html><body><p>Hi {userName},</p><p>Your OTP code is <strong>{otp}</strong>. It will expire in 5 minutes.</p><p>Thanks,<br/>Hariloom Team</p></body></html>";
-                var sent = await SendEmailAsync(toEmail, userName, subject, body);
+                var body = $"<html><body><p>Hi {recipientName},</p><p>Your OTP code is <strong>{otp}</strong>. It will expire in 5 minutes.</p><p>Thanks,<br/>Hariloom Team</p></body></html>";
+                var sent = await SendEmailAsync(toEmail, recipientName, subject, body);
                 if (!sent)
                 {
                     _logger.LogWarning($"[DEVELOPMENT FALLBACK] Could not deliver email via Brevo API/SMTP. OTP for {toEmail} is: {otp}");
@@ -50,6 +51,8 @@ namespace hariloom.Services
         {
             try
             {
+                var recipientName = !string.IsNullOrWhiteSpace(firstName) ? firstName.Trim() : "Customer";
+
                 var itemsHtml = "";
                 foreach (var item in items)
                 {
@@ -61,7 +64,7 @@ namespace hariloom.Services
                 <html>
                 <body>
                     <div style='display:inline-block; width:60px; height:60px; border-radius:50%; background-color:#111; color:#fff; text-align:center; line-height:60px; font-family:sans-serif; font-weight:bold; font-size:14px; margin-bottom: 20px;'>Hariloom.</div>
-                    <p>Hi {firstName},</p>
+                    <p>Hi {recipientName},</p>
                     <br/>
                     <p>Your order has been successfully placed.</p>
                     <br/>
@@ -85,7 +88,7 @@ namespace hariloom.Services
                 </html>";
 
                 var subject = "Order confirmed — thank you for choosing Hariloom.";
-                return await SendEmailAsync(toEmail, firstName, subject, htmlContent);
+                return await SendEmailAsync(toEmail, recipientName, subject, htmlContent);
             }
             catch (Exception ex)
             {

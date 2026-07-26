@@ -30,6 +30,7 @@
 
         body {
             min-height: 100vh;
+            background-color: #f6d5ea;
             background-image: url('@Url.Content("~/images/Login.webp")');
             background-size: cover;
             background-position: center;
@@ -37,13 +38,11 @@
             position: relative;
         }
 
-        /* OVERLAY - GLASS FROSTED EFFECT */
+        /* OVERLAY - SUBTLE LIGHT PURPLE TINT */
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(246, 213, 234, 0.2);
             z-index: 1;
         }
 
@@ -105,12 +104,12 @@
         }
 
         .signup-card::-webkit-scrollbar-thumb {
-            background: rgba(90, 140, 201, 0.5);
+            background: rgba(184, 66, 151, 0.5);
             border-radius: 10px;
         }
 
         .signup-card::-webkit-scrollbar-thumb:hover {
-            background: rgba(90, 140, 201, 0.7);
+            background: rgba(184, 66, 151, 0.7);
         }
 
         /* LOGO */
@@ -118,7 +117,7 @@
             width: 65px;
             height: 65px;
             border-radius: 16px;
-            background: #5a8cc9;
+            background: linear-gradient(135deg, #b84297, #8c246e);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -186,7 +185,9 @@
         }
 
         .field input:focus {
-            outline: 2px solid #5a8cc9;
+            outline: 2px solid #b84297;
+            border-color: #b84297;
+            box-shadow: 0 0 0 2px rgba(184, 66, 151, 0.25);
         }
 
         @*.field input:disabled {
@@ -237,7 +238,7 @@
             width: 100%;
             margin-top: 8px;
             padding: 14px;
-            background: linear-gradient(135deg, #5a8cc9, #4a7fcc);
+            background: linear-gradient(135deg, #b84297, #8c246e);
             border: none;
             border-radius: 12px;
             font-weight: bold;
@@ -248,7 +249,7 @@
 
         button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(90,140,201,0.4);
+            box-shadow: 0 10px 30px rgba(184, 66, 151, 0.4);
         }
 
         button:disabled {
@@ -262,13 +263,13 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #5a8cc9, #4a7fcc);
+            background: linear-gradient(135deg, #b84297, #8c246e);
             color: #fff;
         }
 
         .btn-secondary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(90,140,201,0.4);
+            box-shadow: 0 10px 30px rgba(184, 66, 151, 0.4);
         }
 
         /* FOOTER */
@@ -288,7 +289,7 @@
         }
 
         .footer-text a {
-            color: #5a8cc9;
+            color: #9b337c;
             text-decoration: none;
         }
 
@@ -308,7 +309,7 @@
         }
 
         .signin-link a {
-            color: #5a8cc9;
+            color: #9b337c;
             text-decoration: none;
             font-weight: 600;
         }
@@ -336,7 +337,7 @@
         }
 
             .toggle-password:hover {
-                color: #5a8cc9;
+                color: #9b337c;
             }
 
         #password::-ms-reveal,
@@ -421,7 +422,7 @@
             <div class="field" style="margin-top: 15px; margin-bottom: 20px;">
                 <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-weight: normal; color: #555;">
                     <input type="checkbox" id="termsCheckbox" style="width: auto; margin-top: 3px;" />
-                    <span>I accept the <a href="~/documents/About.pdf" target="_blank" style="color: #5a8cc9; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">privacy policy</a> and <a href="~/documents/Terms.pdf" target="_blank" style="color: #5a8cc9; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">terms of use</a>.</span>
+                    <span>I accept the <a href="~/documents/About.pdf" target="_blank" style="color: #9b337c; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">privacy policy</a> and <a href="~/documents/Terms.pdf" target="_blank" style="color: #9b337c; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">terms of use</a>.</span>
                 </label>
                 <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; margin-top: 10px; font-weight: normal; color: #555;">
                     <input type="checkbox" id="promoCheckbox" style="width: auto; margin-top: 3px;" />
@@ -596,8 +597,15 @@
         $('#email, #phoneNumber').on('blur', validateUserDetails);
 
         $('#sendOtpBtn').click(function () {
+            const fullName = $('#username').val() ? $('#username').val().trim() : '';
             const phoneNumber = $('#phoneNumber').val();
             userEmail = $('#email').val();
+
+            // Validate Full Name
+            if (!fullName) {
+                toastr.error('Please enter your full name');
+                return;
+            }
 
             // Validate phone number
             if (!phoneNumber || phoneNumber.length !== 10) {
@@ -607,7 +615,7 @@
 
             // Validate email
             const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
-            if (!userEmail || !emailRegex.test(userEmail)) {
+            if (!userEmail || !emailRegex.test(userEmail.trim())) {
                 toastr.error('Please enter a valid email address');
                 return;
             }
@@ -642,7 +650,7 @@
                         contentType: 'application/json',
                         data: JSON.stringify({
                             email: userEmail,
-                            userName: $('#username').val() || 'User',
+                            userName: fullName,
                             otp: generatedOTP,
                             phoneNumber: phoneNumber
                         }),
@@ -747,6 +755,9 @@
                 return;
             }
 
+            // Show loading state on Create Account button
+            $('#registerBtn').prop('disabled', true).text('Creating account...');
+
             $.ajax({
                 url: '@Url.Action("userRegister", "Auth")',
                 type: 'POST',
@@ -760,6 +771,7 @@
                         }, 2000);
                     } else {
                         toastr.error(response.message || 'Registration failed');
+                        $('#registerBtn').prop('disabled', false).text('Create Account');
                         if (response.message === "Email ID already in use" || response.message === "Phone number already exists") {
                             setTimeout(function () {
                                 window.location.href = '@Url.Action("Login", "Auth")';
@@ -769,6 +781,7 @@
                 },
                 error: function (response) {
                     toastr.error('Registration failed! Please try again later.');
+                    $('#registerBtn').prop('disabled', false).text('Create Account');
                 }
             });
         });
