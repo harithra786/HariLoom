@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true);
 
 // Increase Kestrel request body size limit to 100 MB
 builder.WebHost.ConfigureKestrel(options =>
