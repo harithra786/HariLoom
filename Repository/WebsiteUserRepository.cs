@@ -459,6 +459,30 @@ namespace hariloom.Repository
                     });
                 }
 
+                // Fetch delivery address for customer details in admin email
+                var addressObj = await _context.trnUserAddress.FirstOrDefaultAsync(a => a.mstUserId == order.mstUserId && a.label == "Delivery" && a.isActive);
+                if (addressObj == null)
+                {
+                    addressObj = await _context.trnUserAddress.FirstOrDefaultAsync(a => a.mstUserId == order.mstUserId && a.isActive);
+                }
+
+                string customerName = user?.name ?? "Customer";
+                string customerPhone = user?.phoneNumber ?? "N/A";
+                string customerAddress = "N/A";
+
+                if (addressObj != null)
+                {
+                    customerAddress = $"{addressObj.addressLine1}{(string.IsNullOrEmpty(addressObj.addressLine2) ? "" : ", " + addressObj.addressLine2)}, {addressObj.city}, {addressObj.state} - {addressObj.zipCode}";
+                }
+                else if (user != null && !string.IsNullOrEmpty(user.address))
+                {
+                    customerAddress = user.address;
+                }
+                else if (user != null && !string.IsNullOrEmpty(user.addressLine1))
+                {
+                    customerAddress = $"{user.addressLine1}{(string.IsNullOrEmpty(user.addressLine2) ? "" : ", " + user.addressLine2)}, {user.city}, {user.state} - {user.zipCode}";
+                }
+
                 if (user != null && !string.IsNullOrEmpty(user.email))
                 {
                     _logger.LogInformation("Starting order confirmation email");
@@ -473,7 +497,7 @@ namespace hariloom.Repository
                     }
                 }
                 
-                await _emailService.SendNewOrderAdminNotificationAsync(order.orderNumber, order.totalAmount.ToString("0.00"), emailItems);
+                await _emailService.SendNewOrderAdminNotificationAsync(order.orderNumber, order.totalAmount.ToString("0.00"), customerName, customerPhone, customerAddress, emailItems);
             }
             catch (Exception ex)
             {

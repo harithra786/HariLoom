@@ -97,7 +97,7 @@ namespace hariloom.Services
             }
         }
 
-        public async Task<bool> SendNewOrderAdminNotificationAsync(string orderNumber, string totalAmount, List<OrderEmailItemDTO> items)
+        public async Task<bool> SendNewOrderAdminNotificationAsync(string orderNumber, string totalAmount, string customerName, string customerPhone, string customerAddress, List<OrderEmailItemDTO> items)
         {
             try
             {
@@ -113,15 +113,31 @@ namespace hariloom.Services
 
                 var htmlContent = $@"
                 <html>
-                <body>
-                    <div style='display:inline-block; width:60px; height:60px; border-radius:50%; background-color:#111; color:#fff; text-align:center; line-height:60px; font-family:sans-serif; font-weight:bold; font-size:14px; margin-bottom: 20px;'>Hariloom.</div>
+                <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
                     <h2>New Order Received</h2>
                     <p>A new order has been placed successfully.</p>
-                    <p><strong>Order ID:</strong> {orderNumber}</p>
-                    <p><strong>Total Amount:</strong> ₹{totalAmount}</p>
-                    <h3>Order Items:</h3>
-                    <table border='1' cellpadding='5' cellspacing='0'>
-                        <tr><th>Image</th><th>Product Name</th><th>Quantity</th><th>Price</th></tr>
+                    <br/>
+                    <h3>Order Details</h3>
+                    <p>
+                        <strong>Order ID:</strong> {orderNumber}<br/>
+                        <strong>Total Amount:</strong> ₹{totalAmount}
+                    </p>
+                    <br/>
+                    <h3>Customer Details</h3>
+                    <p>
+                        <strong>Customer Name:</strong> {customerName}<br/>
+                        <strong>Mobile Number:</strong> {customerPhone}<br/>
+                        <strong>Delivery Address:</strong> {customerAddress}
+                    </p>
+                    <br/>
+                    <h3>Order Items</h3>
+                    <table border='1' cellpadding='8' cellspacing='0' style='border-collapse: collapse; width: 100%; max-width: 600px;'>
+                        <tr style='background-color: #f2f2f2;'>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
                         {itemsHtml}
                     </table>
                 </body>
