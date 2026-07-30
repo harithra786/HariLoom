@@ -182,8 +182,69 @@
                 transform: translateY(0);
             }
 
+        /* Background Animated Container */
+        .home-bg-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Tiny Dark Purple Floating Balls (Uniform Size) */
+        .tiny-purple-ball {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4c1d95;
+            box-shadow: 0 0 6px rgba(91, 33, 182, 0.7), 0 0 2px rgba(126, 34, 206, 0.9);
+            opacity: 0.75;
+            will-change: transform, opacity, box-shadow, background;
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out, box-shadow 0.25s ease-out, background 0.25s ease-out;
+            animation: floatTinyBall 14s ease-in-out infinite alternate;
+        }
+
+        /* When cursor passes near: SHINE ONLY (no size increase) */
+        .tiny-purple-ball.twinkling {
+            opacity: 1;
+            background: #ffffff;
+            box-shadow: 0 0 12px #c084fc, 0 0 24px #a855f7, 0 0 36px #e9d5ff, 0 0 6px #ffffff;
+            animation: shinePulse 0.45s ease-in-out infinite alternate !important;
+        }
+
+        @@keyframes shinePulse {
+            0% {
+                background: #c084fc;
+                box-shadow: 0 0 8px #a855f7, 0 0 16px #c084fc;
+                filter: brightness(1.3);
+            }
+            100% {
+                background: #ffffff;
+                box-shadow: 0 0 16px #d8b4fe, 0 0 32px #a855f7, 0 0 48px #e9d5ff, 0 0 8px #ffffff;
+                filter: brightness(2.8);
+            }
+        }
+
+        @@keyframes floatTinyBall {
+            0% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(25px, -35px);
+            }
+            100% {
+                transform: translate(-20px, 20px);
+            }
+        }
     </style>
 }
+
+<!-- Background Floating Tiny Dark Purple Balls Container -->
+<div class="home-bg-animation-container" id="tinyBallsContainer" aria-hidden="true"></div>
 
 <div class="hero-section">
     <img class="hero-image" src="@Url.Content("~/images/Home.webp")" alt="Home Banner" />
@@ -216,6 +277,48 @@
     <script>
         const productGrid = $('.product-grid');
         const userId = parseInt(sessionStorage.getItem('userId'));
+
+        // Generate 45 tiny floating dark purple balls of uniform size (10px)
+        const container = $('#tinyBallsContainer');
+        if (container.length) {
+            container.empty();
+            for (let i = 0; i < 45; i++) {
+                const top = (Math.random() * 92 + 2).toFixed(1);
+                const left = (Math.random() * 94 + 1).toFixed(1);
+                const dur = (Math.random() * 10 + 10).toFixed(1);
+                const delay = (-(Math.random() * 15)).toFixed(1);
+
+                const ball = $(`<div class="tiny-purple-ball" style="
+                    top: ${top}%;
+                    left: ${left}%;
+                    animation-duration: ${dur}s;
+                    animation-delay: ${delay}s;
+                "></div>`);
+                container.append(ball);
+            }
+        }
+
+        // Interactive Cursor Proximity Twinkle for Tiny Dark Purple Balls
+        $(document).on('mousemove pointermove', function (e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            // Check distance between cursor and each tiny purple ball
+            $('.tiny-purple-ball').each(function () {
+                const rect = this.getBoundingClientRect();
+                const ballCenterX = rect.left + rect.width / 2;
+                const ballCenterY = rect.top + rect.height / 2;
+
+                const dist = Math.hypot(mouseX - ballCenterX, mouseY - ballCenterY);
+
+                // If cursor is near ball (within 150px), trigger twinkling glow!
+                if (dist < 150) {
+                    $(this).addClass('twinkling');
+                } else {
+                    $(this).removeClass('twinkling');
+                }
+            });
+        });
 
         // Hero animation
         $(window).on('scroll', () => {
