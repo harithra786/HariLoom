@@ -758,6 +758,10 @@
             // Show loading state on Create Account button
             $('#registerBtn').prop('disabled', true).text('Creating account...');
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrlParam = urlParams.get('returnUrl') || '@(ViewBag.ReturnUrl ?? "")';
+            const targetLoginUrl = '@Url.Action("Login", "Auth")' + (returnUrlParam ? '?returnUrl=' + encodeURIComponent(returnUrlParam) : '');
+
             $.ajax({
                 url: '@Url.Action("userRegister", "Auth")',
                 type: 'POST',
@@ -767,14 +771,14 @@
                     if (response.success) {
                         toastr.success(response.message || 'Account created successfully!');
                         setTimeout(function () {
-                            window.location.href = '@Url.Action("Login", "Auth")';
+                            window.location.href = targetLoginUrl;
                         }, 2000);
                     } else {
                         toastr.error(response.message || 'Registration failed');
                         $('#registerBtn').prop('disabled', false).text('Create Account');
                         if (response.message === "Email ID already in use" || response.message === "Phone number already exists") {
                             setTimeout(function () {
-                                window.location.href = '@Url.Action("Login", "Auth")';
+                                window.location.href = targetLoginUrl;
                             }, 2000);
                         }
                     }

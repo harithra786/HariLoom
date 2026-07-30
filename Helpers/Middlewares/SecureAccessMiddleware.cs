@@ -1,5 +1,7 @@
-﻿using hariloom.Helpers.DbContexts;
+using hariloom.Helpers.DbContexts;
 using hariloom.Helpers.Middlewares;
+using hariloom.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace nova_attire.Helpers.Middlewares
 {
@@ -7,6 +9,14 @@ namespace nova_attire.Helpers.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IServiceScopeFactory _scopeFactory;
+
+        // Admin-only route prefixes
+        private static readonly string[] AdminRoutePrefixes = new[]
+        {
+            "/dashboard",
+            "/productsmanagement",
+            "/ordermanagement"
+        };
 
         public SecureAccessMiddleware(RequestDelegate next, IServiceScopeFactory scopeFactory)
         {
@@ -16,11 +26,12 @@ namespace nova_attire.Helpers.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var path = context.Request.Path.Value?.ToLower();
+            var path = context.Request.Path.Value?.ToLower() ?? "";
             var token = context.Request.Cookies["hariloomAuthToken"];
 
-            using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<appDBContext>();
+            bool isAdminRoute = AdminRoutePrefixes.Any(prefix => path.StartsWith(prefix));
+
+            hariloom.Models.Entity.mstUser? authenticatedUser = null;
 
             if (!string.IsNullOrEmpty(token))
             {
@@ -28,42 +39,43 @@ namespace nova_attire.Helpers.Middlewares
                 {
                     var payload = TokenHelper.DecryptToken(token);
 
-                    // Validate against database
-                    var user = dbContext.mstUser.FirstOrDefault(u => u.mstUserId == payload.UserId && u.phoneNumber == payload.PhoneNumber && u.accessLevel == payload.AccessLevel && u.isActive);
+                    using var scope = _scopeFactory.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<appDBContext>();
 
-                    if (user == null)
+                    // Validate against database
+                    authenticatedUser = await dbContext.mstUser.FirstOrDefaultAsync(u =>
+                        u.mstUserId == payload.UserId &&
+                        u.isActive);
+
+                    if (authenticatedUser == null)
                     {
-                        //await LogIllegalRequest(context, token, "User data mismatch", dbContext);
                         context.Response.Cookies.Delete("hariloomAuthToken");
-                        context.Response.Redirect("/Auth/Login");
-                        return;
                     }
                 }
                 catch
                 {
-                    //await LogIllegalRequest(context, token, "Token decryption failed", dbContext);
                     context.Response.Cookies.Delete("hariloomAuthToken");
-                    context.Response.Redirect("/Auth/Login");
+                }
+            }
+
+            // Enforce Admin Access for Admin routes
+            if (isAdminRoute)
+            {
+                if (authenticatedUser == null)
+                {
+                    var returnUrl = context.Request.Path.Value + context.Request.QueryString.Value;
+                    context.Response.Redirect($"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                    return;
+                }
+
+                if (authenticatedUser.accessLevel != (int)accessLevelEnum.AdminUser)
+                {
+                    context.Response.Redirect("/Website/Home");
                     return;
                 }
             }
 
             await _next(context);
         }
-
-        //private async Task LogIllegalRequest(HttpContext context, string token, string reason, appDBContext dbContext)
-        //{
-        //    var ip = context.Connection.RemoteIpAddress?.ToString();
-        //    var log = new trnIllegalRequest
-        //    {
-        //        IPAddress = ip ?? "unknown",
-        //        Reason = reason,
-        //        RawToken = token,
-        //        PageAccessed = context.Request.Path
-        //    };
-
-        //    dbContext.trnIllegalRequest.Add(log);
-        //    await dbContext.SaveChangesAsync();
-        //}
     }
 }

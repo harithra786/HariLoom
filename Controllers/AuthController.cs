@@ -17,8 +17,9 @@ namespace hariloom.Controllers
         #endregion
 
         #region Register Functionalities
-        public IActionResult Register()
+        public IActionResult Register(string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
@@ -45,9 +46,10 @@ namespace hariloom.Controllers
         #endregion
 
         #region Login Functionalities
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
             Response.Cookies.Delete("hariloomAuthToken");
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 

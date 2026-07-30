@@ -252,8 +252,8 @@
 
                 <!-- Email Field -->
                 <div class="field">
-                    <label for="phoneNumber">Phone Number</label>
-                    <input type="text" id="phoneNumber" name="phone-number" placeholder="Enter your phone number" autocomplete="username" autofocus class="only-numbers" />
+                    <label for="phoneNumber">Phone Number or Email</label>
+                    <input type="text" id="phoneNumber" name="phone-number" placeholder="Enter your phone number or email" autocomplete="username" autofocus />
                 </div>
 
                 <!-- Password Field -->
@@ -349,7 +349,18 @@
     <script src="~/vendor/js/bootstrap.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        sessionStorage.clear();
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('name');
+        sessionStorage.removeItem('contact');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('accessLevel');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrlParam = urlParams.get('returnUrl') || '@(ViewBag.ReturnUrl ?? "")';
+
+        if (returnUrlParam) {
+            $('.signup-link a').attr('href', '@Url.Action("Register", "Auth")?returnUrl=' + encodeURIComponent(returnUrlParam));
+        }
 
         $('.only-numbers').on('keyup', function () {
             // Remove non-digit characters
@@ -371,11 +382,9 @@
                 url: '@Url.Action("userLogin", "Auth")',
                 type: 'POST',
                 dataType: 'json',
-                data: { phoneNumber: phoneNumber, password: password },
+                data: { phoneNumber: phoneNumber, password: password, returnUrl: returnUrlParam },
                 success: function (response) {
-                    debugger;
                     if (response.success) {
-                        debugger;
 
                         toastr.success(response.message || 'Login successful!');
                         // Add details to session
@@ -391,7 +400,11 @@
                     }
                 },
                 error: function (xhr) {
-                    toastr.error('Login failed! Please try again later.');
+                    let errorMsg = 'Login failed! Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    toastr.error(errorMsg);
                 }
             });
         });

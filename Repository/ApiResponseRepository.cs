@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using hariloom.Models.DTOs;
 using hariloom.Interfaces;
 
@@ -35,8 +35,8 @@ namespace hariloom.Repository
             ApiResponseDTO responseDTO = new ApiResponseDTO();
             responseDTO.statusCode = (int)HttpStatusCode.Unauthorized;
             responseDTO.success = false;
-            responseDTO.message = "Unauthorized request. Retry Login";
-            responseDTO.data = responseInfo.data;
+            responseDTO.message = !string.IsNullOrWhiteSpace(responseInfo?.message) ? responseInfo.message : "Unauthorized request. Retry Login";
+            responseDTO.data = responseInfo?.data;
             return responseDTO;
         }
     }

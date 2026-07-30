@@ -23,7 +23,6 @@ namespace hariloom.Controllers
         #endregion
 
         #region Product Main Category Page Functionality
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult ProductMainCategory()
         {
             return View();
@@ -69,7 +68,6 @@ namespace hariloom.Controllers
         #endregion
 
         #region Product Sub Category Page Functionality
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult ProductSubCategory()
         {
             return View();
@@ -129,7 +127,6 @@ namespace hariloom.Controllers
         #endregion
 
         #region Product Details Page Functionality
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult ProductDetails()
         {
             return View();
@@ -190,7 +187,6 @@ namespace hariloom.Controllers
         #endregion
 
         #region Product Inventory Page Functionality
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult ProductInventory()
         {
             return View();

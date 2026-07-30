@@ -528,13 +528,7 @@
         }
 
         function buyNow(product) {
-            if (!userId) {
-                $("#loginPromptModal").modal("show");
-                return;
-            }
-
             const selling = (product.basePrice || 0) - (product.discountedPrice || 0);
-
             const quantity = $('#qtyInput').val() || 1;
 
             const url = '@Url.Action("BuyNow", "Website")'
@@ -543,6 +537,12 @@
                 + '&quantity=' + encodeURIComponent(quantity)
                 + '&price=' + encodeURIComponent(selling)
                 + '&productName=' + encodeURIComponent(product.productName);
+
+            if (!userId) {
+                window.pendingLoginReturnUrl = url;
+                $("#loginPromptModal").modal("show");
+                return;
+            }
 
             window.location.href = url;
         }

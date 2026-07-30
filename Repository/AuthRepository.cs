@@ -20,15 +20,56 @@ namespace hariloom.Repository
 
         public async Task<ApiResponseDTO> userLoginAsync(LoginDTO model)
         {
-            var user = await _context.mstUser.FirstOrDefaultAsync(u => u.phoneNumber == model.phoneNumber && u.isActive);
-            if (user == null || model.password != user.password)
+            if (string.IsNullOrWhiteSpace(model.phoneNumber) || string.IsNullOrWhiteSpace(model.password))
+                return _apiResponseRepository.UnauthorizedResponse(new ApiResponseDTO { message = "Phone Number / Email and Password are required." });
+
+            var input = model.phoneNumber.Trim();
+            var pass = model.password.Trim();
+
+            var user = await _context.mstUser.FirstOrDefaultAsync(u =>
+                u.phoneNumber == input || (u.email != null && u.email.ToLower() == input.ToLower()));
+
+            if (user == null)
+            {
+                return _apiResponseRepository.UnauthorizedResponse(new ApiResponseDTO { message = "Account not found. Please check your credentials or register." });
+            }
+
+            if (!user.isActive)
+            {
+                return _apiResponseRepository.UnauthorizedResponse(new ApiResponseDTO { message = "Account is inactive. Please contact administrator." });
+            }
+
+            if (user.password != pass && user.password != model.password)
+            {
                 return _apiResponseRepository.UnauthorizedResponse(new ApiResponseDTO { message = "Incorrect password. Please try again." });
+            }
 
             user.visitCount += 1;
             await _context.SaveChangesAsync();
 
-            string returnUrl = user.accessLevel == (int)accessLevelEnum.AdminUser ? "/Dashboard/AdminDashboard" : "/Website/Home";
-            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Login successful.", data = new { userId = user.mstUserId, name = user.name, accessLevel = user.accessLevel, phoneNumber = user.phoneNumber, url = returnUrl } });
+            string defaultUrl = user.accessLevel == (int)accessLevelEnum.AdminUser ? "/Dashboard/AdminDashboard" : "/Website/Home";
+            string redirectUrl = defaultUrl;
+
+            if (!string.IsNullOrWhiteSpace(model.returnUrl))
+            {
+                if (model.returnUrl.StartsWith("/") && !model.returnUrl.StartsWith("//") && !model.returnUrl.StartsWith("/\\"))
+                {
+                    if (user.accessLevel == (int)accessLevelEnum.AdminUser)
+                    {
+                        var lowerReturn = model.returnUrl.ToLower();
+                        if (lowerReturn.StartsWith("/dashboard") || lowerReturn.StartsWith("/productsmanagement") || lowerReturn.StartsWith("/ordermanagement"))
+                        {
+                            redirectUrl = model.returnUrl;
+                        }
+                    }
+                    else
+                    {
+                        redirectUrl = model.returnUrl;
+                    }
+                }
+            }
+
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Login successful.", data = new { userId = user.mstUserId, name = user.name, accessLevel = user.accessLevel, phoneNumber = user.phoneNumber, email = user.email, url = redirectUrl } });
         }
 
         public async Task<ApiResponseDTO> userRegisterAsync(RegisterUserDTO model)

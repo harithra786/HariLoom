@@ -34,7 +34,6 @@ namespace hariloom.Controllers
             return Json(_apiResponseRepository.SuccessResponse(new ApiResponseDTO() { data = orders }));
         }
 
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public async Task<IActionResult> OrderManagement()
         {
             return View();

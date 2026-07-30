@@ -589,12 +589,24 @@
                 $('#userAccessLevel').text(userAccessLevelId == 1 ? "User" : "Admin");
             } else {
                 // User is not logged in, show Login and Bag buttons
+                const currentReturnUrl = encodeURIComponent(window.location.pathname + window.location.search);
                 $navbarUserSection.append(`
                     <li class="nav-item">
-                        <a class="btn btn-primary login-btn" href="/Auth/Login">Login</a>
+                        <a class="btn btn-primary login-btn" href="/Auth/Login?returnUrl=${currentReturnUrl}">Login</a>
                     </li>
                 `);
             }
+
+            // Update login & signup prompt modal links dynamically with returnUrl
+            $('#loginPromptModal').on('show.bs.modal', function () {
+                var returnUrl = window.pendingLoginReturnUrl || (window.location.pathname + window.location.search);
+                window.pendingLoginReturnUrl = null;
+                var loginHref = '/Auth/Login?returnUrl=' + encodeURIComponent(returnUrl);
+                var registerHref = '/Auth/Register?returnUrl=' + encodeURIComponent(returnUrl);
+
+                $(this).find('a[href*="/Auth/Login"]').attr('href', loginHref);
+                $(this).find('a[href*="/Auth/Register"]').attr('href', registerHref);
+            });
 
             const fiveMinutes = 1 * 30 * 1000;
             setTimeout(function() {
@@ -616,8 +628,9 @@
                     <a class="mobile-nav-link" href="javascript:void(0);" onclick="fnUserLogout()">LOG OUT</a>
                 `);
             } else {
+                const currentReturnUrl = encodeURIComponent(window.location.pathname + window.location.search);
                 $mobileLinks.html(`
-                    <a class="mobile-nav-link" href="/Auth/Login">LOGIN</a>
+                    <a class="mobile-nav-link" href="/Auth/Login?returnUrl=${currentReturnUrl}">LOGIN</a>
                 `);
             }
         });

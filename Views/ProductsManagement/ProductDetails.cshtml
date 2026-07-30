@@ -350,14 +350,9 @@
                         $('#coverImage').siblings('div:has(img)').remove();
                         // ensure productTableId is cleared so Save creates new record
                         $('#productTableId').val(0);
-                    }
 
-                    await loadMainCategory();
-
-                    // If there is a selected main category (from session), load subcategories
-                    const mainVal = $('#mainCategory').val();
-                    if (mainVal) {
-                        await loadSubCategory($('#mainCategory'));
+                        await loadMainCategory();
+                        $('#subCategory').html('<option value="" selected disabled>Select sub category</option>');
                     }
                 } catch (err) {
                     console.error('Error loading categories on modal show', err);
@@ -482,6 +477,12 @@
             });
         }
 
+        function fnGoToProductDetails(productId) {
+            sessionStorage.removeItem('selectedProductId');
+            sessionStorage.setItem('selectedProductId', productId);
+            window.open('@Url.Action("ProductDetail", "Website")', '_blank');
+        }
+
         function toggleActive(id, isActive) {
             $.post('@Url.Action("DeactivateProduct", "ProductsManagement")', { id, isActive, updatedBy: 1 }, function (response) {
                 if (response && response.success) {
@@ -600,25 +601,25 @@
         //     btn.parentElement.remove();
         // }
 
-        function loadMainCategory() {
+        function loadMainCategory(selectedCategoryId) {
             return new Promise(function (resolve, reject) {
                 $.get('@Url.Action("GetAllActiveProductMainCategories", "ProductsManagement")')
                     .done(function (response) {
                         $('#mainCategory').html("");
 
                         let options = `<option value="" selected disabled>Select main category</option>`;
-                        response.data.forEach((cat, idx) => {
-                            options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
-                        });
+                        if (response && response.data && Array.isArray(response.data)) {
+                            response.data.forEach((cat) => {
+                                options += `<option value="${cat.mstProductMainCategoryId}">${cat.mainCategoryName}</option>`;
+                            });
+                        }
                         $('#mainCategory').html(options);
 
-                        // Session value selection
-                        const $mainCategory = $('#mainCategory');
-                        const selectedCategoryId = sessionStorage.getItem('selectedCategoryId');
-                        if (selectedCategoryId) {
-                            $mainCategory.val(selectedCategoryId).trigger('change');
+                        const targetId = selectedCategoryId !== undefined && selectedCategoryId !== null ? selectedCategoryId : $('#mainCategory').val();
+                        if (targetId) {
+                            $('#mainCategory').val(targetId);
                         } else {
-                            $mainCategory.prop("selectedIndex", 0); // select default
+                            $('#mainCategory').prop("selectedIndex", 0); // select default
                         }
                         resolve();
                     })
@@ -626,7 +627,7 @@
             });
         }
 
-        function loadSubCategory(ele) {
+        function loadSubCategory(ele, selectedSubCategoryId) {
             return new Promise(function (resolve, reject) {
                 var id = $(ele).val();
                 if (!id) {
@@ -639,17 +640,18 @@
                         $('#subCategory').html("");
 
                         let options = `<option value="" selected disabled>Select sub category</option>`;
-                        response.data.forEach((cat) => {
-                            options += `<option value="${cat.mstProductSubCategoryId}">${cat.subCategoryName}</option>`;
-                        });
+                        if (response && response.data && Array.isArray(response.data)) {
+                            response.data.forEach((cat) => {
+                                options += `<option value="${cat.mstProductSubCategoryId}">${cat.subCategoryName}</option>`;
+                            });
+                        }
                         $('#subCategory').html(options);
 
-                        const $subCategory = $('#subCategory');
-                        const selectedSubCategoryId = sessionStorage.getItem('selectedSubCategoryId');
-                        if (selectedSubCategoryId) {
-                            $subCategory.val(selectedSubCategoryId);
+                        const targetSubId = selectedSubCategoryId !== undefined && selectedSubCategoryId !== null ? selectedSubCategoryId : $('#subCategory').val();
+                        if (targetSubId) {
+                            $('#subCategory').val(targetSubId);
                         } else {
-                            $subCategory.prop("selectedIndex", 0);
+                            $('#subCategory').prop("selectedIndex", 0);
                         }
                         resolve();
                     })
@@ -838,6 +840,11 @@
                 success: async function (res) {
                     if (res.success) {
                         const data = res.data;
+
+                        // Update modal title FIRST to indicate editing
+                        const modalTitle = $('#productAddModal').find('.modal-title');
+                        modalTitle.text('Edit Product');
+
                         $('#productTableId').val(data.productId);
                         $('#productName').val(data.productName);
                         $('#productDisplayId').val(data.productDisplayId);
@@ -846,13 +853,14 @@
                         $('#discountPrice').val(data.discountedPrice);
                         
                         // Populate categories during edit mode
-                        await loadMainCategory();
                         if (data.mstProductMainCategoryId) {
-                            $('#mainCategory').val(data.mstProductMainCategoryId);
-                            await loadSubCategory($('#mainCategory'));
+                            await loadMainCategory(data.mstProductMainCategoryId);
                             if (data.mstProductSubCategoryId) {
-                                $('#subCategory').val(data.mstProductSubCategoryId);
+                                await loadSubCategory($('#mainCategory'), data.mstProductSubCategoryId);
                             }
+                        } else {
+                            await loadMainCategory();
+                            $('#subCategory').html('<option value="" selected disabled>Select sub category</option>');
                         }
 
                         // Tags
@@ -1023,12 +1031,8 @@
                         // }
 
                         // Update modal title to indicate editing
-                        const modalTitle = $('#productAddModal').find('.modal-title');
-                        modalTitle.text('Edit Product');
-
-                        setTimeout(() => {
-                            $('#productAddModal').modal('show');
-                        }, 500);
+                        $('#productAddModal').find('.modal-title').text('Edit Product');
+                        $('#productAddModal').modal('show');
 
                     } else {
                         //$('#errorMsg').text(res.message || "Error occurred").show();

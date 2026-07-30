@@ -19,7 +19,6 @@ namespace hariloom.Controllers
             _context = context;
         }
 
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public async Task<IActionResult> AdminDashboard()
         {
             var vm = new AdminDashboardViewModel();
@@ -102,7 +101,6 @@ namespace hariloom.Controllers
             return View(vm);
         }
 
-        [RestrictToAccessLevel((int)accessLevelEnum.AdminUser)]
         public IActionResult UserDatabase()
         {
             return View();
