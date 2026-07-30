@@ -28,7 +28,9 @@ namespace hariloom.Repository
             var result = cartItems.Select(c =>
             {
                 var basePrice = c.product?.basePrice ?? 0;
-                var unit = Math.Max(0, basePrice);
+                var deliveryCharge = c.product?.deliveryCharge ?? 0;
+                var discountAmount = c.product?.discountAmount ?? 0;
+                var unit = Math.Max(0, basePrice + deliveryCharge - discountAmount);
                 var imagesList = new List<hariloom.Models.DTOs.ProductImageDTO>();
                 try
                 {
@@ -49,7 +51,9 @@ namespace hariloom.Repository
                     size = c.size,
                     unitPrice = (decimal)unit,
                     totalPrice = (decimal)(unit * c.quantity),
-                    basePrice = c.product?.basePrice ?? 0,
+                    basePrice = basePrice,
+                    deliveryCharge = deliveryCharge,
+                    discountAmount = discountAmount,
                 };
             }).ToList();
 

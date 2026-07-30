@@ -305,6 +305,9 @@ namespace hariloom.Repository
                 productDisplayId = p.productDisplayId,
                 productDescription = p.description,
                 basePrice = p.basePrice,
+                deliveryCharge = p.deliveryCharge,
+                discountAmount = p.discountAmount,
+                discountedPrice = p.discountAmount,
                 coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
                 isActive = p.isActive,
                 isAvailable = p.isAvailable
@@ -329,7 +332,9 @@ namespace hariloom.Repository
                     productDisplayId = p.productDisplayId,
                     productDescription = p.description,
                     basePrice = p.basePrice,
-                    discountedPrice = p.discountedPrice ?? 0,
+                    deliveryCharge = p.deliveryCharge,
+                    discountAmount = p.discountAmount,
+                    discountedPrice = p.discountAmount,
                     coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
                     isActive = p.isActive,
                     isAvailable = p.isAvailable
@@ -386,7 +391,9 @@ namespace hariloom.Repository
                 productDisplayId = p.productDisplayId,
                 productDescription = p.description,
                 basePrice = p.basePrice,
-                discountedPrice = p.discountedPrice ?? 0,
+                deliveryCharge = p.deliveryCharge,
+                discountAmount = p.discountAmount,
+                discountedPrice = p.discountAmount,
                 mstProductGroupingIds = p.mstProductGroupingIds,
                 mstProductMainCategoryId = p.mstProductMainCategoryId,
                 mstProductSubCategoryId = p.mstProductSubCategoryId,
@@ -426,7 +433,9 @@ namespace hariloom.Repository
                     entity.coverImagePath = await SaveProductImagesAsync(model.coverImage);
 
                 entity.basePrice = model.basePrice;
-                entity.discountedPrice = model.discountedPrice;
+                entity.deliveryCharge = model.deliveryCharge;
+                entity.discountAmount = model.discountAmount;
+                entity.discountedPrice = model.discountAmount;
                 entity.mstProductGroupingIds = model.productGrouping ?? "";
                 entity.mstProductMainCategoryId = model.mstProductMainCategoryId;
                 entity.mstProductSubCategoryId = model.mstProductSubCategoryId;
@@ -480,7 +489,9 @@ namespace hariloom.Repository
                     description = model.productDescription,
                     coverImagePath = await SaveProductImagesAsync(model.coverImage),
                     basePrice = model.basePrice,
-                    discountedPrice = model.discountedPrice,
+                    deliveryCharge = model.deliveryCharge,
+                    discountAmount = model.discountAmount,
+                    discountedPrice = model.discountAmount,
                     mstProductGroupingIds = model.productGrouping ?? "",
                     mstProductMainCategoryId = model.mstProductMainCategoryId,
                     mstProductSubCategoryId = model.mstProductSubCategoryId,

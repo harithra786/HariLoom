@@ -35,6 +35,8 @@ namespace hariloom.Models.DTOs
         public string coverImagePath { get; set; }
         public string coverImageBase64 { get; set; }
         public int basePrice { get; set; }
+        public int deliveryCharge { get; set; }
+        public int discountAmount { get; set; }
         public int discountedPrice { get; set; }
         public int quantityAvailable { get; set; }
         public string mstProductGroupingIds { get; set; }
@@ -102,6 +104,8 @@ namespace hariloom.Models.DTOs
         public string sizeVariants { get; set; }
         public IFormFile coverImage { get; set; }
         public int basePrice { get; set; }
+        public int deliveryCharge { get; set; }
+        public int discountAmount { get; set; }
         public int discountedPrice { get; set; }
         public string productGrouping { get; set; }
         public int mstProductMainCategoryId { get; set; }
@@ -128,6 +132,8 @@ namespace hariloom.Models.DTOs
         public string productName { get; set; }
         public string coverImageBase64 { get; set; }
         public int basePrice { get; set; }
+        public int deliveryCharge { get; set; }
+        public int discountAmount { get; set; }
         public int discountedPrice { get; set; }
         public string productDescription { get; set; }
     }
@@ -142,7 +148,10 @@ namespace hariloom.Models.DTOs
         public string coverImageBase64 { get; set; } = string.Empty;
         public string coverImagePath { get; set; } = string.Empty;
         public decimal mrp { get; set; }
+        public decimal deliveryCharge { get; set; }
+        public decimal discountAmount { get; set; }
         public decimal discountedPrice { get; set; }
+        public decimal finalPrice { get; set; }
         public int quantityAvailable { get; set; }
         public List<SizeDTO> sizes { get; set; } = new();
     }

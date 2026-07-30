@@ -254,12 +254,25 @@
                         <!-- Pricing Card -->
                         <div class="card mb-2 shadow-lg">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Pricing</h5>
+                                <h5 class="card-title mb-0">Pricing & Charges</h5>
                             </div>
                             <div class="card-body">
-                                <div class="mb-6">
-                                    <label class="form-label" for="productPrice">Base Price</label>
-                                    <input type="text" class="form-control only-decimal" id="productPrice" placeholder="Price" name="productPrice" required/>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label" for="productPrice">Base Price (₹)</label>
+                                        <input type="text" class="form-control only-decimal calc-price-field" id="productPrice" placeholder="Base Price" name="productPrice" required/>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label" for="deliveryCharge">Delivery Charge (₹)</label>
+                                        <input type="text" class="form-control only-decimal calc-price-field" id="deliveryCharge" placeholder="Delivery Charge" name="deliveryCharge" value="0" required/>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label" for="discountAmount">Discount Amount (₹)</label>
+                                        <input type="text" class="form-control only-decimal calc-price-field" id="discountAmount" placeholder="Discount Amount" name="discountAmount" value="0" required/>
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-light rounded border text-muted" style="font-size: 13px;">
+                                    Final Amount collected from customer (Base Price + Delivery Charge - Discount): <strong id="calculatedFinalPrice" class="text-primary fs-6">₹0</strong>
                                 </div>
                             </div>
                         </div>
@@ -309,7 +322,10 @@
                             <th>Product ID</th>
                             <th>Image</th>
                             <th>Name</th>
-                            <th>Price</th>
+                            <th>Base Price</th>
+                            <th>Delivery</th>
+                            <th>Discount</th>
+                            <th>Final Price</th>
                             <th>Available</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -420,6 +436,11 @@
 
                 renderImagePreviews();
             });
+
+            $(document).on('input change', '.calc-price-field', function () {
+                updateCalculatedFinalPrice();
+            });
+
             // Save button click handler - ensure only one handler is attached
             $('#saveBtn').off('click').on('click', function (e) {
                 e.preventDefault();
@@ -427,6 +448,14 @@
                 fnSaveOrUpdateProductDetails();
             });
         });
+
+        function updateCalculatedFinalPrice() {
+            var base = parseInt($('#productPrice').val()) || 0;
+            var delivery = parseInt($('#deliveryCharge').val()) || 0;
+            var discount = parseInt($('#discountAmount').val()) || 0;
+            var finalPrice = Math.max(0, base + delivery - discount);
+            $('#calculatedFinalPrice').text('₹' + finalPrice);
+        }
 
         function loadProducts() {
             $.ajax({
@@ -455,6 +484,9 @@
                             }</td>
                             <td>${p.productName || ''}</td>
                             <td>₹${p.basePrice || 0}</td>
+                            <td>₹${p.deliveryCharge || 0}</td>
+                            <td>₹${p.discountAmount || 0}</td>
+                            <td class="fw-bold text-success">₹${Math.max(0, (p.basePrice || 0) + (p.deliveryCharge || 0) - (p.discountAmount || 0))}</td>
                             <td>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" ${p.isAvailable ? 'checked' : ''}  onchange="toggleAvailable(${p.productId}, this.checked)">
@@ -755,6 +787,8 @@
             formData.append('sizeVariants', $('input[name="productAvailableSizes"]:checked').map(function(){ return this.value; }).get().join(',') || '');
             formData.append("productDescription", $('#productDescriptionEditor').summernote('code'));
             formData.append("basePrice", parseInt($('#productPrice').val()) || 0);
+            formData.append("deliveryCharge", parseInt($('#deliveryCharge').val()) || 0);
+            formData.append("discountAmount", parseInt($('#discountAmount').val()) || 0);
             formData.append("createdBy", sessionStorage.getItem('userId') || 1);
             formData.append("mstProductMainCategoryId", $('#mainCategory').val() || 0);
             formData.append("mstProductSubCategoryId", $('#subCategory').val() || 0);
@@ -849,8 +883,10 @@
                         $('#productName').val(data.productName);
                         $('#productDisplayId').val(data.productDisplayId);
                         $('#productDescriptionEditor').summernote('code', data.productDescription || '');
-                        $('#productPrice').val(data.basePrice);
-                        $('#discountPrice').val(data.discountedPrice);
+                        $('#productPrice').val(data.basePrice || 0);
+                        $('#deliveryCharge').val(data.deliveryCharge || 0);
+                        $('#discountAmount').val(data.discountAmount || 0);
+                        updateCalculatedFinalPrice();
                         
                         // Populate categories during edit mode
                         if (data.mstProductMainCategoryId) {
@@ -1064,6 +1100,9 @@
             // Reset modal title and file input requirements
             const modalTitle = $('#productAddModal').find('.modal-title');
             modalTitle.text('Add Product');
+            $('#deliveryCharge').val(0);
+            $('#discountAmount').val(0);
+            updateCalculatedFinalPrice();
             $('#coverImage').prop('required', true);
             $('#productImages').prop('required', true);
         }

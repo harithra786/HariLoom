@@ -13,6 +13,8 @@ namespace hariloom.Models.Entity
         public string? description { get; set; }
         public string? coverImagePath { get; set; }
         public int basePrice { get; set; }
+        public int deliveryCharge { get; set; } = 0;
+        public int discountAmount { get; set; } = 0;
         public int? discountedPrice { get; set; }
         public int quantityAvailable { get; set; }
         public string? productImages { get; set; }

@@ -19,6 +19,7 @@ namespace hariloom.Models.DTOs
         public decimal unitPrice { get; set; }
         public decimal totalPrice { get; set; }
         public int basePrice { get; set; }
+        public int deliveryCharge { get; set; }
         public int discountAmount { get; set; }
         public int quantityAvailable { get; set; }
     }

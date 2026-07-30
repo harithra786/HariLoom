@@ -2,7 +2,7 @@
 @model BuyNowDTO
 @{
     Layout = "_ShopLayout";
-    var actualPrice = Model.mrp;
+    var actualPrice = Model.finalPrice > 0 ? Model.finalPrice : Math.Max(0, Model.mrp + Model.deliveryCharge - Model.discountAmount);
     var idProduct = Model.mstProductId;
 }
 
@@ -200,9 +200,23 @@
 
     <!-- Price Details -->
     <div class="bn-card price-panel">
+        <h5 style="font-weight: 600; margin-bottom: 12px;">Price Details</h5>
         <div class="row">
-            <span class="muted">MRP</span>
+            <span class="muted">Base Price (MRP)</span>
             <span>₹ @Model.mrp.ToString("F2")</span>
+        </div>
+        <div class="row" style="margin-top: 6px;">
+            <span class="muted">Delivery Charge</span>
+            <span style="color: #0d47a1;">+ ₹ @Model.deliveryCharge.ToString("F2")</span>
+        </div>
+        <div class="row" style="margin-top: 6px;">
+            <span class="muted">Discount Amount</span>
+            <span style="color: #dc3545;">- ₹ @Model.discountAmount.ToString("F2")</span>
+        </div>
+        <hr style="margin: 10px 0;" />
+        <div class="row">
+            <span class="muted" style="font-weight: 600;">Final Unit Price</span>
+            <span style="font-weight: 600;">₹ <span id="unitPrice">@actualPrice.ToString("F2")</span></span>
         </div>
         
         <div style="margin-top: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e6e6e6;">
@@ -222,8 +236,8 @@
         <div style="margin-top: 15px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 13px; color: #555; display: flex; align-items: flex-start; gap: 8px;">
             <i class="bx bx-package" style="font-size: 18px; color: #0d47a1;"></i>
             <div>
-                <div style="font-weight: 600; color: #111; margin-bottom: 4px;">Shipping Details</div>
-                Standard delivery takes 3-5 business days. Free shipping on all orders!
+                <div style="font-weight: 600; color: #111; margin-bottom: 4px;">Shipping & Order Details</div>
+                Standard delivery takes 3-5 business days. Final price includes delivery charge and discounts.
             </div>
         </div>
 

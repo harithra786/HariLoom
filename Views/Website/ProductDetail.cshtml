@@ -363,14 +363,14 @@
                     const fallback = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%20800%20800%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e9ecef%22%20%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%23adb5bd%22%20font-family%3D%22sans-serif%22%20font-size%3D%2240%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E";
 
                     items.forEach(item => {
-                        const selling = (item.basePrice || 0) - (item.discountedPrice || 0);
+                        const selling = Math.max(0, (item.basePrice || 0) + (item.deliveryCharge || 0) - (item.discountAmount || 0));
 
                         html += `<div class="product-card" onclick="fnGoToProductDetails(${item.productId})">
                             <img src="${item.coverImagePath ? '/' + item.coverImagePath : fallback}" />
                             <p>${item.productName}</p>
                             <p class="product-price">
                                 ₹${selling}
-                                ${item.discountedPrice > 0
+                                ${(item.discountAmount > 0 || item.deliveryCharge > 0)
                                     ? `<span class="old-price">₹${item.basePrice}</span>`
                                     : ''}
                             </p>
@@ -398,9 +398,9 @@
 
                     const p = res.data;
 
-                    const selling = (p.basePrice || 0) - (p.discountedPrice || 0);
+                    const selling = Math.max(0, (p.basePrice || 0) + (p.deliveryCharge || 0) - (p.discountAmount || 0));
                     $('.product-details h2').text(p.productName);
-                    $('.price').html(`₹${selling} ${p.discountedPrice > 0 ? `<span class="old-price">₹${p.basePrice}</span>` : ''}`);
+                    $('.price').html(`₹${selling} ${(p.discountAmount > 0 || p.deliveryCharge > 0) ? `<span class="old-price">₹${p.basePrice}</span>` : ''}`);
                     const fallback = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%20800%20800%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e9ecef%22%20%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%23adb5bd%22%20font-family%3D%22sans-serif%22%20font-size%3D%2240%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E";
                     
                     let imagesHtml = '';
@@ -528,7 +528,7 @@
         }
 
         function buyNow(product) {
-            const selling = (product.basePrice || 0) - (product.discountedPrice || 0);
+            const selling = Math.max(0, (product.basePrice || 0) + (product.deliveryCharge || 0) - (product.discountAmount || 0));
             const quantity = $('#qtyInput').val() || 1;
 
             const url = '@Url.Action("BuyNow", "Website")'

@@ -102,23 +102,26 @@ namespace hariloom.Controllers
             if (product == null)
                 return RedirectToAction("Home", "Website");
 
+            decimal calculatedFinalPrice = Math.Max(0, product.basePrice + product.deliveryCharge - product.discountAmount);
+            decimal effectivePrice = price > 0 ? price : calculatedFinalPrice;
+
             var productDetails = new BuyNowDTO
             {
                 mstProductId = mstProductId,
                 size = size ?? "",
                 quantity = quantity,
-                price = price,
-                productName = productName,
+                price = effectivePrice,
+                productName = string.IsNullOrWhiteSpace(productName) ? product.productName : productName,
                 coverImageBase64 = string.Empty,
                 coverImagePath = product.coverImagePath ?? string.Empty,
                 mrp = product.basePrice,
-                discountedPrice = product.discountedPrice,
+                deliveryCharge = product.deliveryCharge,
+                discountAmount = product.discountAmount,
+                discountedPrice = product.discountAmount,
+                finalPrice = calculatedFinalPrice,
                 quantityAvailable = product.quantityAvailable,
                 sizes = product.sizes ?? new List<SizeDTO>()
             };
-
-            if (price == 0)
-                return RedirectToAction("Home", "Website");
 
             return View(productDetails);
         }

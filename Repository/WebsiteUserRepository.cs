@@ -173,13 +173,16 @@ namespace hariloom.Repository
             var orderCount = await _context.trnOrder.CountAsync(o => o.orderDate >= today && o.orderDate < tomorrow);
             var nextSequence = (orderCount + 1).ToString("D4");
 
+            int unitPrice = Math.Max(0, productDetails.basePrice + productDetails.deliveryCharge - productDetails.discountAmount);
+            decimal totalAmount = unitPrice * payload.quantity;
+
             // Create order
             var order = new trnOrder
             {
                 mstUserId = payload.userId,
                 orderNumber = $"ORD-{DateTime.Now:yyyyMMdd}-{nextSequence}",
                 orderDate = DateTime.Now,
-                totalAmount = productDetails.basePrice * payload.quantity,
+                totalAmount = (int)totalAmount,
                 orderStatus = (int)orderStatusEnum.Unpaid,
                 isActive = true,
                 createdBy = payload.userId,
@@ -194,7 +197,7 @@ namespace hariloom.Repository
                 trnOrderId = order.trnOrderId,
                 mstProductId = productDetails.mstProductId,
                 quantity = payload.quantity,
-                price = productDetails.basePrice,
+                price = unitPrice,
                 size = payload.size ?? "",
                 isDelivered = false,
                 isActive = true,
@@ -203,9 +206,6 @@ namespace hariloom.Repository
             };
             _context.trnOrderItem.Add(orderItem);
             await _context.SaveChangesAsync();
-
-
-            decimal totalAmount = productDetails.basePrice * payload.quantity;
             string key = _configuration["Razorpay:Key"];
             string secret = _configuration["Razorpay:Secret"];
 
@@ -284,7 +284,7 @@ namespace hariloom.Repository
                 var productDetails = await _context.mstProduct.FirstOrDefaultAsync(p => p.mstProductId == item.mstProductId);
                 if (productDetails != null)
                 {
-                    int price = productDetails.basePrice; 
+                    int price = Math.Max(0, productDetails.basePrice + productDetails.deliveryCharge - productDetails.discountAmount); 
                     totalAmount += price * item.quantity;
                     
                     var orderItem = new trnOrderItems
@@ -623,6 +623,8 @@ namespace hariloom.Repository
                     quantity = c.quantity,
                     size = c.size,
                     basePrice = c.product.basePrice,
+                    deliveryCharge = c.product.deliveryCharge,
+                    discountAmount = c.product.discountAmount,
                     quantityAvailable = _context.trnProductSize.Where(s => s.mstProductId == c.mstProductId && s.size == c.size && s.isActive).Sum(s => s.quantityAvailable)
                 })
                 .ToListAsync();
@@ -630,7 +632,7 @@ namespace hariloom.Repository
             var result = cartItems.Select(c =>
             {
                 var basePrice = c.basePrice;
-                var unit = Math.Max(0, basePrice);
+                var unit = Math.Max(0, c.basePrice + c.deliveryCharge - c.discountAmount);
 
                 return new CartItemDTO
                 {
@@ -644,6 +646,8 @@ namespace hariloom.Repository
                     unitPrice = (decimal)unit,
                     totalPrice = (decimal)(unit * c.quantity),
                     basePrice = c.basePrice,
+                    deliveryCharge = c.deliveryCharge,
+                    discountAmount = c.discountAmount,
                     quantityAvailable = c.quantityAvailable
                 };
             }).ToList();
