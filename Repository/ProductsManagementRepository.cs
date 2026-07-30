@@ -380,7 +380,8 @@ namespace hariloom.Repository
             if (!string.IsNullOrEmpty(p.productImages))
             {
                 productImages = p.productImages.Split(",", StringSplitOptions.RemoveEmptyEntries)
-                                               .Select(img => img.Replace("\\", "/"))
+                                               .Select(img => img.Replace("\\", "/").Trim())
+                                               .Distinct()
                                                .ToList();
             }
 

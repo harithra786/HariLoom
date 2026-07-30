@@ -94,6 +94,99 @@
             border-radius: 2px;
             font-size: 10px;
         }
+
+        /* Animated Notification Toast */
+        .custom-toast-container {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 10050;
+            pointer-events: none;
+        }
+        .custom-toast {
+            pointer-events: auto;
+            min-width: 320px;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(-40px) scale(0.85);
+            opacity: 0;
+            transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+            border-left: 5px solid #28a745;
+        }
+        .custom-toast.toast-error {
+            border-left-color: #dc3545;
+        }
+        .custom-toast.show {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .custom-toast .toast-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #e8f5e9;
+            color: #28a745;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+        .custom-toast.toast-error .toast-icon-box {
+            background: #ffebee;
+            color: #dc3545;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+        }
+        .custom-toast .toast-content-box {
+            flex-grow: 1;
+        }
+        .custom-toast .toast-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1e293b;
+            margin: 0;
+        }
+        .custom-toast .toast-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+        .custom-toast .toast-btn-close {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.15s ease;
+        }
+        .custom-toast .toast-btn-close:hover {
+            color: #1e293b;
+        }
+        .custom-toast .toast-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #28a745, #10b981);
+            width: 100%;
+            transition: width 3s linear;
+        }
+        .custom-toast.toast-error .toast-progress-bar {
+            background: linear-gradient(90deg, #dc3545, #ef4444);
+        }
     </style>
 }
 
@@ -839,14 +932,19 @@
                 processData: false,
                 success: function (res) {
                     console.log('SaveOrUpdateProduct response:', res);
+                    // 1. Immediately close modal and reset form
+                    fnClrModal();
+
+                    // 2. Immediately refresh product table
+                    loadProducts();
+
+                    // 3. Show animated notification toast
                     if (res && res.success) {
-                        alert(res.message || "Product saved successfully!");
-                        fnClrModal();
-                        // ensure the list refreshes after a short delay to account for any DB latency
-                        setTimeout(loadProducts, 300);
+                        showAnimatedToast("Saved Successfully!", res.message || "Product details have been saved.", true);
                     } else {
-                        alert(res && res.message ? res.message : "Error on Product Save!");
+                        showAnimatedToast("Save Failed", res && res.message ? res.message : "Error on Product Save!", false);
                     }
+
                     // reset saving state and re-enable button
                     isSaving = false;
                     $('#saveBtn').prop('disabled', false);
@@ -858,7 +956,7 @@
                         var json = xhr && xhr.responseJSON ? xhr.responseJSON : JSON.parse(xhr.responseText || '{}');
                         if (json && json.message) msg = json.message;
                     } catch (e) { }
-                    alert(msg);
+                    showAnimatedToast("Save Failed", msg, false);
                     isSaving = false;
                     $('#saveBtn').prop('disabled', false);
                 }
@@ -956,17 +1054,23 @@
                         $('#imagePreviewContainer').html('');
 
                         if (Array.isArray(data.productImages) && data.productImages.length > 0) {
-                            $('#imageCountInfo').text(`${data.productImages.length} image(s) currently uploaded`).css('color', '#6c757d');
-                            data.productImages.forEach((imagePath, idx) => {
+                            // Filter unique image paths to avoid duplicates from DB
+                            const uniqueImages = [...new Set(data.productImages.filter(img => img && img.trim() !== ''))];
+                            $('#imageCountInfo').text(`${uniqueImages.length} image(s) currently uploaded`).css('color', '#6c757d');
+                            
+                            const fetchPromises = uniqueImages.map((imagePath, idx) =>
                                 fetch('/' + imagePath)
                                     .then(res => res.blob())
-                                    .then(blob => {
-                                        const file = new File([blob], `existing_image_${idx + 1}.jpg`, { type: blob.type || 'image/jpeg' });
-                                        selectedProductImages.push(file);
-                                        renderImagePreviews();
+                                    .then(blob => new File([blob], `existing_image_${idx + 1}.jpg`, { type: blob.type || 'image/jpeg' }))
+                                    .catch(err => {
+                                        console.error('Failed to load image', err);
+                                        return null;
                                     })
-                                    .catch(err => console.error('Failed to load image', err));
-                            });
+                            );
+
+                            const files = await Promise.all(fetchPromises);
+                            selectedProductImages = files.filter(f => f !== null);
+                            renderImagePreviews();
                         } else {
                             $('#imageCountInfo').text('').css('color', '#6c757d');
                         }
@@ -1083,18 +1187,21 @@
 
         function fnClrModal(){
             $('#productForm')[0].reset();
-            $('#productForm').parsley().reset();
+            if (typeof $('#productForm').parsley === 'function') {
+                try { $('#productForm').parsley().reset(); } catch(e){}
+            }
             $('#productAddModal').modal('hide');
-            //tags.clear();
-            //$('#tagContainer').empty();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css('overflow', '');
             $('.clrTxtValues').val("");
+            $('#productTableId').val(0);
             $('#specificationContainer').empty();
             $('#washCareContainer').empty();
             $('#colorVariantContainer').empty();
             $('#imagePreviewContainer').empty();
             $('#imageCountInfo').empty();
             selectedProductImages = [];
-            $('#productDescriptionEditor').summernote('code', '');
+            if ($('#productDescriptionEditor').length) $('#productDescriptionEditor').summernote('code', '');
             // Remove cover image preview if exists
             $('#coverImage').siblings('div:has(img)').remove();
             // Reset modal title and file input requirements
@@ -1107,30 +1214,61 @@
             $('#productImages').prop('required', true);
         }
 
+        // Animated Success/Error Toast Notification Helper
+        function showAnimatedToast(title, message, isSuccess = true) {
+            let container = document.getElementById('customToastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'customToastContainer';
+                container.className = 'custom-toast-container';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${isSuccess ? 'toast-success' : 'toast-error'}`;
+            const iconSymbol = isSuccess ? '✓' : '✕';
+
+            toast.innerHTML = `
+                <div class="toast-icon-box">${iconSymbol}</div>
+                <div class="toast-content-box">
+                    <h6 class="toast-title">${title}</h6>
+                    <p class="toast-desc">${message}</p>
+                </div>
+                <button type="button" class="toast-btn-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="toast-progress-bar"></div>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger entrance animation & progress bar shrink
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+                const progressBar = toast.querySelector('.toast-progress-bar');
+                if (progressBar) progressBar.style.width = '0%';
+            });
+
+            // Auto-remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 450);
+            }, 3000);
+        }
+
         // Renders image previews with remove (×) buttons
         function renderImagePreviews() {
             const previewContainer = $('#imagePreviewContainer');
             previewContainer.html('');
 
             selectedProductImages.forEach((file, idx) => {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const wrapper = $(`
-                        <div class="img-preview-wrapper">
-                            <button type="button" class="img-preview-remove" data-idx="${idx}" title="Remove image">&times;</button>
-                            <img src="${e.target.result}" alt="Preview">
-                            <span class="img-preview-index">${idx + 1}/${selectedProductImages.length}</span>
-                        </div>
-                    `);
-                    // Need to insert at the correct position
-                    const children = previewContainer.children();
-                    if (idx >= children.length) {
-                        previewContainer.append(wrapper);
-                    } else {
-                        $(children[idx]).before(wrapper);
-                    }
-                };
-                reader.readAsDataURL(file);
+                const objectUrl = URL.createObjectURL(file);
+                const wrapper = $(`
+                    <div class="img-preview-wrapper">
+                        <button type="button" class="img-preview-remove" data-idx="${idx}" title="Remove image">&times;</button>
+                        <img src="${objectUrl}" alt="Preview">
+                        <span class="img-preview-index">${idx + 1}/${selectedProductImages.length}</span>
+                    </div>
+                `);
+                previewContainer.append(wrapper);
             });
         }
 
