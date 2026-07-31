@@ -386,7 +386,11 @@
         }
 
         function loadProductDetails() {
-            const id = sessionStorage.getItem('selectedProductId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id') || sessionStorage.getItem('selectedProductId');
+            if (id) {
+                sessionStorage.setItem('selectedProductId', id);
+            }
 
             $.ajax({
                 url: '@Url.Action("GetProductById", "ProductsManagement")',

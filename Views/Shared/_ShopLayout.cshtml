@@ -860,7 +860,7 @@
         function fnGoToProductDetails(productId) {
             sessionStorage.removeItem('selectedProductId');
             sessionStorage.setItem('selectedProductId', productId);
-            window.location.href = '@Url.Action("ProductDetail", "Website")';
+            window.location.href = '@Url.Action("ProductDetail", "Website")?id=' + productId;
         }
 
         function fnLoadProductListWithMainCategory(categoryId) {

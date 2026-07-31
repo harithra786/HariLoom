@@ -465,6 +465,9 @@
         // Load Main Categories
         function loadMainCategories() {
             currentView = 'main';
+            if (history.pushState) {
+                history.pushState(null, '', window.location.pathname);
+            }
             $('#category-back-btn').hide();
             $('#section-title').text('SHOP BY CATEGORY');
             $('#category-breadcrumb').html('<span style="color: #333; font-weight: 600;">Categories</span>');
@@ -516,6 +519,10 @@
             currentView = 'sub';
             selectedMainCategoryId = mainCategoryId;
             selectedMainCategoryName = mainCategoryName;
+
+            if (history.pushState) {
+                history.pushState(null, '', window.location.pathname + '?mainCategoryId=' + mainCategoryId);
+            }
 
             $('#category-back-btn').show();
             $('#section-title').text(mainCategoryName.toUpperCase());
@@ -572,6 +579,10 @@
             currentView = 'products';
             selectedSubCategoryId = subCategoryId;
             selectedSubCategoryName = subCategoryName;
+
+            if (history.pushState) {
+                history.pushState(null, '', window.location.pathname + '?mainCategoryId=' + selectedMainCategoryId + '&subCategoryId=' + subCategoryId);
+            }
 
             $('#category-back-btn').show();
             $('#section-title').text(subCategoryName.toUpperCase());
