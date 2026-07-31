@@ -140,6 +140,20 @@ namespace hariloom.Controllers
         }
 
         [HttpGet]
+        public async Task<ApiResponseDTO> GetAllActiveProducts()
+        {
+            var products = await _productsManagementRepository.GetAllActiveProductsAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = products });
+        }
+
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetActiveProductsByMainCategoryId(int mainCategoryId)
+        {
+            var products = await _productsManagementRepository.GetActiveProductsByMainCategoryIdAsync(mainCategoryId);
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = products });
+        }
+
+        [HttpGet]
         public async Task<ApiResponseDTO> GetActiveProductsBySubCategoryId(int subCategoryId)
         {
             var products = await _productsManagementRepository.GetActiveProductsBySubCategoryIdAsync(subCategoryId);

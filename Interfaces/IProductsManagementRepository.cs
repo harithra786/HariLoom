@@ -25,6 +25,8 @@ namespace hariloom.Interfaces
 
         #region Products Details Interface Functions
         Task<List<ProductDetailsDTO>> GetAllProductDetailsAsync();
+        Task<List<ProductDetailsDTO>> GetAllActiveProductsAsync();
+        Task<List<ProductDetailsDTO>> GetActiveProductsByMainCategoryIdAsync(int mainCategoryId);
         Task<List<ProductDetailsDTO>> GetActiveProductsBySubCategoryIdAsync(int subCategoryId);
         Task<ApiResponseDTO> SaveOrUpdateProductAsync(CreateProductDTO model);
         Task<ProductDetailsDTO> GetProductByIdAsync(int id);

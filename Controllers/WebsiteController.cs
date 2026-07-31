@@ -160,6 +160,13 @@ namespace hariloom.Controllers
         }
         #endregion
 
+        #region Product List Page Functionality
+        public IActionResult ProductList(int? mainCategoryId, int? subCategoryId)
+        {
+            ViewBag.MainCategoryId = mainCategoryId;
+            ViewBag.SubCategoryId = subCategoryId;
+            return View();
+        }
         #endregion
 
         #region Bag Page Functionality
@@ -450,5 +457,6 @@ namespace hariloom.Controllers
 
         #endregion
 
+        #endregion
     }
 }

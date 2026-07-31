@@ -866,15 +866,32 @@
         function fnLoadProductListWithMainCategory(categoryId) {
             sessionStorage.removeItem('selectedCategoryId');
             sessionStorage.setItem('selectedCategoryId', categoryId);
-            window.location.href = '@Url.Action("ProductList", "Website")';
+            if (window.location.pathname.endsWith('/Website/Home') || window.location.pathname === '/') {
+                if (typeof fnLoadSubCategories === 'function') {
+                    fnLoadSubCategories(categoryId, '');
+                    scrollToSummerCollection();
+                } else {
+                    window.location.href = '@Url.Action("Home", "Website")?mainCategoryId=' + categoryId + '#summer-collection';
+                }
+            } else {
+                window.location.href = '@Url.Action("Home", "Website")?mainCategoryId=' + categoryId + '#summer-collection';
+            }
         }
 
         function fnLoadProductListWithSubCategory(subCategoryId) {
             sessionStorage.removeItem('selectedSubCategoryId');
             sessionStorage.setItem('selectedSubCategoryId', subCategoryId);
-            window.location.href = '@Url.Action("ProductList", "Website")';
+            if (window.location.pathname.endsWith('/Website/Home') || window.location.pathname === '/') {
+                if (typeof fnLoadProducts === 'function') {
+                    fnLoadProducts(subCategoryId, '');
+                    scrollToSummerCollection();
+                } else {
+                    window.location.href = '@Url.Action("Home", "Website")?subCategoryId=' + subCategoryId + '#summer-collection';
+                }
+            } else {
+                window.location.href = '@Url.Action("Home", "Website")?subCategoryId=' + subCategoryId + '#summer-collection';
+            }
         }
-
 
         function fnOnClickBanner(categoryId,subCategoryId) {
             sessionStorage.removeItem('selectedCategoryId');
@@ -882,7 +899,7 @@
 
             sessionStorage.removeItem('selectedSubCategoryId');
             sessionStorage.setItem('selectedSubCategoryId', subCategoryId);
-            window.location.href = '@Url.Action("ProductList", "Website")';
+            window.location.href = '@Url.Action("Home", "Website")?subCategoryId=' + subCategoryId + '#summer-collection';
         }
 
         function getCookie(name) {

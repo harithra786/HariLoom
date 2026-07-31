@@ -319,11 +319,62 @@ namespace hariloom.Repository
         }
         #endregion
 
-        #region Get Active Products By Sub Category Id
+        #region Get Active Products Methods
+        public async Task<List<ProductDetailsDTO>> GetAllActiveProductsAsync()
+        {
+            var productList = await _context.mstProduct
+                .Where(p => p.isActive)
+                .OrderByDescending(p => p.createdDate)
+                .Select(p => new ProductDetailsDTO
+                {
+                    productId = p.mstProductId,
+                    productName = p.productName,
+                    productDisplayId = p.productDisplayId,
+                    productDescription = p.description,
+                    basePrice = p.basePrice,
+                    deliveryCharge = p.deliveryCharge,
+                    discountAmount = p.discountAmount,
+                    discountedPrice = p.discountAmount,
+                    coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                    isActive = p.isActive,
+                    isAvailable = p.isAvailable
+                }).ToListAsync();
+
+            return productList;
+        }
+
+        public async Task<List<ProductDetailsDTO>> GetActiveProductsByMainCategoryIdAsync(int mainCategoryId)
+        {
+            var subCategoryIds = await _context.mstProductSubCategory
+                .Where(s => s.mstProductMainCategoryId == mainCategoryId && s.isActive)
+                .Select(s => s.mstProductSubCategoryId)
+                .ToListAsync();
+
+            var productList = await _context.mstProduct
+                .Where(p => p.isActive && subCategoryIds.Contains(p.mstProductSubCategoryId))
+                .OrderByDescending(p => p.createdDate)
+                .Select(p => new ProductDetailsDTO
+                {
+                    productId = p.mstProductId,
+                    productName = p.productName,
+                    productDisplayId = p.productDisplayId,
+                    productDescription = p.description,
+                    basePrice = p.basePrice,
+                    deliveryCharge = p.deliveryCharge,
+                    discountAmount = p.discountAmount,
+                    discountedPrice = p.discountAmount,
+                    coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                    isActive = p.isActive,
+                    isAvailable = p.isAvailable
+                }).ToListAsync();
+
+            return productList;
+        }
+
         public async Task<List<ProductDetailsDTO>> GetActiveProductsBySubCategoryIdAsync(int subCategoryId)
         {
             var productList = await _context.mstProduct
-                .Where(p => p.isActive && p.isAvailable && p.mstProductSubCategoryId == subCategoryId)
+                .Where(p => p.isActive && p.mstProductSubCategoryId == subCategoryId)
                 .OrderByDescending(p => p.createdDate)
                 .Select(p => new ProductDetailsDTO
                 {
