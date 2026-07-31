@@ -794,14 +794,14 @@
                         toastr.success(response.message || 'Account created successfully!');
                         btn.html('<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Signing in...');
                         setTimeout(function () {
-                            window.location.href = targetLoginUrl;
+                            window.location.replace(targetLoginUrl);
                         }, 1500);
                     } else {
                         toastr.error(response.message || 'Registration failed');
                         btn.prop('disabled', false).html(originalText);
                         if (response.message === "Email ID already in use" || response.message === "Phone number already exists") {
                             setTimeout(function () {
-                                window.location.href = targetLoginUrl;
+                                window.location.replace(targetLoginUrl);
                             }, 1500);
                         }
                     }

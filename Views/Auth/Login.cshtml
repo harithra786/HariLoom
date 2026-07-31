@@ -367,14 +367,21 @@
     <script src="~/vendor/js/bootstrap.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        sessionStorage.removeItem('userId');
-        sessionStorage.removeItem('name');
-        sessionStorage.removeItem('contact');
-        sessionStorage.removeItem('email');
-        sessionStorage.removeItem('accessLevel');
-
         const urlParams = new URLSearchParams(window.location.search);
+        const isLogout = urlParams.get('logout') === 'true';
         const returnUrlParam = urlParams.get('returnUrl') || '@(ViewBag.ReturnUrl ?? "")';
+        const existingUserId = sessionStorage.getItem('userId');
+
+        if (isLogout) {
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('name');
+            sessionStorage.removeItem('contact');
+            sessionStorage.removeItem('email');
+            sessionStorage.removeItem('accessLevel');
+        } else if (existingUserId && parseInt(existingUserId) > 0) {
+            const redirectTarget = returnUrlParam ? decodeURIComponent(returnUrlParam) : '@Url.Action("Home", "Website")';
+            window.location.replace(redirectTarget);
+        }
 
         if (returnUrlParam) {
             $('.signup-link a').attr('href', '@Url.Action("Register", "Auth")?returnUrl=' + encodeURIComponent(returnUrlParam));
@@ -423,7 +430,7 @@
                         sessionStorage.setItem('email', response.data.email);
                         sessionStorage.setItem('accessLevel', response.data.accessLevel);
 
-                        window.location.href = response.data.url;
+                        window.location.replace(response.data.url || returnUrlParam || '@Url.Action("Home", "Website")');
                     } else {
                         toastr.error(response.message || 'Incorrect password. Please try again.');
                         btn.prop('disabled', false).html(originalText);

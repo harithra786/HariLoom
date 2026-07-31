@@ -46,9 +46,12 @@ namespace hariloom.Controllers
         #endregion
 
         #region Login Functionalities
-        public IActionResult Login(string? returnUrl = null)
+        public IActionResult Login(string? returnUrl = null, bool logout = false)
         {
-            Response.Cookies.Delete("hariloomAuthToken");
+            if (logout)
+            {
+                Response.Cookies.Delete("hariloomAuthToken");
+            }
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }

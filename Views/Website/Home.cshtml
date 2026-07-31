@@ -249,15 +249,15 @@
             overflow: hidden;
         }
 
-        /* Tiny Dark Purple Floating Balls (Uniform Size) */
+        /* Tiny Dark Purple Floating Balls (Refined Micro Size) */
         .tiny-purple-ball {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
             background: #4c1d95;
-            box-shadow: 0 0 6px rgba(91, 33, 182, 0.7), 0 0 2px rgba(126, 34, 206, 0.9);
-            opacity: 0.75;
+            box-shadow: 0 0 4px rgba(91, 33, 182, 0.7), 0 0 2px rgba(126, 34, 206, 0.8);
+            opacity: 0.7;
             will-change: transform, opacity, box-shadow, background;
             transition: transform 0.25s ease-out, opacity 0.25s ease-out, box-shadow 0.25s ease-out, background 0.25s ease-out;
             animation: floatTinyBall 14s ease-in-out infinite alternate;
@@ -477,7 +477,7 @@
                 else if (res && Array.isArray(res.data)) items = res.data;
                 else if (Array.isArray(res)) items = res;
 
-                items = items.filter(function (p) { return p.isActive; });
+                items = items.filter(function (p) { return p.isActive !== false && p.IsActive !== false; });
 
                 if (!items.length) {
                     productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #666;">No categories found</div>');
@@ -533,7 +533,7 @@
                 else if (res && Array.isArray(res.data)) items = res.data;
                 else if (Array.isArray(res)) items = res;
 
-                items = items.filter(function (p) { return p.isActive; });
+                items = items.filter(function (p) { return p.isActive !== false && p.IsActive !== false; });
 
                 if (!items.length) {
                     productGrid.html('<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 16px; color: #666;">No subcategories found in this category</div>');
@@ -689,14 +689,16 @@
         // Initial Load
         $(document).ready(function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const mainCatParam = parseInt(urlParams.get('mainCategoryId')) || parseInt(sessionStorage.getItem('selectedCategoryId')) || 0;
-            const subCatParam = parseInt(urlParams.get('subCategoryId')) || parseInt(sessionStorage.getItem('selectedSubCategoryId')) || 0;
+            const mainCatParam = parseInt(urlParams.get('mainCategoryId')) || 0;
+            const subCatParam = parseInt(urlParams.get('subCategoryId')) || 0;
 
             if (subCatParam > 0) {
                 fnLoadProducts(subCatParam, 'Collection');
             } else if (mainCatParam > 0) {
                 fnLoadSubCategories(mainCatParam, 'Collection');
             } else {
+                sessionStorage.removeItem('selectedCategoryId');
+                sessionStorage.removeItem('selectedSubCategoryId');
                 loadMainCategories();
             }
         });

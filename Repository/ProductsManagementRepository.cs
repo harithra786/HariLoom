@@ -55,6 +55,28 @@ namespace hariloom.Repository
                 createdBy = p.createdBy
             }).ToListAsync();
 
+            if (!productList.Any())
+            {
+                var allCats = await _context.mstProductMainCategory.ToListAsync();
+                if (allCats.Any())
+                {
+                    foreach (var cat in allCats)
+                    {
+                        cat.isActive = true;
+                    }
+                    await _context.SaveChangesAsync();
+
+                    productList = allCats.Select(p => new ProductMainCategoryDetailsDto
+                    {
+                        mstProductMainCategoryId = p.mstProductMainCategoryId,
+                        mainCategoryName = p.mainCategoryName,
+                        mainCategoryImagePath = p.mainCategoryImagePath,
+                        isActive = p.isActive,
+                        createdBy = p.createdBy
+                    }).ToList();
+                }
+            }
+
             var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
             {
                 mstProductMainCategoryId = p.mstProductMainCategoryId,
@@ -82,7 +104,6 @@ namespace hariloom.Repository
                 if (entity != null)
                 {
                     entity.mainCategoryName = model.mainCategoryName;
-                    entity.isActive = model.isActive;
                     entity.updatedBy = model.createdBy;
                     entity.updatedDate = DateTime.Now;
 
@@ -100,6 +121,9 @@ namespace hariloom.Repository
             {
                 mstProductMainCategory newCategory = new mstProductMainCategory();
                 newCategory.mainCategoryName = model.mainCategoryName;
+                newCategory.isActive = true;
+                newCategory.createdBy = model.createdBy;
+                newCategory.createdDate = DateTime.Now;
 
                 if (model.mainCategoryImageFile != null)
                 {
@@ -128,8 +152,7 @@ namespace hariloom.Repository
                 await loadedImage.SaveAsWebpAsync(filePath);
             }
 
-            // Return relative path for use in <img src="...">
-            return filePath.Replace("\\", "/");
+            return $"images/maincategories/{fileName}";
         }
 
         public async Task<mstProductMainCategory> GetMainCategoryByIdAsync(int id)
@@ -196,6 +219,20 @@ namespace hariloom.Repository
         {
             var subCategories = await _context.mstProductSubCategory.Where(x => x.MainCategory.isActive).Where(x => x.isActive && x.mstProductMainCategoryId == id).ToListAsync();
 
+            if (!subCategories.Any())
+            {
+                var allForMain = await _context.mstProductSubCategory.Where(x => x.mstProductMainCategoryId == id).ToListAsync();
+                if (allForMain.Any())
+                {
+                    foreach (var s in allForMain)
+                    {
+                        s.isActive = true;
+                    }
+                    await _context.SaveChangesAsync();
+                    subCategories = allForMain;
+                }
+            }
+
             return subCategories.Select(x => new mstProductSubCategory
             {
                 mstProductSubCategoryId = x.mstProductSubCategoryId,
@@ -240,6 +277,9 @@ namespace hariloom.Repository
                 {
                     subCategoryName = model.subCategoryName,
                     mstProductMainCategoryId = model.mstProductMainCategoryId,
+                    isActive = true,
+                    createdBy = model.createdBy,
+                    createdDate = DateTime.Now
                 };
 
                 if (model.subCategoryImageFile != null)
@@ -270,7 +310,7 @@ namespace hariloom.Repository
                 await loadedImage.SaveAsWebpAsync(filePath);
             }
 
-            return filePath.Replace("\\", "/");
+            return $"images/subcategories/{fileName}";
         }
 
         public async Task<mstProductSubCategory> GetSubCategoryByIdAsync(int id)
@@ -390,6 +430,34 @@ namespace hariloom.Repository
                     isActive = p.isActive,
                     isAvailable = p.isAvailable
                 }).ToListAsync();
+
+            if (!productList.Any())
+            {
+                var allProds = await _context.mstProduct.Where(p => p.mstProductSubCategoryId == subCategoryId).ToListAsync();
+                if (allProds.Any())
+                {
+                    foreach (var pr in allProds)
+                    {
+                        pr.isActive = true;
+                    }
+                    await _context.SaveChangesAsync();
+
+                    productList = allProds.OrderByDescending(p => p.createdDate).Select(p => new ProductDetailsDTO
+                    {
+                        productId = p.mstProductId,
+                        productName = p.productName,
+                        productDisplayId = p.productDisplayId,
+                        productDescription = p.description,
+                        basePrice = p.basePrice,
+                        deliveryCharge = p.deliveryCharge,
+                        discountAmount = p.discountAmount,
+                        discountedPrice = p.discountAmount,
+                        coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                        isActive = p.isActive,
+                        isAvailable = p.isAvailable
+                    }).ToList();
+                }
+            }
 
             return productList;
         }

@@ -31,6 +31,12 @@ namespace nova_attire.Helpers.Middlewares
 
             bool isAdminRoute = AdminRoutePrefixes.Any(prefix => path.StartsWith(prefix));
 
+            // Public storefront read endpoints under ProductsManagement do not require admin access
+            if (path.StartsWith("/productsmanagement/get"))
+            {
+                isAdminRoute = false;
+            }
+
             hariloom.Models.Entity.mstUser? authenticatedUser = null;
 
             if (!string.IsNullOrEmpty(token))
