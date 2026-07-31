@@ -98,6 +98,11 @@ namespace hariloom.Repository
                 return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
             }
 
+            if (model.mainCategoryImageFile != null && IsPngImage(model.mainCategoryImageFile))
+            {
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "PNG images are not allowed. Please upload JPG, JPEG, or WEBP images." });
+            }
+
             if (model.mstProductMainCategoryId > 0)
             {
                 var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == model.mstProductMainCategoryId);
@@ -250,6 +255,11 @@ namespace hariloom.Repository
 
             if (duplicate != null)
                 return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Already Exists" });
+
+            if (model.subCategoryImageFile != null && IsPngImage(model.subCategoryImageFile))
+            {
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "PNG images are not allowed. Please upload JPG, JPEG, or WEBP images." });
+            }
 
             if (model.mstProductSubCategoryId > 0)
             {
@@ -538,6 +548,12 @@ namespace hariloom.Repository
 
             if (duplicate != null)
                 return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Duplicate Product Name" });
+
+            if ((model.coverImage != null && IsPngImage(model.coverImage)) ||
+                (model.productImages != null && model.productImages.Any(img => IsPngImage(img))))
+            {
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "PNG images are not allowed. Please upload JPG, JPEG, or WEBP images." });
+            }
 
             mstProduct entity;
             if (model.productId > 0)
@@ -833,6 +849,13 @@ namespace hariloom.Repository
 
             // Store as a relative path (portable across environments)
             return $"images/{fileName}";
+        }
+
+        private bool IsPngImage(IFormFile file)
+        {
+            if (file == null) return false;
+            var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
+            return ext == ".png" || string.Equals(file.ContentType, "image/png", StringComparison.OrdinalIgnoreCase);
         }
 
 

@@ -325,7 +325,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <input type="file" class="form-control" id="coverImage" name="coverImage" accept=".webp, image/webp" required />
+                                    <input type="file" class="form-control" id="coverImage" name="coverImage" accept=".jpg, .jpeg, .webp, image/jpeg, image/webp" required />
                                     <small class="text-muted">Upload a single cover image for the product.</small>
                                 </div>
                             </div>
@@ -337,7 +337,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <input type="file" class="form-control" id="productImages" name="productImages" accept=".webp, image/webp" multiple required />
+                                    <input type="file" class="form-control" id="productImages" name="productImages" accept=".jpg, .jpeg, .webp, image/jpeg, image/webp" multiple required />
                                     <small class="text-muted d-block mt-2">Upload up to 6 images for the product. Hold Ctrl (Cmd on Mac) to select multiple images.</small>
                                     <small class="text-muted d-block" id="imageCountInfo"></small>
                                 </div>
@@ -1154,7 +1154,7 @@
                         //             </div>
                         //             <div class="mb-3">
                         //                 <label class="form-label">Upload Images</label>
-                        //                 <input type="file" name="colorVariants[${index}].images" class="form-control" multiple accept=".webp, image/webp" />
+                        //                 <input type="file" name="colorVariants[${index}].images" class="form-control" multiple accept=".jpg, .jpeg, .webp, image/jpeg, image/webp" />
                         //                 <small class="text-muted">You can select multiple images for this color. Leave empty to keep existing images.</small>
                         //                 ${variant.colorImageBase64 && variant.colorImageBase64.length > 0 ? `<div class="mt-2"><small class="text-success">✓ Existing image available</small></div>` : ''}
                         //             </div>
