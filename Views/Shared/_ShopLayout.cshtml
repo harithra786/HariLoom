@@ -7,7 +7,8 @@
     <meta name="description" content="" />
     <!-- Favicon -->
     <link rel="icon" type="image/webp" href="~/images/Logo.webp" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+    <link rel="shortcut icon" type="image/webp" href="~/images/Logo.webp" />
+    <link rel="apple-touch-icon" href="~/images/Logo.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
@@ -380,11 +381,222 @@
                 transform: translateY(0);
             }
 
+        }
+
+        /* Tablet (769px - 1023px) */
+        @@media (max-width: 1023px) {
+            .nav-left-menu { display: none !important; }
+            .hamburger-btn { display: block; }
+
+            .center-logo {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Mobile (max-width: 768px) */
+        @@media (max-width: 768px) {
+            .navbar { padding: 0 !important; }
+            .navbar-inner { min-height: 54px; }
+            .center-logo img { height: 46px; }
+
+            .nav-right-menu .nav-link { font-size: 12px; }
+
+            .nav-right-menu .navbar-nav { flex-direction: row; gap: 6px; }
+        }
+
+        /* Small phones (max-width: 480px) */
+        @@media (max-width: 480px) {
+            .navbar { padding: 0 !important; }
+            .navbar-inner { min-height: 48px; }
+            .center-logo img { height: 40px; }
+        }
+
+        /* Footer */
+        .hariloom-footer {
+            background: #f6d5ea;
+            padding: clamp(20px, 5vw, 30px) clamp(15px, 3vw, 20px) 0;
+            overflow: hidden;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(12px, 3vw, 40px);
+            font-size: clamp(10px, 1.5vw, 14px);
+            letter-spacing: 1px;
+            color: #1f4fa3;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        .footer-top a {
+            text-decoration: none;
+            color: #1f4fa3;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+        .footer-top a:hover { opacity: 0.7; }
+
+        .footer-top .copyright {
+            margin-left: clamp(5px, 1.5vw, 20px);
+            font-size: clamp(9px, 1.2vw, 12px);
+        }
+
+        .footer-brand {
+            font-family: 'Elika Gorica', serif;
+            font-size: clamp(48px, 15vw, 616px);
+            font-weight: 800;
+            color: #1f4fa3;
+            line-height: 0.72;
+            text-align: center;
+            overflow: hidden;
+            word-break: break-word;
+            padding: 20px 10px 0;
+            margin-bottom: -0.06em;
+            display: block;
+        }
+
+        .wishlist-heart {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            border: none;
+            background: transparent;
+            font-size: 32px;
+            color: white;
+            -webkit-text-stroke: 2px black;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .wishlist-img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .wishlist-menu-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            vertical-align: middle;
+        }
+
+        .wishlist-heart:hover { transform: scale(1.2); }
+
+        .wishlist-heart.active {
+            color: black;
+            -webkit-text-stroke: 2px black;
+        }
+
+        .site-content-bg {
+            background-color: #f6d5ea;
+        }
+
+        /* Override Bootstrap toast styling for Toastr */
+        #toast-container > div {
+            opacity: 1 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+        #toast-container > .toast-success {
+            background-color: #1f4fa3 !important;
+            color: #fff !important;
+        }
+        #toast-container > .toast-info {
+            background-color: #1f4fa3 !important;
+            color: #fff !important;
+        }
+        #toast-container.toast-top-right {
+            top: 80px !important; /* Push below header */
+            right: 20px !important;
+        }
+
+        @@media(max-width: 768px) {
+            .footer-top { gap: 12px; font-size: 11px; }
+            .footer-brand { font-size: clamp(48px, 15vw, 120px); padding-bottom: 0; margin-bottom: -0.06em; }
+        }
+
+        @@media(max-width: 480px) {
+            .footer-top { gap: 8px; font-size: 10px; padding: 0 8px; }
+            .footer-brand { font-size: clamp(40px, 18vw, 80px); padding: 10px 5px 0; margin-bottom: -0.06em; }
+        }
+
+        .login-btn {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            font-size: clamp(11px, 1.4vw, 14px);
+            padding: clamp(4px, 1vw, 8px) clamp(10px, 2vw, 16px) !important;
+            white-space: nowrap;
+        }
+        .login-btn:hover {
+            background-color: #5a6268 !important;
+            border-color: #5a6268 !important;
+        }
+
+        /* Prevent content overflow globally */
+        .content-wrapper {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Login Prompt Modal Buttons */
+        #loginPromptModal .btn-primary {
+            background-color: #1f4fa3;
+            border-color: #1f4fa3;
+            color: #fff;
+        }
+        #loginPromptModal .btn-primary:hover {
+            background-color: #163d80;
+            border-color: #163d80;
+        }
+        #loginPromptModal .btn-outline-primary {
+            color: #1f4fa3;
+            border-color: #1f4fa3;
+            background-color: transparent;
+        }
+        #loginPromptModal .btn-outline-primary:hover {
+            background-color: #1f4fa3;
+            color: #fff;
+        }
+
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+            .page-transition.loaded {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
             .page-transition.leaving {
                 opacity: 0;
                 transform: translateY(20px);
             }
 
+        /* Cursor Sparkle Comet Trail */
+        .cursor-trail-sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #c084fc;
+            box-shadow: 0 0 10px #a855f7, 0 0 20px #e9d5ff;
+            pointer-events: none;
+            z-index: 9999;
+            animation: trailFade 0.55s ease-out forwards;
+        }
+        @@keyframes trailFade {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.2) translateY(-15px); }
+        }
 
     </style>
     @await RenderSectionAsync("Styles", required: false)
@@ -713,7 +925,7 @@
                     }
 
                     res.data.filter(x => x.isWishlisted).forEach(x => {
-                               const heart = $(`.wishlist-heart[data-id="${x.mstProductId}"]`);
+                                const heart = $(`.wishlist-heart[data-id="${x.mstProductId}"]`);
 
         heart.addClass('active');
 
@@ -722,6 +934,39 @@
                     });
                 }
             });
+        }
+
+        function getEventCoords(e) {
+            if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length > 0) {
+                return { x: e.originalEvent.touches[0].clientX, y: e.originalEvent.touches[0].clientY };
+            }
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        // Sparkle comet trail for Mouse & Touch drag
+        let lastSparkleTime = 0;
+        $(document).on('mousemove touchmove', function (e) {
+            const now = Date.now();
+            if (now - lastSparkleTime > 45) {
+                lastSparkleTime = now;
+                const coords = getEventCoords(e);
+                if (coords.x !== undefined && coords.y !== undefined) {
+                    createCursorSparkle(coords.x, coords.y);
+                }
+            }
+        });
+
+        function createCursorSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'cursor-trail-sparkle';
+            sparkle.style.left = (x + (Math.random() * 16 - 8)) + 'px';
+            sparkle.style.top = (y + (Math.random() * 16 - 8)) + 'px';
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => sparkle.remove(), 550);
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

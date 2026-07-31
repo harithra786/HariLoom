@@ -10,7 +10,8 @@
     <meta name="description" content="" />
     <!-- Favicon -->
     <link rel="icon" type="image/webp" href="~/images/Logo.webp" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon/hariloom_blue_ico.ico" />
+    <link rel="shortcut icon" type="image/webp" href="~/images/Logo.webp" />
+    <link rel="apple-touch-icon" href="~/images/Logo.webp" />
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
@@ -344,6 +345,23 @@
         #password::-ms-reveal,
         #password::-ms-clear {
             display: none;
+        }
+
+        /* Cursor Sparkle Comet Trail */
+        .cursor-trail-sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #c084fc;
+            box-shadow: 0 0 10px #a855f7, 0 0 20px #e9d5ff;
+            pointer-events: none;
+            z-index: 9999;
+            animation: trailFade 0.55s ease-out forwards;
+        }
+        @@keyframes trailFade {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.2) translateY(-15px); }
         }
     </style>
 
@@ -756,8 +774,11 @@
                 return;
             }
 
-            // Show loading state on Create Account button
-            $('#registerBtn').prop('disabled', true).text('Creating account...');
+            // Show loading state on Create Account / Sign In button
+            const btn = $('#registerBtn');
+            const originalText = btn.html();
+
+            btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Signing in...');
 
             const urlParams = new URLSearchParams(window.location.search);
             const returnUrlParam = urlParams.get('returnUrl') || '@(ViewBag.ReturnUrl ?? "")';
@@ -771,22 +792,23 @@
                 success: function (response) {
                     if (response.success) {
                         toastr.success(response.message || 'Account created successfully!');
+                        btn.html('<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Signing in...');
                         setTimeout(function () {
                             window.location.href = targetLoginUrl;
-                        }, 2000);
+                        }, 1500);
                     } else {
                         toastr.error(response.message || 'Registration failed');
-                        $('#registerBtn').prop('disabled', false).text('Create Account');
+                        btn.prop('disabled', false).html(originalText);
                         if (response.message === "Email ID already in use" || response.message === "Phone number already exists") {
                             setTimeout(function () {
                                 window.location.href = targetLoginUrl;
-                            }, 2000);
+                            }, 1500);
                         }
                     }
                 },
                 error: function (response) {
                     toastr.error('Registration failed! Please try again later.');
-                    $('#registerBtn').prop('disabled', false).text('Create Account');
+                    btn.prop('disabled', false).html(originalText);
                 }
             });
         });
@@ -831,6 +853,39 @@
 
             $('#step2').show();
         });
+
+        function getEventCoords(e) {
+            if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length > 0) {
+                return { x: e.originalEvent.touches[0].clientX, y: e.originalEvent.touches[0].clientY };
+            }
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        // Sparkle comet trail for Mouse & Touch drag
+        let lastSparkleTime = 0;
+        $(document).on('mousemove touchmove', function (e) {
+            const now = Date.now();
+            if (now - lastSparkleTime > 45) {
+                lastSparkleTime = now;
+                const coords = getEventCoords(e);
+                if (coords.x !== undefined && coords.y !== undefined) {
+                    createCursorSparkle(coords.x, coords.y);
+                }
+            }
+        });
+
+        function createCursorSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'cursor-trail-sparkle';
+            sparkle.style.left = (x + (Math.random() * 16 - 8)) + 'px';
+            sparkle.style.top = (y + (Math.random() * 16 - 8)) + 'px';
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => sparkle.remove(), 550);
+        }
     </script>
     
 </body>

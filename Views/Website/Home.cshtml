@@ -237,7 +237,7 @@
             100% { opacity: 0; transform: scale(0.2) translateY(-15px); }
         }
 
-        /* Background Animated Container */
+        /* Background Animated Container for Home Page */
         .home-bg-animation-container {
             position: fixed;
             top: 0;
@@ -289,19 +289,20 @@
                 transform: translate(0, 0);
             }
             50% {
-                transform: translate(25px, -35px);
+                transform: translate(8px, -10px);
             }
             100% {
-                transform: translate(-20px, 20px);
+                transform: translate(-8px, 8px);
             }
         }
+
     </style>
 }
 
 <!-- Scroll Progress Bar -->
 <div id="scrollProgressBar" class="scroll-progress-bar"></div>
 
-<!-- Background Floating Tiny Dark Purple Balls Container -->
+<!-- Background Floating Tiny Dark Purple Balls Container (Home Page Only) -->
 <div class="home-bg-animation-container" id="tinyBallsContainer" aria-hidden="true"></div>
 
 <div class="hero-section">
@@ -330,53 +331,80 @@
         const productGrid = $('.product-grid');
         const userId = parseInt(sessionStorage.getItem('userId'));
 
-        // Generate 45 tiny floating dark purple balls of uniform size (10px)
-        const container = $('#tinyBallsContainer');
-        if (container.length) {
-            container.empty();
-            for (let i = 0; i < 45; i++) {
-                const top = (Math.random() * 92 + 2).toFixed(1);
-                const left = (Math.random() * 94 + 1).toFixed(1);
-                const dur = (Math.random() * 10 + 10).toFixed(1);
-                const delay = (-(Math.random() * 15)).toFixed(1);
+        // Generate Poisson-disc random yet uniformly spaced tiny floating dark purple balls for Home Page
+        function initHomeBackgroundAnimations() {
+            const container = $('#tinyBallsContainer');
+            if (container.length) {
+                container.empty();
+                const balls = [];
+                const targetCount = 38;
+                const minDist = 11.8; // Minimum distance % between any two balls to prevent crowding
 
-                const ball = $(`<div class="tiny-purple-ball" style="
-                    top: ${top}%;
-                    left: ${left}%;
-                    animation-duration: ${dur}s;
-                    animation-delay: ${delay}s;
-                "></div>`);
-                container.append(ball);
+                let attempts = 0;
+                while (balls.length < targetCount && attempts < 2000) {
+                    attempts++;
+                    const candidateTop = Math.random() * 90 + 4;
+                    const candidateLeft = Math.random() * 92 + 4;
+
+                    let valid = true;
+                    for (let i = 0; i < balls.length; i++) {
+                        const dTop = candidateTop - balls[i].top;
+                        const dLeft = candidateLeft - balls[i].left;
+                        if (Math.hypot(dTop, dLeft) < minDist) {
+                            valid = false;
+                            break;
+                        }
+                    }
+
+                    if (valid) {
+                        balls.push({ top: candidateTop, left: candidateLeft });
+                    }
+                }
+
+                balls.forEach(b => {
+                    const dur = (Math.random() * 6 + 12).toFixed(1);
+                    const delay = (-(Math.random() * 12)).toFixed(1);
+
+                    const ball = $(`<div class="tiny-purple-ball" style="
+                        top: ${b.top.toFixed(1)}%;
+                        left: ${b.left.toFixed(1)}%;
+                        animation-duration: ${dur}s;
+                        animation-delay: ${delay}s;
+                    "></div>`);
+                    container.append(ball);
+                });
             }
         }
 
-        // Scroll Progress Bar Update
-        $(window).on('scroll', function () {
-            const scrollTop = $(window).scrollTop();
-            const docHeight = $(document).height() - $(window).height();
-            const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-            $('#scrollProgressBar').css('width', scrollPercent + '%');
+        $(document).ready(function () {
+            initHomeBackgroundAnimations();
         });
 
-        // Sparkle comet trail under mouse cursor
-        let lastSparkleTime = 0;
-        $(document).on('mousemove', function (e) {
-            const now = Date.now();
-            if (now - lastSparkleTime > 45) {
-                lastSparkleTime = now;
-                createCursorSparkle(e.clientX, e.clientY);
-            }
+        // Interactive Proximity Twinkle for Mobile Touch & Desktop Mouse (Home Page Only)
+        $(document).on('mousemove pointermove touchmove touchstart', function (e) {
+            if (typeof getEventCoords !== 'function') return;
+            const coords = getEventCoords(e);
+            if (coords.x === undefined || coords.y === undefined) return;
+
+            const mouseX = coords.x;
+            const mouseY = coords.y;
+
+            $('.tiny-purple-ball').each(function () {
+                const rect = this.getBoundingClientRect();
+                const ballCenterX = rect.left + rect.width / 2;
+                const ballCenterY = rect.top + rect.height / 2;
+
+                const dist = Math.hypot(mouseX - ballCenterX, mouseY - ballCenterY);
+
+                if (dist < 140) {
+                    $(this).addClass('twinkling');
+                } else {
+                    $(this).removeClass('twinkling');
+                }
+            });
         });
 
-        function createCursorSparkle(x, y) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'cursor-trail-sparkle';
-            sparkle.style.left = (x + (Math.random() * 16 - 8)) + 'px';
-            sparkle.style.top = (y + (Math.random() * 16 - 8)) + 'px';
-            document.body.appendChild(sparkle);
 
-            setTimeout(() => sparkle.remove(), 550);
-        }
 
         // Hero animation
         $(window).on('scroll', () => {
