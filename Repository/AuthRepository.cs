@@ -44,6 +44,11 @@ namespace hariloom.Repository
                 return _apiResponseRepository.UnauthorizedResponse(new ApiResponseDTO { message = "Incorrect password. Please try again." });
             }
 
+            if (string.IsNullOrWhiteSpace(user.ipAddress) && !string.IsNullOrWhiteSpace(model.ipAddress))
+            {
+                user.ipAddress = model.ipAddress;
+            }
+
             user.visitCount += 1;
             await _context.SaveChangesAsync();
 

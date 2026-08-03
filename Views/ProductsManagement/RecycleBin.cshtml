@@ -1,0 +1,337 @@
+@{
+    ViewData["Title"] = "Recycle Bin";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="fw-bold py-3 mb-0"><span class="text-muted fw-light">Management /</span> Recycle Bin</h4>
+        <small class="text-muted">Manage items moved to the Recycle Bin. Restore or permanently delete records.</small>
+    </div>
+</div>
+
+<!-- Nav Tabs for 3 Sections -->
+<ul class="nav nav-pills mb-3" id="recycleBinTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="main-cat-tab" data-bs-toggle="pill" data-bs-target="#main-cat-section" type="button" role="tab" aria-controls="main-cat-section" aria-selected="true">
+            <i class="bx bx-category me-1"></i> Main Categories (<span id="mainCatCount">0</span>)
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sub-cat-tab" data-bs-toggle="pill" data-bs-target="#sub-cat-section" type="button" role="tab" aria-controls="sub-cat-section" aria-selected="false">
+            <i class="bx bx-grid-alt me-1"></i> Sub Categories (<span id="subCatCount">0</span>)
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="product-tab" data-bs-toggle="pill" data-bs-target="#product-section" type="button" role="tab" aria-controls="product-section" aria-selected="false">
+            <i class="bx bx-package me-1"></i> Product Details (<span id="productCount">0</span>)
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content p-0" id="recycleBinTabContent">
+    <!-- Section 1: Main Categories Bin -->
+    <div class="tab-pane fade show active" id="main-cat-section" role="tabpanel" aria-labelledby="main-cat-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bx bx-trash me-2 text-danger"></i>Deleted Main Categories</h5>
+                <input type="text" id="searchMainCat" class="form-control form-control-sm w-auto" placeholder="Search..." />
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover" id="tblMainCat">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyMainCat">
+                        <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Sub Categories Bin -->
+    <div class="tab-pane fade" id="sub-cat-section" role="tabpanel" aria-labelledby="sub-cat-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bx bx-trash me-2 text-danger"></i>Deleted Sub Categories</h5>
+                <input type="text" id="searchSubCat" class="form-control form-control-sm w-auto" placeholder="Search..." />
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover" id="tblSubCat">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Main Category</th>
+                            <th>Sub Category Name</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodySubCat">
+                        <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Product Details Bin -->
+    <div class="tab-pane fade" id="product-section" role="tabpanel" aria-labelledby="product-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bx bx-trash me-2 text-danger"></i>Deleted Products</h5>
+                <input type="text" id="searchProducts" class="form-control form-control-sm w-auto" placeholder="Search..." />
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover" id="tblProducts">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Display ID</th>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyProducts">
+                        <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadRecycleBinData();
+
+            initializeTableSearch('#searchMainCat', '#tbodyMainCat', [2]);
+            initializeTableSearch('#searchSubCat', '#tbodySubCat', [1, 2]);
+            initializeTableSearch('#searchProducts', '#tbodyProducts', [1, 3]);
+        });
+
+        function loadRecycleBinData() {
+            loadMainCatBin();
+            loadSubCatBin();
+            loadProductsBin();
+        }
+
+        // --- Section 1: Main Category Bin ---
+        function loadMainCatBin() {
+            $.get('@Url.Action("GetRecycleBinMainCategories", "ProductsManagement")', function (res) {
+                let tbody = '';
+                if (res.success && res.data && res.data.length > 0) {
+                    $('#mainCatCount').text(res.data.length);
+                    res.data.forEach((cat, idx) => {
+                        let imgHtml = cat.mainCategoryImagePath 
+                            ? `<img src="data:image/png;base64,${cat.mainCategoryImagePath}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />` 
+                            : `<div style="width:40px;height:40px;background:#e9ecef;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#adb5bd;">📁</div>`;
+                        
+                        let escName = (cat.mainCategoryName || '').replace(/'/g, "\\'");
+
+                        tbody += `<tr>
+                            <td>${idx + 1}</td>
+                            <td>${imgHtml}</td>
+                            <td class="fw-semibold">${cat.mainCategoryName}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success me-1" onclick="restoreMainCat(${cat.mstProductMainCategoryId})">
+                                    <i class="bx bx-undo me-1"></i>Restore
+                                </button>
+                                <button class="btn btn-sm btn-danger" title="Permanently Delete" onclick="permanentDeleteMainCat(${cat.mstProductMainCategoryId}, '${escName}')">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    $('#mainCatCount').text(0);
+                    tbody = `<tr><td colspan="4" class="text-center text-muted py-4">No main categories in Recycle Bin</td></tr>`;
+                }
+                $('#tbodyMainCat').html(tbody);
+            });
+        }
+
+        function restoreMainCat(id) {
+            $.post('@Url.Action("RestoreProductMainCategory", "ProductsManagement")', { id: id }, function (res) {
+                if (res.success) {
+                    toastr.success(res.message || 'Category restored successfully');
+                    loadMainCatBin();
+                } else {
+                    toastr.error(res.message);
+                }
+            });
+        }
+
+        function permanentDeleteMainCat(id, name) {
+            Swal.fire({
+                title: 'Permanently Delete?',
+                text: `Are you sure you want to permanently delete "${name}"? This action cannot be undone!`,
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Delete Permanently'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("PermanentDeleteProductMainCategory", "ProductsManagement")', { id: id }, function (res) {
+                        if (res.success) {
+                            toastr.success(res.message || 'Permanently deleted');
+                            loadMainCatBin();
+                        } else {
+                            toastr.error(res.message);
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- Section 2: Sub Category Bin ---
+        function loadSubCatBin() {
+            $.get('@Url.Action("GetRecycleBinSubCategories", "ProductsManagement")', function (res) {
+                let tbody = '';
+                if (res.success && res.data && res.data.length > 0) {
+                    $('#subCatCount').text(res.data.length);
+                    res.data.forEach((sub, idx) => {
+                        let imgHtml = sub.subCategoryImagePath 
+                            ? `<img src="data:image/png;base64,${sub.subCategoryImagePath}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />` 
+                            : `<div style="width:40px;height:40px;background:#e9ecef;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#adb5bd;">📁</div>`;
+                        
+                        let escName = (sub.subCategoryName || '').replace(/'/g, "\\'");
+
+                        tbody += `<tr>
+                            <td>${idx + 1}</td>
+                            <td><span class="badge bg-label-primary">${sub.mainCategoryName || 'N/A'}</span></td>
+                            <td class="fw-semibold">${sub.subCategoryName}</td>
+                            <td>${imgHtml}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success me-1" onclick="restoreSubCat(${sub.mstProductSubCategoryId})">
+                                    <i class="bx bx-undo me-1"></i>Restore
+                                </button>
+                                <button class="btn btn-sm btn-danger" title="Permanently Delete" onclick="permanentDeleteSubCat(${sub.mstProductSubCategoryId}, '${escName}')">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    $('#subCatCount').text(0);
+                    tbody = `<tr><td colspan="5" class="text-center text-muted py-4">No sub categories in Recycle Bin</td></tr>`;
+                }
+                $('#tbodySubCat').html(tbody);
+            });
+        }
+
+        function restoreSubCat(id) {
+            $.post('@Url.Action("RestoreProductSubCategory", "ProductsManagement")', { id: id }, function (res) {
+                if (res.success) {
+                    toastr.success(res.message || 'Sub Category restored successfully');
+                    loadSubCatBin();
+                } else {
+                    toastr.error(res.message);
+                }
+            });
+        }
+
+        function permanentDeleteSubCat(id, name) {
+            Swal.fire({
+                title: 'Permanently Delete?',
+                text: `Are you sure you want to permanently delete "${name}"? This action cannot be undone!`,
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Delete Permanently'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("PermanentDeleteProductSubCategory", "ProductsManagement")', { id: id }, function (res) {
+                        if (res.success) {
+                            toastr.success(res.message || 'Permanently deleted');
+                            loadSubCatBin();
+                        } else {
+                            toastr.error(res.message);
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- Section 3: Product Details Bin ---
+        function loadProductsBin() {
+            $.get('@Url.Action("GetRecycleBinProductDetails", "ProductsManagement")', function (res) {
+                let tbody = '';
+                if (res.success && res.data && res.data.length > 0) {
+                    $('#productCount').text(res.data.length);
+                    res.data.forEach((p, idx) => {
+                        let imgHtml = p.coverImagePath 
+                            ? `<img src="/${p.coverImagePath}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;" />` 
+                            : `<div style="width:40px;height:40px;background:#e9ecef;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#adb5bd;">📷</div>`;
+                        
+                        let escName = (p.productName || '').replace(/'/g, "\\'");
+
+                        tbody += `<tr>
+                            <td>${idx + 1}</td>
+                            <td>${p.productDisplayId || ''}</td>
+                            <td>${imgHtml}</td>
+                            <td class="fw-semibold">${p.productName}</td>
+                            <td>₹${p.basePrice || 0}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success me-1" onclick="restoreProduct(${p.productId})">
+                                    <i class="bx bx-undo me-1"></i>Restore
+                                </button>
+                                <button class="btn btn-sm btn-danger" title="Permanently Delete" onclick="permanentDeleteProduct(${p.productId}, '${escName}')">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    $('#productCount').text(0);
+                    tbody = `<tr><td colspan="6" class="text-center text-muted py-4">No products in Recycle Bin</td></tr>`;
+                }
+                $('#tbodyProducts').html(tbody);
+            });
+        }
+
+        function restoreProduct(id) {
+            $.post('@Url.Action("RestoreProduct", "ProductsManagement")', { id: id }, function (res) {
+                if (res.success) {
+                    toastr.success(res.message || 'Product restored successfully');
+                    loadProductsBin();
+                } else {
+                    toastr.error(res.message);
+                }
+            });
+        }
+
+        function permanentDeleteProduct(id, name) {
+            Swal.fire({
+                title: 'Permanently Delete?',
+                text: `Are you sure you want to permanently delete "${name}"? This action cannot be undone!`,
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Delete Permanently'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("PermanentDeleteProduct", "ProductsManagement")', { id: id }, function (res) {
+                        if (res.success) {
+                            toastr.success(res.message || 'Permanently deleted');
+                            loadProductsBin();
+                        } else {
+                            toastr.error(res.message);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

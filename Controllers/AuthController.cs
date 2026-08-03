@@ -16,6 +16,27 @@ namespace hariloom.Controllers
         }
         #endregion
 
+        private string GetClientIpAddress()
+        {
+            string? ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                var addresses = ip.Split(',');
+                if (addresses.Length > 0 && !string.IsNullOrWhiteSpace(addresses[0]))
+                {
+                    return addresses[0].Trim();
+                }
+            }
+
+            ip = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                return ip.Trim();
+            }
+
+            return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        }
+
         #region Register Functionalities
         public IActionResult Register(string? returnUrl = null)
         {
@@ -26,7 +47,7 @@ namespace hariloom.Controllers
         [HttpPost]
         public async Task<ApiResponseDTO> userRegister(RegisterUserDTO model)
         {
-            model.ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            model.ipAddress = GetClientIpAddress();
             return await _authRepository.userRegisterAsync(model);
         }
 
@@ -59,6 +80,7 @@ namespace hariloom.Controllers
         [HttpPost]
         public async Task<ApiResponseDTO> userLogin(LoginDTO model)
         {
+            model.ipAddress = GetClientIpAddress();
             var user = await _authRepository.userLoginAsync(model);
 
             if (user.data != null)

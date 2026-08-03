@@ -99,10 +99,42 @@
                         <td><div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch" ${sub.isActive ? 'checked' : ''} onchange="toggleSubActive(${sub.mstProductSubCategoryId}, this.checked)">
                         </div></td>
-                        <td><button class="btn btn-sm btn-warning" onclick="editSubCategory(${sub.mstProductSubCategoryId})">Edit</button></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editSubCategory(${sub.mstProductSubCategoryId})">Edit</button>
+                            <button class="btn btn-sm btn-danger ms-1" title="Move to Recycle Bin" onclick="confirmMoveSubToRecycleBin(${sub.mstProductSubCategoryId}, '${(sub.subCategoryName || '').replace(/'/g, "\\'")}')"><i class="bx bx-trash"></i></button>
+                        </td>
                     </tr>`;
                 });
                 $('table tbody').html(tbody);
+            });
+        }
+
+        function confirmMoveSubToRecycleBin(id, name) {
+            Swal.fire({
+                title: 'Move to Recycle Bin?',
+                text: `Are you sure you want to move "${name}" to the Recycle Bin?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, move it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("DeactivateProductSubCategory", "ProductsManagement")', {
+                        id: id,
+                        isActive: false,
+                        updatedBy: 1
+                    }, function (response) {
+                        if (response.success) {
+                            loadSubCategories();
+                            toastr.success(response.message || 'Moved to Recycle Bin');
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    }).fail(function (xhr) {
+                        toastr.error(xhr.responseText || 'Error moving to Recycle Bin');
+                    });
+                }
             });
         }
 

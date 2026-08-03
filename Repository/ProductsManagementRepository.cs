@@ -23,7 +23,7 @@ namespace hariloom.Repository
         #region Repository Implementation of Product Main Category
         public async Task<List<ProductMainCategoryDetailsDto>> GetAllProductMainCategoriesAsync()
         {
-            var productList = await _context.mstProductMainCategory.Select(p => new ProductMainCategoryDetailsDto
+            var productList = await _context.mstProductMainCategory.Where(a => a.isActive).Select(p => new ProductMainCategoryDetailsDto
             {
                 mstProductMainCategoryId = p.mstProductMainCategoryId,
                 mainCategoryName = p.mainCategoryName,
@@ -54,28 +54,6 @@ namespace hariloom.Repository
                 isActive = p.isActive,
                 createdBy = p.createdBy
             }).ToListAsync();
-
-            if (!productList.Any())
-            {
-                var allCats = await _context.mstProductMainCategory.ToListAsync();
-                if (allCats.Any())
-                {
-                    foreach (var cat in allCats)
-                    {
-                        cat.isActive = true;
-                    }
-                    await _context.SaveChangesAsync();
-
-                    productList = allCats.Select(p => new ProductMainCategoryDetailsDto
-                    {
-                        mstProductMainCategoryId = p.mstProductMainCategoryId,
-                        mainCategoryName = p.mainCategoryName,
-                        mainCategoryImagePath = p.mainCategoryImagePath,
-                        isActive = p.isActive,
-                        createdBy = p.createdBy
-                    }).ToList();
-                }
-            }
 
             var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
             {
@@ -183,7 +161,7 @@ namespace hariloom.Repository
         #region Repository Implementation of Product Sub Category
         public async Task<List<ProductSubCategoryDetailsDto>> GetAllProductSubCategoriesAsync()
         {
-            var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.MainCategory.isActive).ToListAsync();
+            var subCategories = await _context.mstProductSubCategory.Include(x => x.MainCategory).Where(x => x.isActive && x.MainCategory.isActive).ToListAsync();
 
             return subCategories.Select(x => new ProductSubCategoryDetailsDto
             {
@@ -223,20 +201,6 @@ namespace hariloom.Repository
         public async Task<List<mstProductSubCategory>> GetAllActiveSubCategoryByIDWithImageAsync(int id)
         {
             var subCategories = await _context.mstProductSubCategory.Where(x => x.MainCategory.isActive).Where(x => x.isActive && x.mstProductMainCategoryId == id).ToListAsync();
-
-            if (!subCategories.Any())
-            {
-                var allForMain = await _context.mstProductSubCategory.Where(x => x.mstProductMainCategoryId == id).ToListAsync();
-                if (allForMain.Any())
-                {
-                    foreach (var s in allForMain)
-                    {
-                        s.isActive = true;
-                    }
-                    await _context.SaveChangesAsync();
-                    subCategories = allForMain;
-                }
-            }
 
             return subCategories.Select(x => new mstProductSubCategory
             {
@@ -348,20 +312,23 @@ namespace hariloom.Repository
         #region Get All Product Details 
         public async Task<List<ProductDetailsDTO>> GetAllProductDetailsAsync()
         {
-            var productList = await _context.mstProduct.OrderByDescending(p => p.createdDate).Select(p => new ProductDetailsDTO
-            {
-                productId = p.mstProductId,
-                productName = p.productName,
-                productDisplayId = p.productDisplayId,
-                productDescription = p.description,
-                basePrice = p.basePrice,
-                deliveryCharge = p.deliveryCharge,
-                discountAmount = p.discountAmount,
-                discountedPrice = p.discountAmount,
-                coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
-                isActive = p.isActive,
-                isAvailable = p.isAvailable
-            }).ToListAsync();
+            var productList = await _context.mstProduct
+                .Where(p => p.isActive)
+                .OrderByDescending(p => p.createdDate)
+                .Select(p => new ProductDetailsDTO
+                {
+                    productId = p.mstProductId,
+                    productName = p.productName,
+                    productDisplayId = p.productDisplayId,
+                    productDescription = p.description,
+                    basePrice = p.basePrice,
+                    deliveryCharge = p.deliveryCharge,
+                    discountAmount = p.discountAmount,
+                    discountedPrice = p.discountAmount,
+                    coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                    isActive = p.isActive,
+                    isAvailable = p.isAvailable
+                }).ToListAsync();
 
             // Base64 conversion removed for performance reasons. The frontend will use coverImagePath directly.
 
@@ -440,34 +407,6 @@ namespace hariloom.Repository
                     isActive = p.isActive,
                     isAvailable = p.isAvailable
                 }).ToListAsync();
-
-            if (!productList.Any())
-            {
-                var allProds = await _context.mstProduct.Where(p => p.mstProductSubCategoryId == subCategoryId).ToListAsync();
-                if (allProds.Any())
-                {
-                    foreach (var pr in allProds)
-                    {
-                        pr.isActive = true;
-                    }
-                    await _context.SaveChangesAsync();
-
-                    productList = allProds.OrderByDescending(p => p.createdDate).Select(p => new ProductDetailsDTO
-                    {
-                        productId = p.mstProductId,
-                        productName = p.productName,
-                        productDisplayId = p.productDisplayId,
-                        productDescription = p.description,
-                        basePrice = p.basePrice,
-                        deliveryCharge = p.deliveryCharge,
-                        discountAmount = p.discountAmount,
-                        discountedPrice = p.discountAmount,
-                        coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
-                        isActive = p.isActive,
-                        isAvailable = p.isAvailable
-                    }).ToList();
-                }
-            }
 
             return productList;
         }
@@ -910,6 +849,153 @@ namespace hariloom.Repository
             await _context.SaveChangesAsync();
 
             return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Inventory updated successfully" });
+        }
+        #endregion
+
+        #region Recycle Bin Repository Implementations
+        public async Task<List<ProductMainCategoryDetailsDto>> GetRecycleBinMainCategoriesAsync()
+        {
+            var productList = await _context.mstProductMainCategory
+                .Where(p => !p.isActive)
+                .OrderByDescending(p => p.updatedDate ?? p.createdDate)
+                .Select(p => new ProductMainCategoryDetailsDto
+                {
+                    mstProductMainCategoryId = p.mstProductMainCategoryId,
+                    mainCategoryName = p.mainCategoryName,
+                    mainCategoryImagePath = p.mainCategoryImagePath,
+                    isActive = p.isActive,
+                    createdBy = p.createdBy
+                }).ToListAsync();
+
+            var returnResult = productList.Select(p => new ProductMainCategoryDetailsDto
+            {
+                mstProductMainCategoryId = p.mstProductMainCategoryId,
+                mainCategoryName = p.mainCategoryName,
+                mainCategoryImagePath = GetImageFromPathAndConvertToBase64(p.mainCategoryImagePath),
+                isActive = p.isActive,
+                createdBy = p.createdBy
+            }).ToList();
+
+            return returnResult;
+        }
+
+        public async Task<List<ProductSubCategoryDetailsDto>> GetRecycleBinSubCategoriesAsync()
+        {
+            var subCategories = await _context.mstProductSubCategory
+                .Include(x => x.MainCategory)
+                .Where(x => !x.isActive)
+                .OrderByDescending(x => x.updatedDate ?? x.createdDate)
+                .ToListAsync();
+
+            return subCategories.Select(x => new ProductSubCategoryDetailsDto
+            {
+                mstProductSubCategoryId = x.mstProductSubCategoryId,
+                mstProductMainCategoryId = x.mstProductMainCategoryId,
+                mainCategoryName = x.MainCategory != null ? x.MainCategory.mainCategoryName : "N/A",
+                subCategoryName = x.subCategoryName,
+                subCategoryImagePath = GetImageFromPathAndConvertToBase64(x.subCategoryImagePath),
+                isActive = x.isActive,
+                createdBy = x.createdBy
+            }).ToList();
+        }
+
+        public async Task<List<ProductDetailsDTO>> GetRecycleBinProductsAsync()
+        {
+            var productList = await _context.mstProduct
+                .Where(p => !p.isActive)
+                .OrderByDescending(p => p.updatedDate ?? p.createdDate)
+                .Select(p => new ProductDetailsDTO
+                {
+                    productId = p.mstProductId,
+                    productName = p.productName,
+                    productDisplayId = p.productDisplayId,
+                    productDescription = p.description,
+                    basePrice = p.basePrice,
+                    deliveryCharge = p.deliveryCharge,
+                    discountAmount = p.discountAmount,
+                    discountedPrice = p.discountedPrice ?? p.discountAmount,
+                    coverImagePath = p.coverImagePath != null ? p.coverImagePath.Replace("\\", "/") : null,
+                    isActive = p.isActive,
+                    isAvailable = p.isAvailable
+                }).ToListAsync();
+
+            return productList;
+        }
+
+        public async Task<ApiResponseDTO> RestoreProductMainCategoryAsync(int id)
+        {
+            var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            entity.isActive = true;
+            entity.updatedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Restored Successfully" });
+        }
+
+        public async Task<ApiResponseDTO> RestoreProductSubCategoryAsync(int id)
+        {
+            var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            entity.isActive = true;
+            entity.updatedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Restored Successfully" });
+        }
+
+        public async Task<ApiResponseDTO> RestoreProductAsync(int id)
+        {
+            var entity = await _context.mstProduct.FirstOrDefaultAsync(x => x.mstProductId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            entity.isActive = true;
+            entity.updatedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Restored Successfully" });
+        }
+
+        public async Task<ApiResponseDTO> PermanentDeleteProductMainCategoryAsync(int id)
+        {
+            var entity = await _context.mstProductMainCategory.FirstOrDefaultAsync(x => x.mstProductMainCategoryId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            _context.mstProductMainCategory.Remove(entity);
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Permanently Deleted Successfully" });
+        }
+
+        public async Task<ApiResponseDTO> PermanentDeleteProductSubCategoryAsync(int id)
+        {
+            var entity = await _context.mstProductSubCategory.FirstOrDefaultAsync(x => x.mstProductSubCategoryId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            _context.mstProductSubCategory.Remove(entity);
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Permanently Deleted Successfully" });
+        }
+
+        public async Task<ApiResponseDTO> PermanentDeleteProductAsync(int id)
+        {
+            var entity = await _context.mstProduct.FirstOrDefaultAsync(x => x.mstProductId == id);
+            if (entity == null)
+                return _apiResponseRepository.FailureResponse(new ApiResponseDTO { message = "Record Not Found" });
+
+            // Remove associated sizes if any
+            var sizes = await _context.trnProductSize.Where(s => s.mstProductId == id).ToListAsync();
+            if (sizes.Any())
+            {
+                _context.trnProductSize.RemoveRange(sizes);
+            }
+
+            _context.mstProduct.Remove(entity);
+            await _context.SaveChangesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Permanently Deleted Successfully" });
         }
         #endregion
 

@@ -40,5 +40,17 @@ namespace hariloom.Interfaces
         Task<ApiResponseDTO> UpdateProductInventoryAsync(UpdateProductInventoryDTO model);
         #endregion
 
+        #region Recycle Bin Interface Functions
+        Task<List<ProductMainCategoryDetailsDto>> GetRecycleBinMainCategoriesAsync();
+        Task<List<ProductSubCategoryDetailsDto>> GetRecycleBinSubCategoriesAsync();
+        Task<List<ProductDetailsDTO>> GetRecycleBinProductsAsync();
+        Task<ApiResponseDTO> RestoreProductMainCategoryAsync(int id);
+        Task<ApiResponseDTO> RestoreProductSubCategoryAsync(int id);
+        Task<ApiResponseDTO> RestoreProductAsync(int id);
+        Task<ApiResponseDTO> PermanentDeleteProductMainCategoryAsync(int id);
+        Task<ApiResponseDTO> PermanentDeleteProductSubCategoryAsync(int id);
+        Task<ApiResponseDTO> PermanentDeleteProductAsync(int id);
+        #endregion
+
     }
 }

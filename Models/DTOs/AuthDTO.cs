@@ -27,6 +27,7 @@ namespace hariloom.Models.DTOs
         public string phoneNumber { get; set; }
         public string password { get; set; }
         public string? returnUrl { get; set; }
+        public string? ipAddress { get; set; }
     }
 
     public class ForgotPasswordDTO

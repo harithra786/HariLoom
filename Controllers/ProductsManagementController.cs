@@ -221,5 +221,75 @@ namespace hariloom.Controllers
         }
         #endregion
 
+        #region Recycle Bin Page Functionality
+        public IActionResult RecycleBin()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetRecycleBinMainCategories()
+        {
+            var categories = await _productsManagementRepository.GetRecycleBinMainCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = categories });
+        }
+
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetRecycleBinSubCategories()
+        {
+            var subCategories = await _productsManagementRepository.GetRecycleBinSubCategoriesAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = subCategories });
+        }
+
+        [HttpGet]
+        public async Task<ApiResponseDTO> GetRecycleBinProductDetails()
+        {
+            var products = await _productsManagementRepository.GetRecycleBinProductsAsync();
+            return _apiResponseRepository.SuccessResponse(new ApiResponseDTO { message = "Fetched Successfully", data = products });
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> RestoreProductMainCategory(int id)
+        {
+            var response = await _productsManagementRepository.RestoreProductMainCategoryAsync(id);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> RestoreProductSubCategory(int id)
+        {
+            var response = await _productsManagementRepository.RestoreProductSubCategoryAsync(id);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> RestoreProduct(int id)
+        {
+            var response = await _productsManagementRepository.RestoreProductAsync(id);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> PermanentDeleteProductMainCategory(int id)
+        {
+            var response = await _productsManagementRepository.PermanentDeleteProductMainCategoryAsync(id);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> PermanentDeleteProductSubCategory(int id)
+        {
+            var response = await _productsManagementRepository.PermanentDeleteProductSubCategoryAsync(id);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponseDTO> PermanentDeleteProduct(int id)
+        {
+            var response = await _productsManagementRepository.PermanentDeleteProductAsync(id);
+            return response;
+        }
+        #endregion
+
     }
 }
